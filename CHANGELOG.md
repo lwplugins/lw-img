@@ -6,9 +6,11 @@
 - Original image backup: before an upload is replaced with the optimized version, the original is copied to `wp-content/uploads/lw-img-backups/` (enabled by default)
 - Restore original: "Restore original" row action in the Media Library — moves the original back, removes the optimized files, and regenerates thumbnails
 - Backup retention: daily cleanup task deletes backups older than the configured number of days (default 30; 0 = keep forever); backups are also removed when their attachment is deleted
-- Bulk optimize: convert the existing Media Library from the new Bulk settings tab (batched AJAX run with progress) or via WP-CLI
-- WP-CLI commands: `wp lw-img status`, `wp lw-img optimize [<id>...|--all] [--limit] [--dry-run]`, `wp lw-img restore <id>...`
-- Media Library integration: "LW Img" savings column and an "Optimize now" row action for unoptimized images
+- Bulk optimize built for large libraries: background WP-Cron worker (runs with the browser closed), per-attempt status meta making runs resumable, persistent job record with live progress, Retry failed / Re-scan skipped re-queue actions
+- Content URL rewrite on bulk convert and restore: references in post content and page-builder data (postmeta, serialization-aware, JSON-escaped variants included) are updated to the new file URLs
+- WP-CLI commands: `wp lw-img status`, `wp lw-img optimize [<id>...|--all] [--limit] [--dry-run]`, `wp lw-img restore <id>...`, `wp lw-img requeue [--failed] [--skipped]`
+- Media Library integration: "LW Img" savings column, "Optimize now" row action, attachment-screen info box (savings, level, EXIF, date, thumbnail count), Compare page (backup vs optimized), Re-optimize from backup at another level
+- Min file size exclusion (skip tiny images)
 - Exclusion patterns: wildcard filename/path rules that keep matching uploads unconverted
 - Output format setting: convert to WebP (default) or AVIF
 - Resize on upload/bulk: optional max width/height (proportional downscale, never upscales)

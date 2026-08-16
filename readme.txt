@@ -29,16 +29,15 @@ LW Img is a lightweight image optimization plugin that converts non-WebP uploads
 * Optional EXIF preservation
 * Free tier: 1,000 images/month via HelloImg
 
-* Bulk optimize the existing Media Library (settings tab or WP-CLI)
-* Media Library savings column, "Optimize now" and "Restore original" row actions
-* Exclusion patterns (wildcard filename/path rules)
-* WP-CLI: wp lw-img status / optimize / restore
+* Bulk optimize the existing Media Library in the background (WP-Cron worker, resumable, or WP-CLI for huge libraries)
+* Content URL rewrite on bulk convert/restore (post content + page-builder data, serialization-aware)
+* Media Library savings column, "Optimize now" / "Restore original" row actions, attachment info box, Compare, Re-optimize
+* Exclusion patterns (wildcard filename/path rules) and min/max file size limits
+* WP-CLI: wp lw-img status / optimize / restore / requeue
 
 **Roadmap:**
 
-* Content URL rewrite on bulk convert/restore (serialization-aware, for page-builder data)
 * Smart Crop integration
-* AI-generated alt text (HelloImg /v1/ai/seo)
 * LW Site Manager Abilities API integration
 
 == Installation ==
@@ -61,7 +60,7 @@ The upload proceeds with the original format. No upload ever fails because of LW
 
 = Does this work with images already in the media library? =
 
-Yes — use the Bulk tab (or `wp lw-img optimize --all`). Note that converting renames the file (photo.jpg becomes photo.webp): content that embeds an image by its literal file URL (typically page-builder data such as Elementor/Bricks JSON) keeps pointing at the old name. Re-select the image there, restore that image, or add an exclusion pattern for it. Featured images and anything referenced by attachment ID are unaffected. An automatic content URL rewrite is on the roadmap.
+Yes — use the Bulk tab (or `wp lw-img optimize --all`). The run happens in the background via WP-Cron, so you can close the browser; note WP-Cron only fires while the site receives traffic, so for libraries with thousands of images the command line is the guaranteed path. Converting renames the file (photo.jpg becomes photo.webp) and references in post content and page-builder data (Elementor/Bricks JSON in postmeta) are rewritten automatically — widgets and options are not covered, and images can always be excluded or restored.
 
 = Is there a free tier? =
 
@@ -73,9 +72,11 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 * New: Original image backup before conversion (on by default), stored in wp-content/uploads/lw-img-backups/
 * New: "Restore original" row action in the Media Library — restores the original and regenerates thumbnails
 * New: Backup retention — daily cleanup of backups older than the configured days (default 30, 0 = forever); backups are removed with their attachment
-* New: Bulk optimize for the existing Media Library (Bulk settings tab with progress, or WP-CLI)
-* New: WP-CLI commands — wp lw-img status / optimize / restore
-* New: "LW Img" savings column and "Optimize now" row action in the Media Library
+* New: Bulk optimize for large Media Libraries — background WP-Cron worker (keeps running with the browser closed), resumable runs, Retry failed / Re-scan skipped
+* New: Content URL rewrite on bulk convert/restore — post content and page-builder data are updated to the new file URLs (serialization-aware)
+* New: WP-CLI commands — wp lw-img status / optimize / restore / requeue
+* New: "LW Img" savings column, "Optimize now" row action, attachment info box, Compare page, and Re-optimize at another level
+* New: Min file size exclusion
 * New: Exclusion patterns (wildcard filename/path rules)
 * New: Output format setting — WebP (default) or AVIF
 * New: Resize on upload/bulk — optional max width/height, never upscales
