@@ -27,13 +27,17 @@ LW Img is a lightweight image optimization plugin that converts non-WebP uploads
 * Optional EXIF preservation
 * Free tier: 1,000 images/month via HelloImg
 
+* Bulk optimize the existing Media Library (settings tab or WP-CLI)
+* Media Library savings column, "Optimize now" and "Restore original" row actions
+* Exclusion patterns (wildcard filename/path rules)
+* WP-CLI: wp lw-img status / optimize / restore
+
 **Roadmap:**
 
-* Bulk optimize for the existing media library
+* AVIF output, resize on upload, animated WebP (pending HelloImg API support)
 * Smart Crop integration
 * AI-generated alt text
 * LW Site Manager Abilities API integration
-* WP-CLI commands
 
 == Installation ==
 
@@ -66,8 +70,12 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 = 1.1.0 =
 * New: Original image backup before conversion (on by default), stored in wp-content/uploads/lw-img-backups/
 * New: "Restore original" row action in the Media Library — restores the original and regenerates thumbnails
-* New: Backup retention — daily cleanup of backups older than the configured days (default 30, 0 = forever)
-* New: Backup settings tab
+* New: Backup retention — daily cleanup of backups older than the configured days (default 30, 0 = forever); backups are removed with their attachment
+* New: Bulk optimize for the existing Media Library (Bulk settings tab with progress, or WP-CLI)
+* New: WP-CLI commands — wp lw-img status / optimize / restore
+* New: "LW Img" savings column and "Optimize now" row action in the Media Library
+* New: Exclusion patterns (wildcard filename/path rules)
+* New: Backup and Bulk settings tabs
 * New: lw_img_restored action and "restored" event log status
 
 = 1.0.0 =

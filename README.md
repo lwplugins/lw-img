@@ -14,6 +14,10 @@ When a non-WebP image is uploaded to WordPress, LW Img sends it to the HelloImg 
 - API failure → original kept (graceful fallback)
 - Originals are backed up (`uploads/lw-img-backups/`, on by default) and restorable from the Media Library — thumbnails are regenerated on restore
 - Backup retention: daily cleanup after the configured days (default 30, `0` = keep forever)
+- Bulk optimize the existing Media Library (Bulk tab with progress, or `wp lw-img optimize --all`)
+- Media Library savings column + "Optimize now" / "Restore original" row actions
+- Wildcard exclusion patterns (`*-original.jpg`, `2026/08/*`)
+- WP-CLI: `wp lw-img status` / `optimize` / `restore`
 
 ## Install
 

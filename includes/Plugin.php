@@ -13,9 +13,13 @@ use LightweightPlugins\Img\Admin\SettingsPage;
 use LightweightPlugins\Img\Backup\AttachmentDeleteCleanup;
 use LightweightPlugins\Img\Backup\RestoreHandler;
 use LightweightPlugins\Img\Backup\RetentionCleaner;
+use LightweightPlugins\Img\Bulk\AjaxHandler;
+use LightweightPlugins\Img\Bulk\OptimizeHandler;
+use LightweightPlugins\Img\CLI\Commands as CLICommands;
 use LightweightPlugins\Img\Log\ClearHandler;
 use LightweightPlugins\Img\Log\EventLog;
 use LightweightPlugins\Img\Media\RowActions;
+use LightweightPlugins\Img\Media\SavingsColumn;
 use LightweightPlugins\Img\Upload\UploadInterceptor;
 
 /**
@@ -41,8 +45,15 @@ final class Plugin {
 		if ( is_admin() ) {
 			ClearHandler::register();
 			RestoreHandler::register();
+			OptimizeHandler::register();
+			AjaxHandler::register();
 			RowActions::register();
+			SavingsColumn::register();
 			new SettingsPage();
+		}
+
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			\WP_CLI::add_command( 'lw-img', CLICommands::class );
 		}
 	}
 

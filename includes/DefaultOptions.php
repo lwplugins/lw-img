@@ -30,13 +30,14 @@ final class DefaultOptions {
 
 	private static function upload(): array {
 		return [
-			'auto_convert'      => true,
-			'level'             => 'normal',
-			'keep_exif'         => false,
-			'skip_already_webp' => true,
-			'skip_animated_gif' => true,
-			'max_filesize_mb'   => 10,
-			'mime_types'        => [
+			'auto_convert'       => true,
+			'level'              => 'normal',
+			'keep_exif'          => false,
+			'skip_already_webp'  => true,
+			'skip_animated_gif'  => true,
+			'max_filesize_mb'    => 10,
+			'exclusion_patterns' => [],
+			'mime_types'         => [
 				'image/jpeg',
 				'image/png',
 				'image/heic',

@@ -21,11 +21,38 @@ final class ConvertibleDetector {
 		'image/avif',
 	];
 
+	/**
+	 * Matches user-defined exclusion patterns.
+	 *
+	 * @var ExclusionMatcher
+	 */
+	private ExclusionMatcher $exclusions;
+
+	public function __construct( ?ExclusionMatcher $exclusions = null ) {
+		$this->exclusions = $exclusions ?? new ExclusionMatcher();
+	}
+
 	public function should_convert( string $file_path, string $mime_type ): bool {
 		if ( ! Options::get( 'auto_convert' ) ) {
 			return $this->skip( $file_path, 'auto_convert disabled' );
 		}
 
+		return $this->passes_common_rules( $file_path, $mime_type );
+	}
+
+	/**
+	 * Like should_convert(), but for explicit user actions (bulk, row action):
+	 * the auto-convert-on-upload toggle does not apply.
+	 *
+	 * @param string $file_path Absolute file path.
+	 * @param string $mime_type File mime type.
+	 * @return bool
+	 */
+	public function should_convert_on_demand( string $file_path, string $mime_type ): bool {
+		return $this->passes_common_rules( $file_path, $mime_type );
+	}
+
+	private function passes_common_rules( string $file_path, string $mime_type ): bool {
 		if ( '' === (string) Options::get( 'api_key' ) ) {
 			return $this->skip( $file_path, 'no API key' );
 		}
@@ -41,6 +68,11 @@ final class ConvertibleDetector {
 		$allowed = (array) Options::get( 'mime_types' );
 		if ( ! in_array( $mime_type, $allowed, true ) ) {
 			return $this->skip( $file_path, 'mime not in allowed list' );
+		}
+
+		$patterns = (array) Options::get( 'exclusion_patterns' );
+		if ( [] !== $patterns && $this->exclusions->matches( $file_path, $patterns ) ) {
+			return $this->skip( $file_path, 'excluded by pattern' );
 		}
 
 		if ( ! is_readable( $file_path ) ) {

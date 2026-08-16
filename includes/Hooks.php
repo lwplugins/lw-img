@@ -2,7 +2,9 @@
 /**
  * Public hooks (filters/actions) reference.
  *
- * Documents the filters this plugin exposes for third-party integration:
+ * Documents the filters this plugin exposes for third-party integration.
+ * The converted/skipped/failed actions fire for uploads AND for bulk /
+ * on-demand optimization of existing attachments:
  *
  *  - filter `lw_img_should_convert`        ( bool $should_convert, string $file_path, string $mime_type ): bool
  *  - filter `lw_img_optimize_request_args` ( array $args, string $file_path ): array

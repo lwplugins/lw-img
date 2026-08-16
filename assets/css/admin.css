@@ -165,3 +165,36 @@
 	background: #008a60;
 	border-color: #008a60;
 }
+
+.lw-img-bulk-bar {
+	width: 100%;
+	max-width: 420px;
+	height: 10px;
+	background: #dcdcde;
+	border-radius: 5px;
+	margin: 12px 0;
+	overflow: hidden;
+}
+
+.lw-img-bulk-bar-fill {
+	height: 100%;
+	width: 0;
+	background: #00a32a;
+	transition: width 0.3s ease;
+}
+
+.lw-img-bulk-log {
+	margin: 8px 0 0;
+	max-height: 240px;
+	overflow-y: auto;
+	font-family: Consolas, Monaco, monospace;
+	font-size: 12px;
+}
+
+.lw-img-bulk-log--failed {
+	color: #d63638;
+}
+
+.lw-img-bulk-log--skipped {
+	color: #996800;
+}

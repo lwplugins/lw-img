@@ -93,4 +93,18 @@ final class SettingsSanitizerTest extends MonkeyTestCase {
 
 		$this->assertSame( 'himg_abc123', $sanitized['api_key'] );
 	}
+
+	public function test_exclusion_patterns_textarea_is_split_into_a_clean_list(): void {
+		$sanitized = SettingsSanitizer::sanitize(
+			[ 'exclusion_patterns' => "*-original.jpg\r\n\n  2026/08/*  \n\n" ]
+		);
+
+		$this->assertSame( [ '*-original.jpg', '2026/08/*' ], $sanitized['exclusion_patterns'] );
+	}
+
+	public function test_exclusion_patterns_default_to_empty_list(): void {
+		$sanitized = SettingsSanitizer::sanitize( [] );
+
+		$this->assertSame( [], $sanitized['exclusion_patterns'] );
+	}
 }

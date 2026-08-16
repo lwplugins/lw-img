@@ -52,15 +52,36 @@ final class AttachmentMetaWriter {
 
 		delete_transient( $key );
 
-		update_post_meta( $attachment_id, '_lw_img_optimized', 1 );
-		update_post_meta( $attachment_id, '_lw_img_original_size', (int) $data['original_size'] );
-		update_post_meta( $attachment_id, '_lw_img_new_size', (int) $data['new_size'] );
-		update_post_meta( $attachment_id, '_lw_img_savings_pct', (float) $data['percent'] );
-		update_post_meta( $attachment_id, '_lw_img_job_id', (string) $data['job_id'] );
+		self::write_meta(
+			$attachment_id,
+			(int) $data['original_size'],
+			(int) $data['new_size'],
+			(float) $data['percent'],
+			(string) $data['job_id'],
+			(string) ( $data['backup'] ?? '' )
+		);
+	}
 
-		$backup = (string) ( $data['backup'] ?? '' );
-		if ( '' !== $backup ) {
-			update_post_meta( $attachment_id, BackupStore::META_KEY, $backup );
+	/**
+	 * Write the optimization meta directly (used for existing attachments too).
+	 *
+	 * @param int    $attachment_id Attachment post ID.
+	 * @param int    $original_size Original file size in bytes.
+	 * @param int    $new_size      Optimized file size in bytes.
+	 * @param float  $percent       Savings percentage.
+	 * @param string $job_id        HelloImg job ID.
+	 * @param string $backup_rel    Backup-relative path ('' when no backup).
+	 * @return void
+	 */
+	public static function write_meta( int $attachment_id, int $original_size, int $new_size, float $percent, string $job_id, string $backup_rel = '' ): void {
+		update_post_meta( $attachment_id, '_lw_img_optimized', 1 );
+		update_post_meta( $attachment_id, '_lw_img_original_size', $original_size );
+		update_post_meta( $attachment_id, '_lw_img_new_size', $new_size );
+		update_post_meta( $attachment_id, '_lw_img_savings_pct', $percent );
+		update_post_meta( $attachment_id, '_lw_img_job_id', $job_id );
+
+		if ( '' !== $backup_rel ) {
+			update_post_meta( $attachment_id, BackupStore::META_KEY, $backup_rel );
 		}
 	}
 }

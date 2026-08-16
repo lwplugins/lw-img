@@ -102,6 +102,20 @@ final class TabUpload implements TabInterface {
 				</td>
 			</tr>
 			<tr>
+				<th><label for="exclusion_patterns"><?php esc_html_e( 'Exclusions', 'lw-img' ); ?></label></th>
+				<td>
+					<?php
+					$this->render_textarea_field(
+						[
+							'name'        => 'exclusion_patterns',
+							'placeholder' => "*-original.jpg\n2026/08/*",
+							'description' => __( 'One pattern per line, * matches anything. Patterns without / match the filename; patterns with / match anywhere in the file path. Matching files are never converted.', 'lw-img' ),
+						]
+					);
+					?>
+				</td>
+			</tr>
+			<tr>
 				<th><label for="max_filesize_mb"><?php esc_html_e( 'Max file size (MB)', 'lw-img' ); ?></label></th>
 				<td>
 					<?php

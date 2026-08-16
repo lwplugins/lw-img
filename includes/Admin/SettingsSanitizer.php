@@ -30,6 +30,10 @@ final class SettingsSanitizer {
 	}
 
 	private static function sanitize_value( string $key, mixed $default, mixed $fallback, mixed $value ): mixed {
+		if ( 'exclusion_patterns' === $key ) {
+			return self::sanitize_patterns( $value );
+		}
+
 		if ( is_bool( $default ) ) {
 			return ! empty( $value );
 		}
@@ -51,5 +55,28 @@ final class SettingsSanitizer {
 		}
 
 		return null === $value ? (string) $fallback : sanitize_text_field( (string) $value );
+	}
+
+	/**
+	 * Normalize the exclusion patterns textarea (or array) into a clean list.
+	 *
+	 * @param mixed $value Submitted value: newline-separated string or array.
+	 * @return array<int, string>
+	 */
+	private static function sanitize_patterns( mixed $value ): array {
+		if ( is_string( $value ) ) {
+			$value = preg_split( '/\r\n|\r|\n/', $value );
+		}
+
+		if ( ! is_array( $value ) ) {
+			return [];
+		}
+
+		$patterns = array_map(
+			static fn ( $pattern ): string => trim( sanitize_text_field( (string) $pattern ) ),
+			$value
+		);
+
+		return array_values( array_filter( $patterns, static fn ( string $pattern ): bool => '' !== $pattern ) );
 	}
 }

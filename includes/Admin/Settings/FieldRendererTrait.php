@@ -68,6 +68,20 @@ trait FieldRendererTrait {
 		$this->render_description( (string) ( $args['description'] ?? '' ) );
 	}
 
+	protected function render_textarea_field( array $args ): void {
+		$value = Options::get( (string) $args['name'] );
+		$text  = is_array( $value ) ? implode( "\n", array_map( 'strval', $value ) ) : (string) $value;
+		printf(
+			'<textarea id="%1$s" name="%2$s[%1$s]" rows="%4$s" class="large-text code" placeholder="%5$s">%3$s</textarea>',
+			esc_attr( (string) $args['name'] ),
+			esc_attr( Options::OPTION_NAME ),
+			esc_textarea( $text ),
+			esc_attr( (string) ( $args['rows'] ?? '4' ) ),
+			esc_attr( (string) ( $args['placeholder'] ?? '' ) )
+		);
+		$this->render_description( (string) ( $args['description'] ?? '' ) );
+	}
+
 	private function render_description( string $desc ): void {
 		if ( '' === $desc ) {
 			return;
