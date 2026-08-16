@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.0] - 2026-08-16
+
+### Added
+- Original image backup: before an upload is replaced with the optimized version, the original is moved to `wp-content/uploads/lw-img-backups/` (enabled by default)
+- Restore original: "Restore original" row action in the Media Library — moves the original back, removes the optimized files, and regenerates thumbnails
+- Backup retention: daily cleanup task deletes backups older than the configured number of days (default 30; 0 = keep forever)
+- Backup settings tab (toggle + retention)
+- `lw_img_restored` action and `restored` event log status
+
 ## [1.0.0] - 2026-08-16
 
 ### Added

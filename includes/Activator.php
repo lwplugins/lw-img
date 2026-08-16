@@ -17,11 +17,12 @@ final class Activator {
 	public static function activate(): void {
 		self::set_defaults();
 		self::ensure_log_option();
+		\LightweightPlugins\Img\Backup\RetentionCleaner::schedule();
 		update_option( 'lw_img_version', LW_IMG_VERSION );
 	}
 
 	public static function deactivate(): void {
-		// Nothing scheduled — no-op.
+		\LightweightPlugins\Img\Backup\RetentionCleaner::unschedule();
 	}
 
 	private static function set_defaults(): void {

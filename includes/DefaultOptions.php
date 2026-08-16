@@ -50,9 +50,11 @@ final class DefaultOptions {
 
 	private static function advanced(): array {
 		return [
-			'request_timeout' => 30,
-			'debug_mode'      => false,
-			'enable_log'      => true,
+			'backup_enabled'        => true,
+			'backup_retention_days' => 30,
+			'request_timeout'       => 30,
+			'debug_mode'            => false,
+			'enable_log'            => true,
 		];
 	}
 }

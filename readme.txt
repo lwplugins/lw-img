@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,7 @@ LW Img is a lightweight image optimization plugin that converts non-WebP uploads
 * Already-WebP / AVIF uploads are skipped (no API call, no credit usage)
 * Animated GIFs are skipped (animation would be lost)
 * Graceful fallback — if the API is unreachable, the original upload is kept
+* Original image backup (on by default) with configurable retention — restore any optimized image from the Media Library, thumbnails are regenerated automatically
 * Three optimization levels: normal, aggressive, ultra
 * Optional EXIF preservation
 * Free tier: 1,000 images/month via HelloImg
@@ -46,7 +47,7 @@ LW Img is a lightweight image optimization plugin that converts non-WebP uploads
 
 = Does this keep the original JPEG / PNG file? =
 
-No. The original is replaced by the WebP version. WordPress sub-sizes (thumbnails) are then generated from the WebP source.
+The Media Library file is replaced by the WebP version, and WordPress sub-sizes (thumbnails) are generated from the WebP source. By default the original is kept as a backup in wp-content/uploads/lw-img-backups/ and can be restored any time from the Media Library ("Restore original"). Backups are cleaned up after the configured retention period (30 days by default, 0 = keep forever). Backups are never deleted on uninstall.
 
 = What happens if my HelloImg balance runs out? =
 
@@ -61,6 +62,13 @@ Not yet — v1.0.0 only converts new uploads. Bulk optimize is on the roadmap.
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.1.0 =
+* New: Original image backup before conversion (on by default), stored in wp-content/uploads/lw-img-backups/
+* New: "Restore original" row action in the Media Library — restores the original and regenerates thumbnails
+* New: Backup retention — daily cleanup of backups older than the configured days (default 30, 0 = forever)
+* New: Backup settings tab
+* New: lw_img_restored action and "restored" event log status
 
 = 1.0.0 =
 * New: Initial release

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace LightweightPlugins\Img\Upload;
 
 use LightweightPlugins\Img\Api\OptimizeResult;
+use LightweightPlugins\Img\Backup\BackupStore;
 
 /**
  * Stashes optimization stats and writes them to attachment meta.
@@ -22,7 +23,7 @@ final class AttachmentMetaWriter {
 		add_action( 'add_attachment', [ $this, 'apply_pending_meta' ] );
 	}
 
-	public function stash( string $file_path, OptimizeResult $result ): void {
+	public function stash( string $file_path, OptimizeResult $result, ?string $backup_rel = null ): void {
 		set_transient(
 			self::PENDING_TRANSIENT_PREFIX . md5( $file_path ),
 			[
@@ -30,6 +31,7 @@ final class AttachmentMetaWriter {
 				'new_size'      => $result->new_size,
 				'percent'       => $result->percent,
 				'job_id'        => $result->job_id,
+				'backup'        => (string) $backup_rel,
 			],
 			MINUTE_IN_SECONDS * 5
 		);
@@ -55,5 +57,10 @@ final class AttachmentMetaWriter {
 		update_post_meta( $attachment_id, '_lw_img_new_size', (int) $data['new_size'] );
 		update_post_meta( $attachment_id, '_lw_img_savings_pct', (float) $data['percent'] );
 		update_post_meta( $attachment_id, '_lw_img_job_id', (string) $data['job_id'] );
+
+		$backup = (string) ( $data['backup'] ?? '' );
+		if ( '' !== $backup ) {
+			update_post_meta( $attachment_id, BackupStore::META_KEY, $backup );
+		}
 	}
 }

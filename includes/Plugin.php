@@ -10,8 +10,12 @@ declare(strict_types=1);
 namespace LightweightPlugins\Img;
 
 use LightweightPlugins\Img\Admin\SettingsPage;
+use LightweightPlugins\Img\Backup\AttachmentDeleteCleanup;
+use LightweightPlugins\Img\Backup\RestoreHandler;
+use LightweightPlugins\Img\Backup\RetentionCleaner;
 use LightweightPlugins\Img\Log\ClearHandler;
 use LightweightPlugins\Img\Log\EventLog;
+use LightweightPlugins\Img\Media\RowActions;
 use LightweightPlugins\Img\Upload\UploadInterceptor;
 
 /**
@@ -30,10 +34,14 @@ final class Plugin {
 
 	private function init_components(): void {
 		EventLog::register();
+		RetentionCleaner::register();
+		AttachmentDeleteCleanup::register();
 		new UploadInterceptor();
 
 		if ( is_admin() ) {
 			ClearHandler::register();
+			RestoreHandler::register();
+			RowActions::register();
 			new SettingsPage();
 		}
 	}

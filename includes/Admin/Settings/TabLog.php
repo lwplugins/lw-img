@@ -234,6 +234,13 @@ final class TabLog implements TabInterface {
 			);
 		}
 
+		if ( EventLog::STATUS_RESTORED === $status ) {
+			return sprintf(
+				'<span class="description">%s</span>',
+				esc_html__( 'original restored from backup', 'lw-img' )
+			);
+		}
+
 		return '';
 	}
 }

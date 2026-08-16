@@ -78,7 +78,10 @@ final class UploadInterceptor {
 
 			$swapped = $this->swapper->swap( $file, (string) ( $upload['url'] ?? '' ), $result );
 
-			$this->meta_writer->stash( $swapped['file'], $result );
+			$backup_rel = $swapped['lw_img_backup'] ?? null;
+			unset( $swapped['lw_img_backup'] );
+
+			$this->meta_writer->stash( $swapped['file'], $result, is_string( $backup_rel ) ? $backup_rel : null );
 
 			Logger::debug(
 				'upload converted',

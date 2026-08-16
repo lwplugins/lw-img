@@ -23,11 +23,27 @@ final class EventLog {
 	public const STATUS_CONVERTED = 'converted';
 	public const STATUS_SKIPPED   = 'skipped';
 	public const STATUS_FAILED    = 'failed';
+	public const STATUS_RESTORED  = 'restored';
 
 	public static function register(): void {
 		add_action( 'lw_img_upload_converted', [ self::class, 'on_converted' ], 10, 3 );
 		add_action( 'lw_img_upload_skipped', [ self::class, 'on_skipped' ], 10, 2 );
 		add_action( 'lw_img_upload_failed', [ self::class, 'on_failed' ], 10, 2 );
+		add_action( 'lw_img_restored', [ self::class, 'on_restored' ], 10, 2 );
+	}
+
+	public static function on_restored( int $attachment_id, string $file_path ): void {
+		if ( ! self::enabled() ) {
+			return;
+		}
+
+		self::record(
+			[
+				'status' => self::STATUS_RESTORED,
+				'file'   => basename( $file_path ),
+				'mime'   => self::guess_mime( $file_path ) ?? '',
+			]
+		);
 	}
 
 	public static function on_converted( string $original_path, string $new_path, array $result ): void {

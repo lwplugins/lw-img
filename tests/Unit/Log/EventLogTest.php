@@ -109,6 +109,27 @@ final class EventLogTest extends MonkeyTestCase {
 		$this->assertTrue( true );
 	}
 
+	public function test_on_restored_prepends_a_restored_entry(): void {
+		$this->stub_options( [] );
+
+		$captured = null;
+		Functions\expect( 'update_option' )
+			->once()
+			->andReturnUsing(
+				static function ( $name, $value ) use ( &$captured ) {
+					$captured = $value;
+					return true;
+				}
+			);
+
+		EventLog::on_restored( 42, '/uploads/2026/08/photo.jpg' );
+
+		$this->assertIsArray( $captured );
+		$this->assertSame( EventLog::STATUS_RESTORED, $captured[0]['status'] );
+		$this->assertSame( 'photo.jpg', $captured[0]['file'] );
+		$this->assertSame( 'image/jpeg', $captured[0]['mime'] );
+	}
+
 	public function test_all_returns_empty_array_for_corrupt_option(): void {
 		Functions\when( 'get_option' )->justReturn( 'corrupt-string' );
 

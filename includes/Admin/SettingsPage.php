@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Admin;
 
+use LightweightPlugins\Img\Admin\Settings\TabBackup;
 use LightweightPlugins\Img\Admin\Settings\TabGeneral;
 use LightweightPlugins\Img\Admin\Settings\TabLog;
 use LightweightPlugins\Img\Admin\Settings\TabUpload;
@@ -34,6 +35,7 @@ final class SettingsPage {
 		$this->tabs = [
 			new TabGeneral(),
 			new TabUpload(),
+			new TabBackup(),
 			new TabLog(),
 		];
 

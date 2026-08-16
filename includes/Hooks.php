@@ -9,6 +9,7 @@
  *  - action `lw_img_upload_converted`     ( string $original_path, string $new_path, array $result )
  *  - action `lw_img_upload_skipped`       ( string $file_path, string $reason )
  *  - action `lw_img_upload_failed`        ( string $file_path, string $error )
+ *  - action `lw_img_restored`             ( int $attachment_id, string $restored_path )
  *
  * @package LightweightPlugins\Img
  */
