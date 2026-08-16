@@ -13,6 +13,7 @@ use LightweightPlugins\Img\Api\ApiException;
 use LightweightPlugins\Img\Api\Client;
 use LightweightPlugins\Img\Api\OptimizeRequest;
 use LightweightPlugins\Img\Media\AttachmentRebuilder;
+use LightweightPlugins\Img\Upload\AnimatedGifProbe;
 use LightweightPlugins\Img\Upload\AttachmentMetaWriter;
 use LightweightPlugins\Img\Upload\ConvertibleDetector;
 use LightweightPlugins\Img\Upload\FileSwapper;
@@ -116,7 +117,11 @@ final class AttachmentOptimizer {
 	 * @return array{result: string, detail: string}
 	 */
 	private function convert( int $attachment_id, string $file, string $mime ): array {
-		$result = ( new Client() )->optimize( OptimizeRequest::from_options( $file ) );
+		$override = ( 'image/gif' === $mime && AnimatedGifProbe::is_animated( $file ) )
+			? OptimizeRequest::FORMAT_WEBP
+			: null;
+
+		$result = ( new Client() )->optimize( OptimizeRequest::from_options( $file, $override ) );
 
 		if ( ! $result->is_smaller() ) {
 			do_action( 'lw_img_upload_skipped', $file, 'optimized result not smaller' );

@@ -63,7 +63,7 @@ final class UploadInterceptor {
 
 		try {
 			$client  = new Client();
-			$request = OptimizeRequest::from_options( $file );
+			$request = OptimizeRequest::from_options( $file, $this->animation_safe_override( $file, $type ) );
 
 			$args    = (array) apply_filters( 'lw_img_optimize_request_args', $request->to_data_payload(), $file );
 			$request = new OptimizeRequest(
@@ -128,5 +128,21 @@ final class UploadInterceptor {
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
 			return $upload;
 		}
+	}
+
+	/**
+	 * Force WebP output for animated GIFs.
+	 *
+	 * Only WebP is verified to preserve frames and timing — an AVIF target
+	 * would silently flatten the animation to its first frame.
+	 *
+	 * @param string $file Absolute file path.
+	 * @param string $mime File mime type.
+	 * @return string|null 'webp' for animated GIF input, null otherwise.
+	 */
+	private function animation_safe_override( string $file, string $mime ): ?string {
+		return ( 'image/gif' === $mime && AnimatedGifProbe::is_animated( $file ) )
+			? OptimizeRequest::FORMAT_WEBP
+			: null;
 	}
 }

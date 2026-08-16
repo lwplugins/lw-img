@@ -35,16 +35,19 @@ final class OptimizeRequest {
 	/**
 	 * Build a request for a file from the saved plugin options.
 	 *
-	 * @param string $file_path Absolute path of the file to optimize.
+	 * @param string      $file_path        Absolute path of the file to optimize.
+	 * @param string|null $convert_override Force a specific output format (e.g. 'webp'
+	 *                                      for animated input, where only WebP keeps
+	 *                                      the animation). Null uses the saved option.
 	 * @return self
 	 */
-	public static function from_options( string $file_path ): self {
+	public static function from_options( string $file_path, ?string $convert_override = null ): self {
 		$level = (string) Options::get( 'level' );
 		if ( ! self::valid_level( $level ) ) {
 			$level = self::LEVEL_NORMAL;
 		}
 
-		$format = (string) Options::get( 'output_format' );
+		$format = $convert_override ?? (string) Options::get( 'output_format' );
 		if ( ! self::valid_format( $format ) ) {
 			$format = self::FORMAT_WEBP;
 		}

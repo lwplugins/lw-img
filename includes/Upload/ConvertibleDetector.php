@@ -84,7 +84,7 @@ final class ConvertibleDetector {
 			return $this->skip( $file_path, 'exceeds max_filesize_mb' );
 		}
 
-		if ( Options::get( 'skip_animated_gif' ) && 'image/gif' === $mime_type && $this->is_animated_gif( $file_path ) ) {
+		if ( Options::get( 'skip_animated_gif' ) && 'image/gif' === $mime_type && AnimatedGifProbe::is_animated( $file_path ) ) {
 			return $this->skip( $file_path, 'animated gif' );
 		}
 
@@ -94,26 +94,5 @@ final class ConvertibleDetector {
 	private function skip( string $file_path, string $reason ): bool {
 		do_action( 'lw_img_upload_skipped', $file_path, $reason );
 		return false;
-	}
-
-	private function is_animated_gif( string $file_path ): bool {
-		// phpcs:disable WordPress.WP.AlternativeFunctions -- chunked binary read for frame-marker detection; WP_Filesystem has no partial-read API.
-		$handle = fopen( $file_path, 'rb' );
-		if ( false === $handle ) {
-			return false;
-		}
-
-		$count = 0;
-		$chunk = '';
-
-		while ( ! feof( $handle ) && $count < 2 ) {
-			$chunk .= fread( $handle, 1024 * 100 );
-			$count  = preg_match_all( '#\x00\x21\xF9\x04#s', $chunk );
-		}
-
-		fclose( $handle );
-		// phpcs:enable WordPress.WP.AlternativeFunctions
-
-		return $count > 1;
 	}
 }
