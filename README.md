@@ -41,6 +41,12 @@ After activation: **LW Plugins → Img** → paste your HelloImg API key.
 | Skip already-WebP | on | Saves credits |
 | Skip animated GIF | on | Animation would be lost |
 
+## Sponsor
+
+Development is sponsored by [GoBird](https://gobird.io):
+
+<a href="https://gobird.io"><img src=".github/gobird.svg" alt="GoBird" height="32"></a>
+
 ## License
 
 GPL-2.0-or-later
