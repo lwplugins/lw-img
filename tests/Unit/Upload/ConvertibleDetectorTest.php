@@ -99,15 +99,33 @@ final class ConvertibleDetectorTest extends MonkeyTestCase {
 	}
 
 	public function test_skips_animated_gif_when_skip_rule_is_on(): void {
-		$this->saved_options( [ 'api_key' => 'himg_x' ] );
+		$this->saved_options(
+			[
+				'api_key'           => 'himg_x',
+				'skip_animated_gif' => true,
+			]
+		);
 
 		$detector = new ConvertibleDetector();
 
 		$this->assertFalse( $detector->should_convert( self::FIXTURES . 'animated.gif', 'image/gif' ) );
 	}
 
-	public function test_converts_static_gif_despite_animated_skip_rule(): void {
+	public function test_converts_animated_gif_by_default(): void {
 		$this->saved_options( [ 'api_key' => 'himg_x' ] );
+
+		$detector = new ConvertibleDetector();
+
+		$this->assertTrue( $detector->should_convert( self::FIXTURES . 'animated.gif', 'image/gif' ) );
+	}
+
+	public function test_converts_static_gif_despite_animated_skip_rule(): void {
+		$this->saved_options(
+			[
+				'api_key'           => 'himg_x',
+				'skip_animated_gif' => true,
+			]
+		);
 
 		$detector = new ConvertibleDetector();
 

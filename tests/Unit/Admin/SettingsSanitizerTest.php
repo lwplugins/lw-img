@@ -74,6 +74,11 @@ final class SettingsSanitizerTest extends MonkeyTestCase {
 		$this->assertSame( 'normal', $sanitized['level'] );
 	}
 
+	public function test_output_format_is_whitelisted(): void {
+		$this->assertSame( 'avif', SettingsSanitizer::sanitize( [ 'output_format' => 'avif' ] )['output_format'] );
+		$this->assertSame( 'webp', SettingsSanitizer::sanitize( [ 'output_format' => 'jxl' ] )['output_format'] );
+	}
+
 	public function test_array_input_is_filtered_and_sanitized(): void {
 		$sanitized = SettingsSanitizer::sanitize(
 			[ 'mime_types' => [ ' image/jpeg ', '', 'image/png' ] ]

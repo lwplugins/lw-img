@@ -45,7 +45,7 @@ final class TabGeneral implements TabInterface {
 							'name'        => 'api_key',
 							'type'        => 'password',
 							'placeholder' => 'himg_...',
-							'description' => __( 'Stored in wp_options. Any HelloImg key is accepted.', 'lw-img' ),
+							'description' => __( 'Stored in wp_options. HelloImg is in open beta: keys are not validated yet, so any value enables conversion. Key validation will arrive later.', 'lw-img' ),
 						]
 					);
 					?>
@@ -70,6 +70,14 @@ final class TabGeneral implements TabInterface {
 				esc_html( $e->getMessage() )
 			);
 			return;
+		}
+
+		if ( ! empty( $account['mock'] ) ) {
+			printf(
+				'<p><span style="display:inline-block;background:#dba617;color:#1d2327;font-size:11px;padding:2px 6px;border-radius:3px;">%s</span> %s</p>',
+				esc_html__( 'Preview data', 'lw-img' ),
+				esc_html__( 'Billing is not live yet — the figures below are placeholders, identical for every account.', 'lw-img' )
+			);
 		}
 
 		$balance    = (string) ( $account['balance']['amount'] ?? '$0.00' );

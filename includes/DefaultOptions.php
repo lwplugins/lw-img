@@ -32,9 +32,12 @@ final class DefaultOptions {
 		return [
 			'auto_convert'       => true,
 			'level'              => 'normal',
+			'output_format'      => 'webp',
 			'keep_exif'          => false,
+			'max_width'          => 0,
+			'max_height'         => 0,
 			'skip_already_webp'  => true,
-			'skip_animated_gif'  => true,
+			'skip_animated_gif'  => false,
 			'max_filesize_mb'    => 10,
 			'exclusion_patterns' => [],
 			'mime_types'         => [

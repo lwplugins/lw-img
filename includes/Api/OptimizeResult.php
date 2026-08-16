@@ -23,7 +23,8 @@ final class OptimizeResult {
 		public float $percent,
 		public string $format,
 		public int $width,
-		public int $height
+		public int $height,
+		public bool $animated = false
 	) {}
 
 	public static function from_response( array $body ): self {
@@ -38,11 +39,24 @@ final class OptimizeResult {
 			(float) ( $result['percent'] ?? 0 ),
 			(string) ( $result['format'] ?? '' ),
 			(int) ( $result['width'] ?? 0 ),
-			(int) ( $result['height'] ?? 0 )
+			(int) ( $result['height'] ?? 0 ),
+			(bool) ( $result['animated'] ?? false )
 		);
 	}
 
 	public function is_completed(): bool {
 		return 'completed' === $this->status && '' !== $this->image_url;
+	}
+
+	/**
+	 * Whether the optimized file is actually smaller than the original.
+	 *
+	 * The API returns the converted file regardless of size (e.g. an animated
+	 * WebP can be larger than a tiny GIF) — the plugin only swaps when it wins.
+	 *
+	 * @return bool
+	 */
+	public function is_smaller(): bool {
+		return $this->new_size > 0 && $this->new_size < $this->original_size;
 	}
 }

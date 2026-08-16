@@ -54,6 +54,11 @@ final class SettingsSanitizer {
 			return in_array( $value, [ 'normal', 'aggressive', 'ultra' ], true ) ? $value : (string) $fallback;
 		}
 
+		if ( 'output_format' === $key ) {
+			$value = sanitize_text_field( (string) $value );
+			return in_array( $value, [ 'webp', 'avif' ], true ) ? $value : (string) $fallback;
+		}
+
 		return null === $value ? (string) $fallback : sanitize_text_field( (string) $value );
 	}
 

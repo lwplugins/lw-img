@@ -13,7 +13,6 @@ use LightweightPlugins\Img\Api\ApiException;
 use LightweightPlugins\Img\Api\Client;
 use LightweightPlugins\Img\Api\OptimizeRequest;
 use LightweightPlugins\Img\Media\AttachmentRebuilder;
-use LightweightPlugins\Img\Options;
 use LightweightPlugins\Img\Upload\AttachmentMetaWriter;
 use LightweightPlugins\Img\Upload\ConvertibleDetector;
 use LightweightPlugins\Img\Upload\FileSwapper;
@@ -117,13 +116,15 @@ final class AttachmentOptimizer {
 	 * @return array{result: string, detail: string}
 	 */
 	private function convert( int $attachment_id, string $file, string $mime ): array {
-		$level = (string) Options::get( 'level' );
-		if ( ! OptimizeRequest::valid_level( $level ) ) {
-			$level = OptimizeRequest::LEVEL_NORMAL;
-		}
+		$result = ( new Client() )->optimize( OptimizeRequest::from_options( $file ) );
 
-		$request = new OptimizeRequest( $file, $level, (bool) Options::get( 'keep_exif' ), 'webp' );
-		$result  = ( new Client() )->optimize( $request );
+		if ( ! $result->is_smaller() ) {
+			do_action( 'lw_img_upload_skipped', $file, 'optimized result not smaller' );
+			return [
+				'result' => self::RESULT_SKIPPED,
+				'detail' => 'result not smaller',
+			];
+		}
 
 		$swapped    = $this->swapper->swap( $file, (string) wp_get_attachment_url( $attachment_id ), $result );
 		$backup_rel = $swapped['lw_img_backup'] ?? null;

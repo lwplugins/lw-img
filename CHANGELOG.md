@@ -10,6 +10,11 @@
 - WP-CLI commands: `wp lw-img status`, `wp lw-img optimize [<id>...|--all] [--limit] [--dry-run]`, `wp lw-img restore <id>...`
 - Media Library integration: "LW Img" savings column and an "Optimize now" row action for unoptimized images
 - Exclusion patterns: wildcard filename/path rules that keep matching uploads unconverted
+- Output format setting: convert to WebP (default) or AVIF
+- Resize on upload/bulk: optional max width/height (proportional downscale, never upscales)
+- Animated GIFs are now converted to animated WebP (frames and timing preserved); the skip option remains available
+- Size guard: if the converted file would not be smaller than the original, the original is kept
+- Account panel is labelled "Preview data" while HelloImg billing returns placeholder figures
 - Backup and Bulk settings tabs
 - `lw_img_restored` action and `restored` event log status
 

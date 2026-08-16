@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Api;
 
+use LightweightPlugins\Img\Options;
+
 /**
  * Value object describing a /v1/optimize request.
  */
@@ -18,12 +20,44 @@ final class OptimizeRequest {
 	public const LEVEL_AGGRESSIVE = 'aggressive';
 	public const LEVEL_ULTRA      = 'ultra';
 
+	public const FORMAT_WEBP = 'webp';
+	public const FORMAT_AVIF = 'avif';
+
 	public function __construct(
 		public string $file_path,
 		public string $level = self::LEVEL_NORMAL,
 		public bool $keep_exif = false,
-		public ?string $convert = 'webp'
+		public ?string $convert = self::FORMAT_WEBP,
+		public int $max_width = 0,
+		public int $max_height = 0
 	) {}
+
+	/**
+	 * Build a request for a file from the saved plugin options.
+	 *
+	 * @param string $file_path Absolute path of the file to optimize.
+	 * @return self
+	 */
+	public static function from_options( string $file_path ): self {
+		$level = (string) Options::get( 'level' );
+		if ( ! self::valid_level( $level ) ) {
+			$level = self::LEVEL_NORMAL;
+		}
+
+		$format = (string) Options::get( 'output_format' );
+		if ( ! self::valid_format( $format ) ) {
+			$format = self::FORMAT_WEBP;
+		}
+
+		return new self(
+			$file_path,
+			$level,
+			(bool) Options::get( 'keep_exif' ),
+			$format,
+			max( 0, (int) Options::get( 'max_width' ) ),
+			max( 0, (int) Options::get( 'max_height' ) )
+		);
+	}
 
 	public function to_data_payload(): array {
 		$data = [
@@ -35,6 +69,14 @@ final class OptimizeRequest {
 			$data['convert'] = $this->convert;
 		}
 
+		if ( $this->max_width > 0 ) {
+			$data['max_width'] = $this->max_width;
+		}
+
+		if ( $this->max_height > 0 ) {
+			$data['max_height'] = $this->max_height;
+		}
+
 		return $data;
 	}
 
@@ -44,5 +86,15 @@ final class OptimizeRequest {
 			[ self::LEVEL_NORMAL, self::LEVEL_AGGRESSIVE, self::LEVEL_ULTRA ],
 			true
 		);
+	}
+
+	/**
+	 * Whether the output format is one the plugin offers.
+	 *
+	 * @param string $format Candidate output format.
+	 * @return bool
+	 */
+	public static function valid_format( string $format ): bool {
+		return in_array( $format, [ self::FORMAT_WEBP, self::FORMAT_AVIF ], true );
 	}
 }

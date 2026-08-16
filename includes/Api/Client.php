@@ -84,12 +84,43 @@ final class Client {
 		$body   = json_decode( (string) wp_remote_retrieve_body( $response ), true );
 
 		if ( 200 !== $status ) {
-			$code    = is_array( $body ) ? (string) ( $body['error']['code'] ?? 'http_' . $status ) : 'http_' . $status;
-			$message = is_array( $body ) ? (string) ( $body['error']['message'] ?? 'HTTP ' . $status ) : 'HTTP ' . $status;
+			[ $code, $message ] = self::error_parts( $body, $status );
 			throw new ApiException( esc_html( $message ), $code, $status ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- code and status are internal scalars, never output as HTML.
 		}
 
 		return is_array( $body ) ? $body : [];
+	}
+
+	/**
+	 * Extract [code, message] from an error body.
+	 *
+	 * Handles both response shapes the API uses: the nested
+	 * `{"error": {"code", "message"}}` and the flat
+	 * `{"error": "message", "code": "..."}` (e.g. invalid_request rejections).
+	 *
+	 * @param mixed $body   Decoded response body.
+	 * @param int   $status HTTP status code.
+	 * @return array{0: string, 1: string}
+	 */
+	private static function error_parts( mixed $body, int $status ): array {
+		if ( ! is_array( $body ) ) {
+			return [ 'http_' . $status, 'HTTP ' . $status ];
+		}
+
+		$error = $body['error'] ?? null;
+
+		if ( is_string( $error ) && '' !== $error ) {
+			return [ (string) ( $body['code'] ?? 'http_' . $status ), $error ];
+		}
+
+		if ( is_array( $error ) ) {
+			return [
+				(string) ( $error['code'] ?? 'http_' . $status ),
+				(string) ( $error['message'] ?? 'HTTP ' . $status ),
+			];
+		}
+
+		return [ 'http_' . $status, 'HTTP ' . $status ];
 	}
 
 	private function require_api_key(): void {
@@ -108,8 +139,7 @@ final class Client {
 		$body   = json_decode( (string) wp_remote_retrieve_body( $response ), true );
 
 		if ( 200 !== $status ) {
-			$code    = is_array( $body ) ? (string) ( $body['error']['code'] ?? 'http_' . $status ) : 'http_' . $status;
-			$message = is_array( $body ) ? (string) ( $body['error']['message'] ?? 'HTTP ' . $status ) : 'HTTP ' . $status;
+			[ $code, $message ] = self::error_parts( $body, $status );
 			Logger::error(
 				'optimize: api error',
 				[

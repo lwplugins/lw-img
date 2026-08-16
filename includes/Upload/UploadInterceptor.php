@@ -13,7 +13,6 @@ use LightweightPlugins\Img\Api\ApiException;
 use LightweightPlugins\Img\Api\Client;
 use LightweightPlugins\Img\Api\OptimizeRequest;
 use LightweightPlugins\Img\Logger;
-use LightweightPlugins\Img\Options;
 use Throwable;
 
 /**
@@ -64,17 +63,24 @@ final class UploadInterceptor {
 
 		try {
 			$client  = new Client();
-			$request = $this->build_request( $file );
+			$request = OptimizeRequest::from_options( $file );
 
 			$args    = (array) apply_filters( 'lw_img_optimize_request_args', $request->to_data_payload(), $file );
 			$request = new OptimizeRequest(
 				$file,
 				(string) ( $args['level'] ?? $request->level ),
 				(bool) ( $args['keep_exif'] ?? $request->keep_exif ),
-				(string) ( $args['convert'] ?? 'webp' )
+				(string) ( $args['convert'] ?? $request->convert ),
+				(int) ( $args['max_width'] ?? $request->max_width ),
+				(int) ( $args['max_height'] ?? $request->max_height )
 			);
 
 			$result = $client->optimize( $request );
+
+			if ( ! $result->is_smaller() ) {
+				do_action( 'lw_img_upload_skipped', $file, 'optimized result not smaller' );
+				return $upload;
+			}
 
 			$swapped = $this->swapper->swap( $file, (string) ( $upload['url'] ?? '' ), $result );
 
@@ -122,19 +128,5 @@ final class UploadInterceptor {
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
 			return $upload;
 		}
-	}
-
-	private function build_request( string $file ): OptimizeRequest {
-		$level = (string) Options::get( 'level' );
-		if ( ! OptimizeRequest::valid_level( $level ) ) {
-			$level = OptimizeRequest::LEVEL_NORMAL;
-		}
-
-		return new OptimizeRequest(
-			$file,
-			$level,
-			(bool) Options::get( 'keep_exif' ),
-			'webp'
-		);
 	}
 }

@@ -67,6 +67,46 @@ final class TabUpload implements TabInterface {
 				</td>
 			</tr>
 			<tr>
+				<th><label for="output_format"><?php esc_html_e( 'Output format', 'lw-img' ); ?></label></th>
+				<td>
+					<?php
+					$this->render_select_field(
+						[
+							'name'        => 'output_format',
+							'options'     => [
+								'webp' => __( 'WebP — widest support', 'lw-img' ),
+								'avif' => __( 'AVIF — smaller, modern browsers', 'lw-img' ),
+							],
+							'description' => __( 'The format uploads are converted to. If the converted file would not be smaller than the original, the original is kept.', 'lw-img' ),
+						]
+					);
+					?>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Resize large images', 'lw-img' ); ?></th>
+				<td>
+					<?php
+					$this->render_number_field(
+						[
+							'name'        => 'max_width',
+							'min'         => '0',
+							'max'         => '10000',
+							'description' => __( 'Max width (px). 0 = no limit.', 'lw-img' ),
+						]
+					);
+					$this->render_number_field(
+						[
+							'name'        => 'max_height',
+							'min'         => '0',
+							'max'         => '10000',
+							'description' => __( 'Max height (px). 0 = no limit. Images are scaled down proportionally to fit; small images are never upscaled.', 'lw-img' ),
+						]
+					);
+					?>
+				</td>
+			</tr>
+			<tr>
 				<th><?php esc_html_e( 'EXIF metadata', 'lw-img' ); ?></th>
 				<td>
 					<?php
@@ -94,8 +134,8 @@ final class TabUpload implements TabInterface {
 					$this->render_checkbox_field(
 						[
 							'name'        => 'skip_animated_gif',
-							'label'       => __( 'Skip animated GIFs only (recommended — animation would be lost)', 'lw-img' ),
-							'description' => __( 'Static (single-frame) GIFs are still converted to WebP. Animated GIFs are detected by counting frame markers and left untouched.', 'lw-img' ),
+							'label'       => __( 'Skip animated GIFs', 'lw-img' ),
+							'description' => __( 'Off by default: animated GIFs are converted to animated WebP with frames and timing preserved. Turn on to leave animated GIFs untouched. If the animated WebP would be larger than the GIF, the original is kept automatically.', 'lw-img' ),
 						]
 					);
 					?>

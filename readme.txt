@@ -16,11 +16,13 @@ Lightweight image optimization — auto-convert WordPress uploads to WebP via th
 
 LW Img is a lightweight image optimization plugin that converts non-WebP uploads to WebP automatically using the HelloImg API. The original format is replaced — sub-sizes (thumbnails) are generated from the WebP source, so a single API call optimizes every variant.
 
-**Features (v1.0.0):**
+**Features:**
 
-* Auto-convert JPEG / PNG / HEIC / TIFF / BMP uploads to WebP on upload
+* Auto-convert JPEG / PNG / GIF / HEIC / TIFF / BMP uploads to WebP or AVIF on upload
 * Already-WebP / AVIF uploads are skipped (no API call, no credit usage)
-* Animated GIFs are skipped (animation would be lost)
+* Animated GIFs become animated WebP (frames and timing preserved; optional skip)
+* Optional resize on upload (max width/height, never upscales)
+* Size guard: the original is kept if the converted file would not be smaller
 * Graceful fallback — if the API is unreachable, the original upload is kept
 * Original image backup (on by default) with configurable retention — restore any optimized image from the Media Library, thumbnails are regenerated automatically
 * Three optimization levels: normal, aggressive, ultra
@@ -35,9 +37,8 @@ LW Img is a lightweight image optimization plugin that converts non-WebP uploads
 **Roadmap:**
 
 * Content URL rewrite on bulk convert/restore (serialization-aware, for page-builder data)
-* AVIF output, resize on upload, animated WebP (pending HelloImg API support)
 * Smart Crop integration
-* AI-generated alt text
+* AI-generated alt text (HelloImg /v1/ai/seo)
 * LW Site Manager Abilities API integration
 
 == Installation ==
@@ -76,6 +77,10 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 * New: WP-CLI commands — wp lw-img status / optimize / restore
 * New: "LW Img" savings column and "Optimize now" row action in the Media Library
 * New: Exclusion patterns (wildcard filename/path rules)
+* New: Output format setting — WebP (default) or AVIF
+* New: Resize on upload/bulk — optional max width/height, never upscales
+* New: Animated GIF to animated WebP conversion (skip option remains)
+* New: Size guard — the original is kept if the converted file would not be smaller
 * New: Backup and Bulk settings tabs
 * New: lw_img_restored action and "restored" event log status
 

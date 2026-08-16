@@ -82,4 +82,42 @@ final class OptimizeResultTest extends MonkeyTestCase {
 			'failed'             => [ 'failed', '', false ],
 		];
 	}
+
+	/**
+	 * @dataProvider provide_size_pairs
+	 */
+	public function test_is_smaller_compares_result_against_original( int $original, int $new_size, bool $expected ): void {
+		$result = OptimizeResult::from_response(
+			[
+				'result' => [
+					'original_size' => $original,
+					'new_size'      => $new_size,
+				],
+			]
+		);
+
+		$this->assertSame( $expected, $result->is_smaller() );
+	}
+
+	/**
+	 * Size comparison cases.
+	 *
+	 * @return array<string, array{int, int, bool}>
+	 */
+	public static function provide_size_pairs(): array {
+		return [
+			'smaller result'         => [ 1000, 400, true ],
+			'larger result (anim webp)' => [ 378, 544, false ],
+			'equal size'             => [ 500, 500, false ],
+			'zero new size'          => [ 500, 0, false ],
+		];
+	}
+
+	public function test_animated_flag_is_parsed_and_defaults_to_false(): void {
+		$animated = OptimizeResult::from_response( [ 'result' => [ 'animated' => true ] ] );
+		$still    = OptimizeResult::from_response( [ 'result' => [] ] );
+
+		$this->assertTrue( $animated->animated );
+		$this->assertFalse( $still->animated );
+	}
 }
