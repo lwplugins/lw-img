@@ -1,5 +1,5 @@
 /**
- * LW Img — admin tab handler.
+ * LW Img — admin tab handler + bulk progress polling.
  */
 
 (function () {
@@ -71,22 +71,18 @@
 		}
 	}
 
+	// The run itself happens server-side via WP-Cron; this only keeps the
+	// progress display fresh while the tab is open.
 	function initBulk() {
 		var container = document.getElementById('lw-img-bulk');
-		var button    = document.getElementById('lw-img-bulk-start');
 
-		if (!container || !button || typeof window.ajaxurl === 'undefined') {
+		if (!container || container.getAttribute('data-running') !== '1' || typeof window.ajaxurl === 'undefined') {
 			return;
 		}
 
 		var statusEl = document.getElementById('lw-img-bulk-status');
-		var bar      = document.getElementById('lw-img-bulk-bar');
 		var barFill  = document.getElementById('lw-img-bulk-bar-fill');
-		var logEl         = document.getElementById('lw-img-bulk-log');
-		var total         = parseInt(container.getAttribute('data-remaining'), 10) || 0;
-		var done          = 0;
-		var optimized     = 0;
-		var prevRemaining = Infinity;
+		var finished = false;
 
 		function setStatus(text) {
 			if (statusEl) {
@@ -94,78 +90,43 @@
 			}
 		}
 
-		function appendLog(item) {
-			if (!logEl) {
-				return;
-			}
-			var li = document.createElement('li');
-			li.className = 'lw-img-bulk-log--' + item.result;
-			li.textContent = '#' + item.id + ' ' + (item.title || '') + ' — ' + item.result + ' (' + item.detail + ')';
-			logEl.insertBefore(li, logEl.firstChild);
-		}
-
-		function step() {
+		function poll() {
 			var body = new FormData();
-			body.append('action', 'lw_img_bulk_step');
+			body.append('action', 'lw_img_bulk_status');
 			body.append('nonce', container.getAttribute('data-nonce'));
 
 			fetch(window.ajaxurl, { method: 'POST', credentials: 'same-origin', body: body })
 				.then(function (response) { return response.json(); })
 				.then(function (payload) {
 					if (!payload || !payload.success) {
-						throw new Error(payload && payload.data && payload.data.message ? payload.data.message : 'request failed');
+						throw new Error('status request failed');
 					}
 
-					if (payload.data.locked) {
-						setStatus('Another bulk run is already in progress.');
-						button.disabled = false;
-						return;
+					var d = payload.data;
+
+					if (barFill && d.total > 0) {
+						barFill.style.width = Math.min(100, Math.round((d.processed / d.total) * 100)) + '%';
 					}
 
-					payload.data.processed.forEach(appendLog);
-					done += payload.data.processed.length;
-					payload.data.processed.forEach(function (item) {
-						if (item.result === 'optimized') {
-							optimized += 1;
-						}
-					});
-
-					var remaining = payload.data.remaining;
-					if (barFill && total > 0) {
-						barFill.style.width = Math.min(100, Math.round(((total - remaining) / total) * 100)) + '%';
-					}
-					setStatus(remaining + ' remaining…');
-
-					// Guard against a stalled queue: skipped/failed images stay
-					// "unoptimized", so a non-decreasing remaining count means the
-					// rest cannot be processed — continuing would loop forever.
-					var stalled = remaining >= prevRemaining;
-					prevRemaining = remaining;
-
-					if (remaining > 0 && payload.data.processed.length > 0 && !stalled) {
-						step();
-					} else if (remaining > 0) {
-						setStatus('Done — ' + optimized + ' optimized, ' + remaining + ' image(s) could not be processed (see the Log tab).');
-						button.disabled = false;
-					} else {
-						setStatus('Done — ' + optimized + ' of ' + done + ' image(s) optimized.');
-						button.disabled = false;
+					if (d.state === 'running') {
+						setStatus(
+							d.processed + ' / ' + d.total + ' — ' +
+							d.optimized + ' optimized, ' + d.skipped + ' skipped, ' + d.failed + ' failed'
+						);
+						window.setTimeout(poll, 3000);
+					} else if (!finished) {
+						finished = true;
+						setStatus('Finished — reloading…');
+						window.location.reload();
 					}
 				})
-				.catch(function (err) {
-					setStatus('Error: ' + err.message);
-					button.disabled = false;
+				.catch(function () {
+					// Transient hiccup (or logged-out session): retry slower.
+					window.setTimeout(poll, 10000);
 				});
 		}
 
-		button.addEventListener('click', function () {
-			button.disabled = true;
-			if (bar) {
-				bar.hidden = false;
-			}
-			setStatus('Starting…');
-			step();
-		});
+		poll();
 	}
 
 	function init() {

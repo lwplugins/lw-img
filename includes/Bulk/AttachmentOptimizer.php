@@ -13,6 +13,8 @@ use LightweightPlugins\Img\Api\ApiException;
 use LightweightPlugins\Img\Api\Client;
 use LightweightPlugins\Img\Api\OptimizeRequest;
 use LightweightPlugins\Img\Media\AttachmentRebuilder;
+use LightweightPlugins\Img\Media\UrlPairs;
+use LightweightPlugins\Img\Media\UrlRewriter;
 use LightweightPlugins\Img\Upload\AnimatedGifProbe;
 use LightweightPlugins\Img\Upload\AttachmentMetaWriter;
 use LightweightPlugins\Img\Upload\ConvertibleDetector;
@@ -50,62 +52,76 @@ final class AttachmentOptimizer {
 	 */
 	private AttachmentRebuilder $rebuilder;
 
+	/**
+	 * Per-run optimization level override (used by re-optimize).
+	 *
+	 * @var string|null
+	 */
+	private ?string $level_override;
+
 	public function __construct(
 		?ConvertibleDetector $detector = null,
 		?FileSwapper $swapper = null,
-		?AttachmentRebuilder $rebuilder = null
+		?AttachmentRebuilder $rebuilder = null,
+		?string $level_override = null
 	) {
-		$this->detector  = $detector ?? new ConvertibleDetector();
-		$this->swapper   = $swapper ?? new FileSwapper();
-		$this->rebuilder = $rebuilder ?? new AttachmentRebuilder();
+		$this->detector       = $detector ?? new ConvertibleDetector();
+		$this->swapper        = $swapper ?? new FileSwapper();
+		$this->rebuilder      = $rebuilder ?? new AttachmentRebuilder();
+		$this->level_override = $level_override;
 	}
 
 	/**
 	 * Optimize one attachment.
+	 *
+	 * Every attempt stamps the attachment with a StatusMeta outcome, which
+	 * removes it from the pending queue until it is explicitly re-queued.
 	 *
 	 * @param int $attachment_id Attachment post ID.
 	 * @return array{result: string, detail: string} Outcome and a human-readable detail.
 	 */
 	public function optimize( int $attachment_id ): array {
 		if ( get_post_meta( $attachment_id, '_lw_img_optimized', true ) ) {
-			return [
-				'result' => self::RESULT_SKIPPED,
-				'detail' => 'already optimized',
-			];
+			return $this->finish( $attachment_id, self::RESULT_SKIPPED, 'already optimized' );
 		}
 
 		$file = (string) get_attached_file( $attachment_id );
 		$mime = (string) get_post_mime_type( $attachment_id );
 
 		if ( '' === $file || ! file_exists( $file ) ) {
-			return [
-				'result' => self::RESULT_SKIPPED,
-				'detail' => 'file missing',
-			];
+			return $this->finish( $attachment_id, self::RESULT_SKIPPED, 'file missing' );
 		}
 
 		if ( ! $this->detector->should_convert_on_demand( $file, $mime ) ) {
-			return [
-				'result' => self::RESULT_SKIPPED,
-				'detail' => 'skip rules apply',
-			];
+			return $this->finish( $attachment_id, self::RESULT_SKIPPED, 'skip rules apply' );
 		}
 
 		try {
 			return $this->convert( $attachment_id, $file, $mime );
 		} catch ( ApiException $e ) {
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
-			return [
-				'result' => self::RESULT_FAILED,
-				'detail' => $e->getMessage(),
-			];
+			return $this->finish( $attachment_id, self::RESULT_FAILED, $e->getMessage() );
 		} catch ( Throwable $e ) {
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
-			return [
-				'result' => self::RESULT_FAILED,
-				'detail' => $e->getMessage(),
-			];
+			return $this->finish( $attachment_id, self::RESULT_FAILED, $e->getMessage() );
 		}
+	}
+
+	/**
+	 * Stamp the outcome and build the result array.
+	 *
+	 * @param int    $attachment_id Attachment post ID.
+	 * @param string $result        Outcome constant.
+	 * @param string $detail        Human-readable detail.
+	 * @return array{result: string, detail: string}
+	 */
+	private function finish( int $attachment_id, string $result, string $detail ): array {
+		StatusMeta::write( $attachment_id, $result, $detail );
+
+		return [
+			'result' => $result,
+			'detail' => $detail,
+		];
 	}
 
 	/**
@@ -121,20 +137,30 @@ final class AttachmentOptimizer {
 			? OptimizeRequest::FORMAT_WEBP
 			: null;
 
-		$result = ( new Client() )->optimize( OptimizeRequest::from_options( $file, $override ) );
+		$request = OptimizeRequest::from_options( $file, $override, $this->level_override );
+		$result  = ( new Client() )->optimize( $request );
 
 		if ( ! $result->is_smaller() ) {
 			do_action( 'lw_img_upload_skipped', $file, 'optimized result not smaller' );
-			return [
-				'result' => self::RESULT_SKIPPED,
-				'detail' => 'result not smaller',
-			];
+			return $this->finish( $attachment_id, self::RESULT_SKIPPED, 'result not smaller' );
 		}
 
-		$swapped    = $this->swapper->swap( $file, (string) wp_get_attachment_url( $attachment_id ), $result );
+		$old_url  = (string) wp_get_attachment_url( $attachment_id );
+		$old_meta = wp_get_attachment_metadata( $attachment_id );
+
+		$swapped    = $this->swapper->swap( $file, $old_url, $result );
 		$backup_rel = $swapped['lw_img_backup'] ?? null;
 
 		$this->rebuilder->replace_main_file( $attachment_id, (string) $swapped['file'], false );
+
+		( new UrlRewriter() )->rewrite(
+			UrlPairs::build(
+				$old_url,
+				UrlPairs::sizes_map( $old_meta ),
+				(string) wp_get_attachment_url( $attachment_id ),
+				UrlPairs::sizes_map( wp_get_attachment_metadata( $attachment_id ) )
+			)
+		);
 
 		AttachmentMetaWriter::write_meta(
 			$attachment_id,
@@ -142,7 +168,9 @@ final class AttachmentOptimizer {
 			$result->new_size,
 			$result->percent,
 			$result->job_id,
-			is_string( $backup_rel ) ? $backup_rel : ''
+			is_string( $backup_rel ) ? $backup_rel : '',
+			$request->level,
+			$request->keep_exif
 		);
 
 		do_action(
@@ -159,9 +187,6 @@ final class AttachmentOptimizer {
 			]
 		);
 
-		return [
-			'result' => self::RESULT_OPTIMIZED,
-			'detail' => sprintf( '-%.1f%%', $result->percent ),
-		];
+		return $this->finish( $attachment_id, self::RESULT_OPTIMIZED, sprintf( '-%.1f%%', $result->percent ) );
 	}
 }

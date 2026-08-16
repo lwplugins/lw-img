@@ -23,7 +23,7 @@ final class AttachmentMetaWriter {
 		add_action( 'add_attachment', [ $this, 'apply_pending_meta' ] );
 	}
 
-	public function stash( string $file_path, OptimizeResult $result, ?string $backup_rel = null ): void {
+	public function stash( string $file_path, OptimizeResult $result, ?string $backup_rel = null, string $level = '', bool $keep_exif = false ): void {
 		set_transient(
 			self::PENDING_TRANSIENT_PREFIX . md5( $file_path ),
 			[
@@ -32,6 +32,8 @@ final class AttachmentMetaWriter {
 				'percent'       => $result->percent,
 				'job_id'        => $result->job_id,
 				'backup'        => (string) $backup_rel,
+				'level'         => $level,
+				'keep_exif'     => $keep_exif,
 			],
 			MINUTE_IN_SECONDS * 5
 		);
@@ -58,7 +60,9 @@ final class AttachmentMetaWriter {
 			(int) $data['new_size'],
 			(float) $data['percent'],
 			(string) $data['job_id'],
-			(string) ( $data['backup'] ?? '' )
+			(string) ( $data['backup'] ?? '' ),
+			(string) ( $data['level'] ?? '' ),
+			(bool) ( $data['keep_exif'] ?? false )
 		);
 	}
 
@@ -71,14 +75,19 @@ final class AttachmentMetaWriter {
 	 * @param float  $percent       Savings percentage.
 	 * @param string $job_id        HelloImg job ID.
 	 * @param string $backup_rel    Backup-relative path ('' when no backup).
+	 * @param string $level         Optimization level used.
+	 * @param bool   $keep_exif     Whether EXIF was kept.
 	 * @return void
 	 */
-	public static function write_meta( int $attachment_id, int $original_size, int $new_size, float $percent, string $job_id, string $backup_rel = '' ): void {
+	public static function write_meta( int $attachment_id, int $original_size, int $new_size, float $percent, string $job_id, string $backup_rel = '', string $level = '', bool $keep_exif = false ): void {
 		update_post_meta( $attachment_id, '_lw_img_optimized', 1 );
 		update_post_meta( $attachment_id, '_lw_img_original_size', $original_size );
 		update_post_meta( $attachment_id, '_lw_img_new_size', $new_size );
 		update_post_meta( $attachment_id, '_lw_img_savings_pct', $percent );
 		update_post_meta( $attachment_id, '_lw_img_job_id', $job_id );
+		update_post_meta( $attachment_id, '_lw_img_level', $level );
+		update_post_meta( $attachment_id, '_lw_img_keep_exif', $keep_exif ? 1 : 0 );
+		update_post_meta( $attachment_id, '_lw_img_optimized_at', time() );
 
 		if ( '' !== $backup_rel ) {
 			update_post_meta( $attachment_id, BackupStore::META_KEY, $backup_rel );

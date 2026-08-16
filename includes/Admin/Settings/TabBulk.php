@@ -1,6 +1,6 @@
 <?php
 /**
- * Bulk tab — optimize the existing Media Library.
+ * Bulk tab — optimize the existing Media Library in the background.
  *
  * @package LightweightPlugins\Img
  */
@@ -9,11 +9,15 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Admin\Settings;
 
-use LightweightPlugins\Img\Bulk\AjaxHandler;
+use LightweightPlugins\Img\Bulk\BulkJob;
+use LightweightPlugins\Img\Bulk\JobHandlers;
+use LightweightPlugins\Img\Bulk\StatusEndpoint;
+use LightweightPlugins\Img\Bulk\StatusMeta;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
 
 /**
- * Bulk tab: counts, start button, and the progress area driven by admin.js.
+ * Bulk tab: pending/processed counts, background run controls, and the
+ * progress area polled by admin.js. The run continues with the tab closed.
  */
 final class TabBulk implements TabInterface {
 
@@ -30,22 +34,25 @@ final class TabBulk implements TabInterface {
 	}
 
 	public function render(): void {
-		$query       = new UnoptimizedQuery();
-		$unoptimized = $query->count();
-		$optimized   = $query->optimized_count();
+		$pending = ( new UnoptimizedQuery() )->count();
+		$counts  = StatusMeta::counts();
+		$job     = BulkJob::get();
+		$running = BulkJob::is_running();
 
 		?>
 		<h2><?php esc_html_e( 'Bulk optimize', 'lw-img' ); ?></h2>
-		<p><?php esc_html_e( 'Convert the images already in your Media Library. Images are processed a few at a time — keep this tab open until the run finishes. The upload skip rules (exclusions, max size, animated GIFs) apply here too.', 'lw-img' ); ?></p>
-		<p><strong><?php esc_html_e( 'Note:', 'lw-img' ); ?></strong> <?php esc_html_e( 'converting renames files (photo.jpg becomes photo.webp). Content that embeds an image by its file URL (typically page-builder data) keeps pointing at the old name — re-select the image there, restore that image, or exclude it before running. Featured images and anything referenced by attachment ID are unaffected.', 'lw-img' ); ?></p>
+		<p><?php esc_html_e( 'Convert the images already in your Media Library. The run happens in the background (WP-Cron) — you can close this tab, the progress below keeps itself up to date while it is open. References to converted files in post content and page-builder data are rewritten automatically.', 'lw-img' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Note: WP-Cron only runs while the site receives visits. For very large libraries (thousands of images) the command line is the guaranteed path: wp lw-img optimize --all', 'lw-img' ); ?></p>
 
 		<table class="form-table">
 			<tr>
 				<th><?php esc_html_e( 'Status', 'lw-img' ); ?></th>
 				<td>
 					<p>
-						<strong><?php echo esc_html( number_format_i18n( $unoptimized ) ); ?></strong> <?php esc_html_e( 'images not optimized yet', 'lw-img' ); ?>,
-						<strong><?php echo esc_html( number_format_i18n( $optimized ) ); ?></strong> <?php esc_html_e( 'already optimized', 'lw-img' ); ?>.
+						<strong><?php echo esc_html( number_format_i18n( $pending ) ); ?></strong> <?php esc_html_e( 'pending', 'lw-img' ); ?> ·
+						<strong><?php echo esc_html( number_format_i18n( $counts[ StatusMeta::OPTIMIZED ] ) ); ?></strong> <?php esc_html_e( 'optimized', 'lw-img' ); ?> ·
+						<strong><?php echo esc_html( number_format_i18n( $counts[ StatusMeta::SKIPPED ] ) ); ?></strong> <?php esc_html_e( 'skipped', 'lw-img' ); ?> ·
+						<strong><?php echo esc_html( number_format_i18n( $counts[ StatusMeta::FAILED ] ) ); ?></strong> <?php esc_html_e( 'failed', 'lw-img' ); ?>
 					</p>
 				</td>
 			</tr>
@@ -54,19 +61,49 @@ final class TabBulk implements TabInterface {
 				<td>
 					<div
 						id="lw-img-bulk"
-						data-nonce="<?php echo esc_attr( wp_create_nonce( AjaxHandler::NONCE_ACTION ) ); ?>"
-						data-remaining="<?php echo esc_attr( (string) $unoptimized ); ?>"
+						data-nonce="<?php echo esc_attr( wp_create_nonce( StatusEndpoint::NONCE_ACTION ) ); ?>"
+						data-running="<?php echo esc_attr( $running ? '1' : '0' ); ?>"
 					>
-						<button type="button" class="button button-primary" id="lw-img-bulk-start" <?php disabled( 0 === $unoptimized ); ?>>
-							<?php esc_html_e( 'Optimize all', 'lw-img' ); ?>
-						</button>
-						<span id="lw-img-bulk-status" class="description" style="margin-left: 8px;"></span>
-						<div id="lw-img-bulk-bar" class="lw-img-bulk-bar" hidden><div id="lw-img-bulk-bar-fill" class="lw-img-bulk-bar-fill"></div></div>
-						<ul id="lw-img-bulk-log" class="lw-img-bulk-log"></ul>
+						<?php if ( $running ) : ?>
+							<a href="<?php echo esc_url( JobHandlers::url( JobHandlers::ACTION_CANCEL ) ); ?>" class="button">
+								<?php esc_html_e( 'Cancel run', 'lw-img' ); ?>
+							</a>
+						<?php else : ?>
+							<a href="<?php echo esc_url( JobHandlers::url( JobHandlers::ACTION_START ) ); ?>" class="button button-primary<?php echo 0 === $pending ? ' disabled' : ''; ?>">
+								<?php esc_html_e( 'Optimize all in background', 'lw-img' ); ?>
+							</a>
+						<?php endif; ?>
+						<span id="lw-img-bulk-status" class="description" style="margin-left: 8px;">
+						<?php
+						if ( $running ) {
+							esc_html_e( 'Run in progress…', 'lw-img' );
+						} elseif ( BulkJob::STATE_DONE === ( $job['state'] ?? '' ) ) {
+							esc_html_e( 'Last run finished.', 'lw-img' );
+						}
+						?>
+						</span>
+						<div id="lw-img-bulk-bar" class="lw-img-bulk-bar" <?php echo $running ? '' : 'hidden'; ?>><div id="lw-img-bulk-bar-fill" class="lw-img-bulk-bar-fill"></div></div>
 					</div>
-					<p class="description"><?php esc_html_e( 'Tip: the same run is available from the command line: wp lw-img optimize --all', 'lw-img' ); ?></p>
 				</td>
 			</tr>
+			<?php if ( $counts[ StatusMeta::FAILED ] > 0 || $counts[ StatusMeta::SKIPPED ] > 0 ) : ?>
+			<tr>
+				<th><?php esc_html_e( 'Re-queue', 'lw-img' ); ?></th>
+				<td>
+					<?php if ( $counts[ StatusMeta::FAILED ] > 0 ) : ?>
+						<a href="<?php echo esc_url( JobHandlers::url( JobHandlers::ACTION_RETRY ) ); ?>" class="button">
+							<?php esc_html_e( 'Retry failed', 'lw-img' ); ?>
+						</a>
+					<?php endif; ?>
+					<?php if ( $counts[ StatusMeta::SKIPPED ] > 0 ) : ?>
+						<a href="<?php echo esc_url( JobHandlers::url( JobHandlers::ACTION_RESCAN ) ); ?>" class="button">
+							<?php esc_html_e( 'Re-scan skipped', 'lw-img' ); ?>
+						</a>
+					<?php endif; ?>
+					<p class="description"><?php esc_html_e( 'Skipped and failed images are not retried automatically. Re-queue them after changing settings or fixing the cause — details are in the Log tab.', 'lw-img' ); ?></p>
+				</td>
+			</tr>
+			<?php endif; ?>
 		</table>
 		<?php
 	}

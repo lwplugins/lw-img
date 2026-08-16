@@ -9,7 +9,10 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Backup;
 
+use LightweightPlugins\Img\Bulk\StatusMeta;
 use LightweightPlugins\Img\Media\AttachmentRebuilder;
+use LightweightPlugins\Img\Media\UrlPairs;
+use LightweightPlugins\Img\Media\UrlRewriter;
 
 /**
  * Moves the backed-up original back into place, removes the optimized
@@ -58,7 +61,20 @@ final class Restorer {
 			return false;
 		}
 
+		$old_url  = (string) wp_get_attachment_url( $attachment_id );
+		$old_meta = wp_get_attachment_metadata( $attachment_id );
+
 		( new AttachmentRebuilder() )->replace_main_file( $attachment_id, $target, true );
+
+		( new UrlRewriter() )->rewrite(
+			UrlPairs::build(
+				$old_url,
+				UrlPairs::sizes_map( $old_meta ),
+				(string) wp_get_attachment_url( $attachment_id ),
+				UrlPairs::sizes_map( wp_get_attachment_metadata( $attachment_id ) )
+			)
+		);
+
 		$this->clear_meta( $attachment_id );
 
 		do_action( 'lw_img_restored', $attachment_id, $target );
@@ -79,11 +95,17 @@ final class Restorer {
 			'_lw_img_new_size',
 			'_lw_img_savings_pct',
 			'_lw_img_job_id',
+			'_lw_img_level',
+			'_lw_img_keep_exif',
+			'_lw_img_optimized_at',
 			BackupStore::META_KEY,
 		];
 
 		foreach ( $keys as $key ) {
 			delete_post_meta( $attachment_id, $key );
 		}
+
+		// The attachment becomes pending again — it can be re-optimized.
+		StatusMeta::clear( $attachment_id );
 	}
 }

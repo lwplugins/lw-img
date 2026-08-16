@@ -170,6 +170,21 @@ final class TabUpload implements TabInterface {
 					?>
 				</td>
 			</tr>
+			<tr>
+				<th><label for="min_filesize_kb"><?php esc_html_e( 'Min file size (KB)', 'lw-img' ); ?></label></th>
+				<td>
+					<?php
+					$this->render_number_field(
+						[
+							'name'        => 'min_filesize_kb',
+							'min'         => '0',
+							'max'         => '10240',
+							'description' => __( 'Skip images below this size — tiny files rarely benefit from conversion. 0 = no minimum.', 'lw-img' ),
+						]
+					);
+					?>
+				</td>
+			</tr>
 		</table>
 		<?php
 	}

@@ -140,6 +140,19 @@ final class ConvertibleDetectorTest extends MonkeyTestCase {
 		$this->assertTrue( $detector->should_convert( self::FIXTURES . 'static.gif', 'image/jpeg' ) );
 	}
 
+	public function test_skips_files_below_the_min_filesize(): void {
+		$this->saved_options(
+			[
+				'api_key'         => 'himg_x',
+				'min_filesize_kb' => 1,
+			]
+		);
+
+		$detector = new ConvertibleDetector();
+
+		$this->assertFalse( $detector->should_convert( self::FIXTURES . 'static.gif', 'image/jpeg' ) );
+	}
+
 	public function test_skips_files_matching_an_exclusion_pattern(): void {
 		$this->saved_options(
 			[

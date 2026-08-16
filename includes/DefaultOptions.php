@@ -39,6 +39,7 @@ final class DefaultOptions {
 			'skip_already_webp'  => true,
 			'skip_animated_gif'  => false,
 			'max_filesize_mb'    => 10,
+			'min_filesize_kb'    => 0,
 			'exclusion_patterns' => [],
 			'mime_types'         => [
 				'image/jpeg',

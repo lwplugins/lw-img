@@ -84,6 +84,11 @@ final class ConvertibleDetector {
 			return $this->skip( $file_path, 'exceeds max_filesize_mb' );
 		}
 
+		$min_bytes = ( (int) Options::get( 'min_filesize_kb' ) ) * 1024;
+		if ( $min_bytes > 0 && filesize( $file_path ) < $min_bytes ) {
+			return $this->skip( $file_path, 'below min_filesize_kb' );
+		}
+
 		if ( Options::get( 'skip_animated_gif' ) && 'image/gif' === $mime_type && AnimatedGifProbe::is_animated( $file_path ) ) {
 			return $this->skip( $file_path, 'animated gif' );
 		}

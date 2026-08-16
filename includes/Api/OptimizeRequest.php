@@ -39,10 +39,12 @@ final class OptimizeRequest {
 	 * @param string|null $convert_override Force a specific output format (e.g. 'webp'
 	 *                                      for animated input, where only WebP keeps
 	 *                                      the animation). Null uses the saved option.
+	 * @param string|null $level_override   Force a specific optimization level
+	 *                                      (used by re-optimize). Null uses the saved option.
 	 * @return self
 	 */
-	public static function from_options( string $file_path, ?string $convert_override = null ): self {
-		$level = (string) Options::get( 'level' );
+	public static function from_options( string $file_path, ?string $convert_override = null, ?string $level_override = null ): self {
+		$level = $level_override ?? (string) Options::get( 'level' );
 		if ( ! self::valid_level( $level ) ) {
 			$level = self::LEVEL_NORMAL;
 		}

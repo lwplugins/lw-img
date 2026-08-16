@@ -12,6 +12,8 @@ namespace LightweightPlugins\Img\CLI;
 use LightweightPlugins\Img\Backup\BackupStore;
 use LightweightPlugins\Img\Backup\Restorer;
 use LightweightPlugins\Img\Bulk\AttachmentOptimizer;
+use LightweightPlugins\Img\Bulk\BulkJob;
+use LightweightPlugins\Img\Bulk\StatusMeta;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
 use WP_CLI;
 
@@ -28,20 +30,63 @@ final class Commands {
 	 *     wp lw-img status
 	 */
 	public function status(): void {
-		$query = new UnoptimizedQuery();
+		$counts = StatusMeta::counts();
 
 		$items = [
 			[
-				'metric' => 'optimized',
-				'value'  => $query->optimized_count(),
+				'metric' => 'pending',
+				'value'  => ( new UnoptimizedQuery() )->count(),
 			],
 			[
-				'metric' => 'not optimized',
-				'value'  => $query->count(),
+				'metric' => 'optimized',
+				'value'  => $counts[ StatusMeta::OPTIMIZED ],
+			],
+			[
+				'metric' => 'skipped',
+				'value'  => $counts[ StatusMeta::SKIPPED ],
+			],
+			[
+				'metric' => 'failed',
+				'value'  => $counts[ StatusMeta::FAILED ],
 			],
 		];
 
 		WP_CLI\Utils\format_items( 'table', $items, [ 'metric', 'value' ] );
+	}
+
+	/**
+	 * Re-queue skipped and/or failed attachments for the next run.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--failed]
+	 * : Re-queue attachments whose last attempt failed.
+	 *
+	 * [--skipped]
+	 * : Re-queue attachments that were skipped (e.g. after changing settings).
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp lw-img requeue --failed
+	 *     wp lw-img requeue --failed --skipped
+	 *
+	 * @param array<int, string>    $args       Positional arguments.
+	 * @param array<string, string> $assoc_args Named arguments.
+	 */
+	public function requeue( array $args, array $assoc_args ): void {
+		if ( ! isset( $assoc_args['failed'] ) && ! isset( $assoc_args['skipped'] ) ) {
+			WP_CLI::error( 'Pass --failed and/or --skipped.' );
+		}
+
+		$total = 0;
+		if ( isset( $assoc_args['failed'] ) ) {
+			$total += StatusMeta::requeue_by_status( StatusMeta::FAILED );
+		}
+		if ( isset( $assoc_args['skipped'] ) ) {
+			$total += StatusMeta::requeue_by_status( StatusMeta::SKIPPED );
+		}
+
+		WP_CLI::success( sprintf( '%d attachment(s) re-queued.', $total ) );
 	}
 
 	/**
@@ -71,6 +116,10 @@ final class Commands {
 	 * @param array<string, string> $assoc_args Named arguments.
 	 */
 	public function optimize( array $args, array $assoc_args ): void {
+		if ( BulkJob::is_running() ) {
+			WP_CLI::warning( 'A background bulk run is active — running both at once may double-process items. Cancel it on the Bulk tab first.' );
+		}
+
 		$ids = array_map( 'absint', $args );
 
 		if ( isset( $assoc_args['all'] ) ) {

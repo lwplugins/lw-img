@@ -78,6 +78,11 @@ final class UnoptimizedQuery {
 			'fields'         => 'ids',
 			'no_found_rows'  => false,
 			'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- admin/CLI-only listing; NOT EXISTS is required to find unprocessed items.
+				'relation' => 'AND',
+				[
+					'key'     => StatusMeta::META_STATUS,
+					'compare' => 'NOT EXISTS',
+				],
 				[
 					'key'     => '_lw_img_optimized',
 					'compare' => 'NOT EXISTS',
