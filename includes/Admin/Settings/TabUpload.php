@@ -1,0 +1,122 @@
+<?php
+/**
+ * Upload tab — auto-conversion settings.
+ *
+ * @package LightweightPlugins\Img
+ */
+
+declare(strict_types=1);
+
+namespace LightweightPlugins\Img\Admin\Settings;
+
+/**
+ * Upload tab: auto-conversion settings.
+ */
+final class TabUpload implements TabInterface {
+
+	use FieldRendererTrait;
+
+	public function get_slug(): string {
+		return 'upload';
+	}
+
+	public function get_label(): string {
+		return __( 'Upload', 'lw-img' );
+	}
+
+	public function get_icon(): string {
+		return 'dashicons-upload';
+	}
+
+	public function render(): void {
+		?>
+		<h2><?php esc_html_e( 'Auto-convert uploads', 'lw-img' ); ?></h2>
+		<p><?php esc_html_e( 'When a non-WebP image is uploaded, it is sent to HelloImg and replaced with the optimized WebP. WordPress sub-sizes are then generated from the WebP source.', 'lw-img' ); ?></p>
+
+		<table class="form-table">
+			<tr>
+				<th><?php esc_html_e( 'Auto-convert', 'lw-img' ); ?></th>
+				<td>
+					<?php
+					$this->render_checkbox_field(
+						[
+							'name'        => 'auto_convert',
+							'label'       => __( 'Convert non-WebP uploads to WebP automatically', 'lw-img' ),
+							'description' => __( 'Disable to leave uploads untouched.', 'lw-img' ),
+						]
+					);
+					?>
+				</td>
+			</tr>
+			<tr>
+				<th><label for="level"><?php esc_html_e( 'Optimization level', 'lw-img' ); ?></label></th>
+				<td>
+					<?php
+					$this->render_select_field(
+						[
+							'name'        => 'level',
+							'options'     => [
+								'normal'     => __( 'Normal — balanced', 'lw-img' ),
+								'aggressive' => __( 'Aggressive — smaller files', 'lw-img' ),
+								'ultra'      => __( 'Ultra — maximum compression', 'lw-img' ),
+							],
+							'description' => __( 'Higher levels save more bytes but may show visible compression.', 'lw-img' ),
+						]
+					);
+					?>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'EXIF metadata', 'lw-img' ); ?></th>
+				<td>
+					<?php
+					$this->render_checkbox_field(
+						[
+							'name'        => 'keep_exif',
+							'label'       => __( 'Keep EXIF metadata (camera info, GPS, copyright)', 'lw-img' ),
+							'description' => __( 'Off by default — smaller files and removes potentially sensitive data.', 'lw-img' ),
+						]
+					);
+					?>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Skip rules', 'lw-img' ); ?></th>
+				<td>
+					<?php
+					$this->render_checkbox_field(
+						[
+							'name'  => 'skip_already_webp',
+							'label' => __( 'Skip already-WebP / AVIF uploads (recommended)', 'lw-img' ),
+						]
+					);
+					echo '<br>';
+					$this->render_checkbox_field(
+						[
+							'name'        => 'skip_animated_gif',
+							'label'       => __( 'Skip animated GIFs only (recommended — animation would be lost)', 'lw-img' ),
+							'description' => __( 'Static (single-frame) GIFs are still converted to WebP. Animated GIFs are detected by counting frame markers and left untouched.', 'lw-img' ),
+						]
+					);
+					?>
+				</td>
+			</tr>
+			<tr>
+				<th><label for="max_filesize_mb"><?php esc_html_e( 'Max file size (MB)', 'lw-img' ); ?></label></th>
+				<td>
+					<?php
+					$this->render_number_field(
+						[
+							'name'        => 'max_filesize_mb',
+							'min'         => '1',
+							'max'         => '10',
+							'description' => __( 'HelloImg rejects images over 10 MB. Larger uploads are skipped (original kept).', 'lw-img' ),
+						]
+					);
+					?>
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
+}
