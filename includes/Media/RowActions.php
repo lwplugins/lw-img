@@ -12,6 +12,7 @@ namespace LightweightPlugins\Img\Media;
 use LightweightPlugins\Img\Backup\BackupStore;
 use LightweightPlugins\Img\Backup\RestoreHandler;
 use LightweightPlugins\Img\Bulk\OptimizeHandler;
+use LightweightPlugins\Img\Compat\CompetitorRegistry;
 use LightweightPlugins\Img\Options;
 use WP_Post;
 
@@ -43,6 +44,10 @@ final class RowActions {
 
 		if ( get_post_meta( $post->ID, '_lw_img_optimized', true ) ) {
 			return self::add_restore_action( $actions, $post->ID );
+		}
+
+		if ( null !== CompetitorRegistry::managed_by( $post->ID ) ) {
+			return $actions;
 		}
 
 		if ( in_array( (string) $post->post_mime_type, (array) Options::get( 'mime_types' ), true ) ) {

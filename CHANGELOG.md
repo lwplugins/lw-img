@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0] - 2026-08-16
+
+### Added
+- Respect other optimizers' work: images already optimized by ShortPixel, TinyPNG (Tinify), or Imagify (detected via their own postmeta, verified against each plugin's source) are skipped by bulk and on-demand optimization, and the Media Library shows which plugin manages them
+- Competitor warning: when another image optimizer is active (ShortPixel, TinyPNG, Imagify, Smush, EWWW), a dismissible admin notice suggests deactivating one — warning only, nothing is blocked; the notice returns if the set of active optimizers changes
+- `lw_img_competitor_plugins` filter to extend the competitor list
+
 ## [1.1.0] - 2026-08-16
 
 ### Added

@@ -19,6 +19,7 @@ use LightweightPlugins\Img\Bulk\OptimizeHandler;
 use LightweightPlugins\Img\Bulk\ReoptimizeHandler;
 use LightweightPlugins\Img\Bulk\StatusEndpoint;
 use LightweightPlugins\Img\CLI\Commands as CLICommands;
+use LightweightPlugins\Img\Compat\CompetitorNotice;
 use LightweightPlugins\Img\Log\ClearHandler;
 use LightweightPlugins\Img\Log\EventLog;
 use LightweightPlugins\Img\Media\ComparePage;
@@ -49,6 +50,7 @@ final class Plugin {
 		new UploadInterceptor();
 
 		if ( is_admin() ) {
+			CompetitorNotice::register();
 			ClearHandler::register();
 			RestoreHandler::register();
 			OptimizeHandler::register();

@@ -49,6 +49,11 @@ final class SavingsColumn {
 		}
 
 		if ( ! get_post_meta( $post_id, '_lw_img_optimized', true ) ) {
+			$owner = \LightweightPlugins\Img\Compat\CompetitorRegistry::managed_by( $post_id );
+			if ( null !== $owner ) {
+				echo '<span class="description">' . esc_html( $owner ) . '</span>';
+				return;
+			}
 			echo '<span aria-hidden="true">—</span>';
 			return;
 		}

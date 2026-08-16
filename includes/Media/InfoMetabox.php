@@ -13,6 +13,7 @@ use LightweightPlugins\Img\Backup\BackupStore;
 use LightweightPlugins\Img\Backup\RestoreHandler;
 use LightweightPlugins\Img\Bulk\OptimizeHandler;
 use LightweightPlugins\Img\Bulk\ReoptimizeHandler;
+use LightweightPlugins\Img\Compat\CompetitorRegistry;
 use LightweightPlugins\Img\Options;
 use WP_Post;
 
@@ -105,6 +106,18 @@ final class InfoMetabox {
 	 * @return void
 	 */
 	private static function render_unoptimized( WP_Post $post ): void {
+		$owner = CompetitorRegistry::managed_by( $post->ID );
+		if ( null !== $owner ) {
+			printf(
+				'<p class="description">%s</p>',
+				esc_html(
+					/* translators: %s: competitor plugin name. */
+					sprintf( __( 'Already optimized by %s — LW Img leaves this image untouched.', 'lw-img' ), $owner )
+				)
+			);
+			return;
+		}
+
 		if ( ! in_array( (string) $post->post_mime_type, (array) Options::get( 'mime_types' ), true ) ) {
 			echo '<p class="description">' . esc_html__( 'This file type is not converted by LW Img.', 'lw-img' ) . '</p>';
 			return;

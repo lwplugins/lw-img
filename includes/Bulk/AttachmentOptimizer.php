@@ -12,6 +12,7 @@ namespace LightweightPlugins\Img\Bulk;
 use LightweightPlugins\Img\Api\ApiException;
 use LightweightPlugins\Img\Api\Client;
 use LightweightPlugins\Img\Api\OptimizeRequest;
+use LightweightPlugins\Img\Compat\CompetitorRegistry;
 use LightweightPlugins\Img\Media\AttachmentRebuilder;
 use LightweightPlugins\Img\Media\UrlPairs;
 use LightweightPlugins\Img\Media\UrlRewriter;
@@ -83,6 +84,11 @@ final class AttachmentOptimizer {
 	public function optimize( int $attachment_id ): array {
 		if ( get_post_meta( $attachment_id, '_lw_img_optimized', true ) ) {
 			return $this->finish( $attachment_id, self::RESULT_SKIPPED, 'already optimized' );
+		}
+
+		$owner = CompetitorRegistry::managed_by( $attachment_id );
+		if ( null !== $owner ) {
+			return $this->finish( $attachment_id, self::RESULT_SKIPPED, 'already optimized by ' . $owner );
 		}
 
 		$file = (string) get_attached_file( $attachment_id );
