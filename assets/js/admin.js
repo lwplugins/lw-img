@@ -82,9 +82,11 @@
 		var statusEl = document.getElementById('lw-img-bulk-status');
 		var bar      = document.getElementById('lw-img-bulk-bar');
 		var barFill  = document.getElementById('lw-img-bulk-bar-fill');
-		var logEl    = document.getElementById('lw-img-bulk-log');
-		var total    = parseInt(container.getAttribute('data-remaining'), 10) || 0;
-		var done     = 0;
+		var logEl         = document.getElementById('lw-img-bulk-log');
+		var total         = parseInt(container.getAttribute('data-remaining'), 10) || 0;
+		var done          = 0;
+		var optimized     = 0;
+		var prevRemaining = Infinity;
 
 		function setStatus(text) {
 			if (statusEl) {
@@ -116,6 +118,11 @@
 
 					payload.data.processed.forEach(appendLog);
 					done += payload.data.processed.length;
+					payload.data.processed.forEach(function (item) {
+						if (item.result === 'optimized') {
+							optimized += 1;
+						}
+					});
 
 					var remaining = payload.data.remaining;
 					if (barFill && total > 0) {
@@ -123,10 +130,19 @@
 					}
 					setStatus(remaining + ' remaining…');
 
-					if (remaining > 0 && payload.data.processed.length > 0) {
+					// Guard against a stalled queue: skipped/failed images stay
+					// "unoptimized", so a non-decreasing remaining count means the
+					// rest cannot be processed — continuing would loop forever.
+					var stalled = remaining >= prevRemaining;
+					prevRemaining = remaining;
+
+					if (remaining > 0 && payload.data.processed.length > 0 && !stalled) {
 						step();
+					} else if (remaining > 0) {
+						setStatus('Done — ' + optimized + ' optimized, ' + remaining + ' image(s) could not be processed (see the Log tab).');
+						button.disabled = false;
 					} else {
-						setStatus('Done — ' + done + ' image(s) processed.');
+						setStatus('Done — ' + optimized + ' of ' + done + ' image(s) optimized.');
 						button.disabled = false;
 					}
 				})
