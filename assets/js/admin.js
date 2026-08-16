@@ -116,6 +116,12 @@
 						throw new Error(payload && payload.data && payload.data.message ? payload.data.message : 'request failed');
 					}
 
+					if (payload.data.locked) {
+						setStatus('Another bulk run is already in progress.');
+						button.disabled = false;
+						return;
+					}
+
 					payload.data.processed.forEach(appendLog);
 					done += payload.data.processed.length;
 					payload.data.processed.forEach(function (item) {

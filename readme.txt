@@ -34,6 +34,7 @@ LW Img is a lightweight image optimization plugin that converts non-WebP uploads
 
 **Roadmap:**
 
+* Content URL rewrite on bulk convert/restore (serialization-aware, for page-builder data)
 * AVIF output, resize on upload, animated WebP (pending HelloImg API support)
 * Smart Crop integration
 * AI-generated alt text
@@ -59,7 +60,7 @@ The upload proceeds with the original format. No upload ever fails because of LW
 
 = Does this work with images already in the media library? =
 
-Not yet — v1.0.0 only converts new uploads. Bulk optimize is on the roadmap.
+Yes — use the Bulk tab (or `wp lw-img optimize --all`). Note that converting renames the file (photo.jpg becomes photo.webp): content that embeds an image by its literal file URL (typically page-builder data such as Elementor/Bricks JSON) keeps pointing at the old name. Re-select the image there, restore that image, or add an exclusion pattern for it. Featured images and anything referenced by attachment ID are unaffected. An automatic content URL rewrite is on the roadmap.
 
 = Is there a free tier? =
 

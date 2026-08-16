@@ -42,7 +42,22 @@ final class AjaxHandler {
 			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'lw-img' ) ], 403 );
 		}
 
-		$query     = new UnoptimizedQuery();
+		$query = new UnoptimizedQuery();
+
+		// A second tab (or double-started loop) must not process the same
+		// batch concurrently — that would double-convert and waste API calls.
+		if ( false !== get_transient( 'lw_img_bulk_lock' ) ) {
+			wp_send_json_success(
+				[
+					'processed' => [],
+					'remaining' => $query->count(),
+					'locked'    => true,
+				]
+			);
+		}
+
+		set_transient( 'lw_img_bulk_lock', 1, MINUTE_IN_SECONDS );
+
 		$optimizer = new AttachmentOptimizer();
 		$processed = [];
 
@@ -57,10 +72,13 @@ final class AjaxHandler {
 			];
 		}
 
+		delete_transient( 'lw_img_bulk_lock' );
+
 		wp_send_json_success(
 			[
 				'processed' => $processed,
 				'remaining' => $query->count(),
+				'locked'    => false,
 			]
 		);
 	}

@@ -37,6 +37,7 @@ final class TabBulk implements TabInterface {
 		?>
 		<h2><?php esc_html_e( 'Bulk optimize', 'lw-img' ); ?></h2>
 		<p><?php esc_html_e( 'Convert the images already in your Media Library. Images are processed a few at a time — keep this tab open until the run finishes. The upload skip rules (exclusions, max size, animated GIFs) apply here too.', 'lw-img' ); ?></p>
+		<p><strong><?php esc_html_e( 'Note:', 'lw-img' ); ?></strong> <?php esc_html_e( 'converting renames files (photo.jpg becomes photo.webp). Content that embeds an image by its file URL (typically page-builder data) keeps pointing at the old name — re-select the image there, restore that image, or exclude it before running. Featured images and anything referenced by attachment ID are unaffected.', 'lw-img' ); ?></p>
 
 		<table class="form-table">
 			<tr>
