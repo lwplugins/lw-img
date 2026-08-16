@@ -34,10 +34,12 @@ final class TabBulk implements TabInterface {
 	}
 
 	public function render(): void {
-		$pending = ( new UnoptimizedQuery() )->count();
-		$counts  = StatusMeta::counts();
-		$job     = BulkJob::get();
-		$running = BulkJob::is_running();
+		$query     = new UnoptimizedQuery();
+		$pending   = $query->count();
+		$optimized = $query->optimized_count();
+		$counts    = StatusMeta::counts();
+		$job       = BulkJob::get();
+		$running   = BulkJob::is_running();
 
 		?>
 		<h2><?php esc_html_e( 'Bulk optimize', 'lw-img' ); ?></h2>
@@ -50,7 +52,7 @@ final class TabBulk implements TabInterface {
 				<td>
 					<p>
 						<strong><?php echo esc_html( number_format_i18n( $pending ) ); ?></strong> <?php esc_html_e( 'pending', 'lw-img' ); ?> ·
-						<strong><?php echo esc_html( number_format_i18n( $counts[ StatusMeta::OPTIMIZED ] ) ); ?></strong> <?php esc_html_e( 'optimized', 'lw-img' ); ?> ·
+						<strong><?php echo esc_html( number_format_i18n( $optimized ) ); ?></strong> <?php esc_html_e( 'optimized', 'lw-img' ); ?> ·
 						<strong><?php echo esc_html( number_format_i18n( $counts[ StatusMeta::SKIPPED ] ) ); ?></strong> <?php esc_html_e( 'skipped', 'lw-img' ); ?> ·
 						<strong><?php echo esc_html( number_format_i18n( $counts[ StatusMeta::FAILED ] ) ); ?></strong> <?php esc_html_e( 'failed', 'lw-img' ); ?>
 					</p>

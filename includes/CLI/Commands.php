@@ -31,15 +31,16 @@ final class Commands {
 	 */
 	public function status(): void {
 		$counts = StatusMeta::counts();
+		$query  = new UnoptimizedQuery();
 
 		$items = [
 			[
 				'metric' => 'pending',
-				'value'  => ( new UnoptimizedQuery() )->count(),
+				'value'  => $query->count(),
 			],
 			[
 				'metric' => 'optimized',
-				'value'  => $counts[ StatusMeta::OPTIMIZED ],
+				'value'  => $query->optimized_count(),
 			],
 			[
 				'metric' => 'skipped',
