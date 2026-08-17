@@ -17,6 +17,10 @@ use WP_Query;
  */
 final class UnoptimizedQuery {
 
+	private const CLAIM_TTL = 600;
+
+	private const CLAIM_LOCK = 'lw_img_claim';
+
 	/**
 	 * IDs of unoptimized image attachments.
 	 *
@@ -27,6 +31,39 @@ final class UnoptimizedQuery {
 		$query = new WP_Query( $this->args( $limit ) );
 
 		return array_map( 'intval', $query->posts );
+	}
+
+	/**
+	 * Atomically claim a batch of pending IDs for this process.
+	 *
+	 * Claimed rows leave the pending queue until their outcome stamp (or the
+	 * claim's expiry, should the process die), so several workers — cron
+	 * ticks, poll assists, parallel WP-CLI processes — can drain the same
+	 * queue without double-processing. A MySQL advisory lock makes the
+	 * pick-and-stamp atomic; without lock support this degrades to the
+	 * single-process behavior.
+	 *
+	 * @param int $limit Maximum number of IDs to claim.
+	 * @return array<int, int>
+	 */
+	public function claim( int $limit ): array {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- advisory lock; no data is read.
+		$locked = '1' === (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', self::CLAIM_LOCK ) );
+
+		$ids = $this->ids( $limit );
+
+		foreach ( $ids as $attachment_id ) {
+			update_post_meta( $attachment_id, StatusMeta::META_CLAIM, time() );
+		}
+
+		if ( $locked ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- advisory lock release; no data is read.
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', self::CLAIM_LOCK ) );
+		}
+
+		return $ids;
 	}
 
 	/**
@@ -86,6 +123,19 @@ final class UnoptimizedQuery {
 				[
 					'key'     => '_lw_img_optimized',
 					'compare' => 'NOT EXISTS',
+				],
+				[
+					'relation' => 'OR',
+					[
+						'key'     => StatusMeta::META_CLAIM,
+						'compare' => 'NOT EXISTS',
+					],
+					[
+						'key'     => StatusMeta::META_CLAIM,
+						'value'   => time() - self::CLAIM_TTL,
+						'compare' => '<',
+						'type'    => 'NUMERIC',
+					],
 				],
 			],
 		];

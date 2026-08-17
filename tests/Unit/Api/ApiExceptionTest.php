@@ -35,6 +35,8 @@ final class ApiExceptionTest extends MonkeyTestCase {
 		return [
 			'network error'          => [ 'network_error', 0, true ],
 			'sync timeout (408)'     => [ 'timeout', 408, true ],
+			'rate limited (429)'     => [ 'unknown', 429, true ],
+			'rate limited by code'   => [ 'rate_limited', 200, true ],
 			'server error (500)'     => [ 'http_500', 500, true ],
 			'incomplete job'         => [ 'incomplete', 200, true ],
 			'invalid request (400)'  => [ 'invalid_request', 400, false ],

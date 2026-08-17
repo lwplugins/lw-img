@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Bulk;
 
+use LightweightPlugins\Img\Media\RewriteBuffer;
+
 /**
  * Processes pending attachments in time-budgeted ticks and reschedules
  * itself until nothing is left or the run is cancelled. A transient lock
@@ -57,10 +59,24 @@ final class BackgroundWorker {
 	 */
 	private static function budget(): int {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			return 240;
+			return 1200;
 		}
 
 		return self::BUDGET_SEC;
+	}
+
+	/**
+	 * Keep long CLI ticks from accumulating an unbounded in-process object
+	 * cache. A full flush is only safe against the in-memory array cache —
+	 * with Redis/Memcached it would wipe the whole site's cache, so external
+	 * object caches are left alone.
+	 *
+	 * @return void
+	 */
+	public static function free_memory(): void {
+		if ( function_exists( 'wp_using_ext_object_cache' ) && ! wp_using_ext_object_cache() ) {
+			wp_cache_flush();
+		}
 	}
 
 	/**
@@ -143,15 +159,17 @@ final class BackgroundWorker {
 
 		$deadline  = time() + $budget;
 		$query     = new UnoptimizedQuery();
-		$optimizer = new AttachmentOptimizer();
+		$buffer    = new RewriteBuffer();
+		$optimizer = new AttachmentOptimizer( null, null, null, null, $buffer );
 		$drained   = false;
+		$processed = 0;
 
 		while ( time() < $deadline ) {
 			if ( ! BulkJob::is_running() ) {
 				break;
 			}
 
-			$ids = $query->ids( 3 );
+			$ids = $query->claim( 3 );
 			if ( [] === $ids ) {
 				$drained = true;
 				break;
@@ -167,12 +185,18 @@ final class BackgroundWorker {
 					(string) $outcome['detail']
 				);
 
+				++$processed;
+				if ( 0 === $processed % 50 ) {
+					self::free_memory();
+				}
+
 				if ( time() >= $deadline || ! BulkJob::is_running() ) {
 					break;
 				}
 			}
 		}
 
+		$buffer->flush();
 		delete_transient( self::LOCK );
 
 		if ( $drained ) {

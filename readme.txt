@@ -72,9 +72,13 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 * New: Stats tab — total savings, backup folder size, and leftover backup folders from other optimizers (e.g. ShortPixel)
 * New: Redesigned Bulk tab — progress dashboard with segmented bar, stat tiles, elapsed/speed/ETA, live activity feed, and a finish summary
 * New: Skip-reason breakdown on the Bulk tab and in wp lw-img status
+* New: Batched content URL rewrite during bulk runs — large-database bulk optimization is several times faster
+* New: Parallel-safe queue claiming — multiple wp lw-img optimize --all workers can drain the queue together; CLI progress shows up live on the Bulk tab
 * Fix: much larger background worker budget under WP-CLI system cron (DISABLE_WP_CRON hosts no longer crawl)
 * Fix: lost bulk ticks are re-scheduled automatically while a run is active
 * Fix: with the Bulk tab open, a stalled run is kept moving by the status poll itself (works even when the host's cron loopback fails)
+* Fix: JSON-escaped URLs in post_content (Gutenberg block attributes) are rewritten too
+* Fix: HTTP 429 rate-limit responses are retried automatically instead of failing permanently
 
 = 1.4.0 =
 * New: Slow jobs are polled instead of failing (API 408 + poll URL handling)

@@ -14,6 +14,7 @@ use LightweightPlugins\Img\Api\Client;
 use LightweightPlugins\Img\Api\OptimizeRequest;
 use LightweightPlugins\Img\Compat\CompetitorRegistry;
 use LightweightPlugins\Img\Media\AttachmentRebuilder;
+use LightweightPlugins\Img\Media\RewriteBuffer;
 use LightweightPlugins\Img\Media\UrlPairs;
 use LightweightPlugins\Img\Media\UrlRewriter;
 use LightweightPlugins\Img\Upload\AnimatedGifProbe;
@@ -60,16 +61,26 @@ final class AttachmentOptimizer {
 	 */
 	private ?string $level_override;
 
+	/**
+	 * Optional shared rewrite buffer: bulk runs batch content rewrites
+	 * across images instead of scanning every table per image.
+	 *
+	 * @var RewriteBuffer|null
+	 */
+	private ?RewriteBuffer $rewrite_buffer;
+
 	public function __construct(
 		?ConvertibleDetector $detector = null,
 		?FileSwapper $swapper = null,
 		?AttachmentRebuilder $rebuilder = null,
-		?string $level_override = null
+		?string $level_override = null,
+		?RewriteBuffer $rewrite_buffer = null
 	) {
 		$this->detector       = $detector ?? new ConvertibleDetector();
 		$this->swapper        = $swapper ?? new FileSwapper();
 		$this->rebuilder      = $rebuilder ?? new AttachmentRebuilder();
 		$this->level_override = $level_override;
+		$this->rewrite_buffer = $rewrite_buffer;
 	}
 
 	/**
@@ -160,14 +171,18 @@ final class AttachmentOptimizer {
 
 		$this->rebuilder->replace_main_file( $attachment_id, (string) $swapped['file'], false );
 
-		( new UrlRewriter() )->rewrite(
-			UrlPairs::build(
-				$old_url,
-				UrlPairs::sizes_map( $old_meta ),
-				(string) wp_get_attachment_url( $attachment_id ),
-				UrlPairs::sizes_map( wp_get_attachment_metadata( $attachment_id ) )
-			)
+		$pairs = UrlPairs::build(
+			$old_url,
+			UrlPairs::sizes_map( $old_meta ),
+			(string) wp_get_attachment_url( $attachment_id ),
+			UrlPairs::sizes_map( wp_get_attachment_metadata( $attachment_id ) )
 		);
+
+		if ( null !== $this->rewrite_buffer ) {
+			$this->rewrite_buffer->add( $pairs );
+		} else {
+			( new UrlRewriter() )->rewrite( $pairs );
+		}
 
 		AttachmentMetaWriter::write_meta(
 			$attachment_id,

@@ -43,8 +43,13 @@ final class UrlRewriter {
 		],
 	];
 
+	private const PAIRS_PER_QUERY = 100;
+
 	/**
 	 * Apply the pairs to posts, all meta tables, and options.
+	 *
+	 * Large batches are split so a single query never carries an unbounded
+	 * number of LIKE conditions.
 	 *
 	 * @param array<string, string> $pairs Map of old URL => new URL.
 	 * @return void
@@ -56,10 +61,18 @@ final class UrlRewriter {
 			ARRAY_FILTER_USE_BOTH
 		);
 
-		if ( [] === $pairs ) {
-			return;
+		foreach ( array_chunk( $pairs, self::PAIRS_PER_QUERY, true ) as $chunk ) {
+			$this->apply( $chunk );
 		}
+	}
 
+	/**
+	 * Apply one chunk of pairs to every content table.
+	 *
+	 * @param array<string, string> $pairs Map of old URL => new URL.
+	 * @return void
+	 */
+	private function apply( array $pairs ): void {
 		$this->rewrite_posts( $pairs );
 
 		foreach ( array_keys( self::META_TABLES ) as $table ) {
@@ -109,7 +122,8 @@ final class UrlRewriter {
 	}
 
 	/**
-	 * Plain text replace in post_content.
+	 * Replace in post_content (raw and JSON-escaped forms, e.g. Gutenberg
+	 * block attributes) via candidate select + targeted per-row update.
 	 *
 	 * @param array<string, string> $pairs Map of old URL => new URL.
 	 * @return void
@@ -117,27 +131,31 @@ final class UrlRewriter {
 	private function rewrite_posts( array $pairs ): void {
 		global $wpdb;
 
-		$expression = 'post_content';
-		$params     = [];
-		$likes      = [];
+		[ $condition, $params ] = $this->like_condition( 'post_content', $pairs );
 
-		foreach ( $pairs as $old_url => $new_url ) {
-			$expression = 'REPLACE(' . $expression . ', %s, %s)';
-			$params[]   = $old_url;
-			$params[]   = $new_url;
-			$likes[]    = 'post_content LIKE %s';
-		}
+		$last_id = 0;
 
-		foreach ( array_keys( $pairs ) as $old_url ) {
-			$params[] = '%' . $wpdb->esc_like( $old_url ) . '%';
-		}
+		do {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- candidate scan for the rewrite; conditions consist of %s placeholders only and the whole query is prepared here.
+			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT ID, post_content FROM {$wpdb->posts} WHERE ID > %d AND {$condition} ORDER BY ID ASC LIMIT %d", array_merge( [ $last_id ], $params, [ self::META_BATCH ] ) ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- bulk content rewrite; the interpolated expression and conditions consist of %s placeholders only and the whole query is prepared here.
-		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_content = {$expression} WHERE " . implode( ' OR ', $likes ), $params ) );
+			$row_count = count( $rows );
 
-		if ( function_exists( 'wp_cache_flush_group' ) ) {
-			wp_cache_flush_group( 'posts' );
-		}
+			foreach ( $rows as $row ) {
+				$last_id = (int) $row->ID;
+				$updated = self::replace_in_value( (string) $row->post_content, $pairs );
+
+				if ( $updated !== (string) $row->post_content ) {
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- targeted update by primary key; the post cache is cleaned below.
+					$wpdb->update(
+						$wpdb->posts,
+						[ 'post_content' => $updated ],
+						[ 'ID' => $row->ID ]
+					);
+					clean_post_cache( (int) $row->ID );
+				}
+			}
+		} while ( self::META_BATCH === $row_count );
 	}
 
 	/**

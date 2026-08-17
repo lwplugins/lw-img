@@ -7,9 +7,14 @@
 - Redesigned Bulk tab: progress dashboard with a segmented bar (optimized/skipped/failed composition), semantic stat tiles, elapsed/speed/ETA/saved-so-far row, a live "Now processing" line, a recent-activity feed with result chips, skip-reason chips, count-aware action buttons, and a summary banner when a run finishes
 - Skip-reason breakdown on the Bulk tab and in `wp lw-img status` (e.g. "file missing" for ghost attachment records)
 - `wp lw-img status` also reports storage saved and backup folder sizes
+- Batched content URL rewrite during bulk runs: rewrite pairs of many images are applied in one pass, so a batch costs the same table scans as a single image did before (on large databases this was the dominant per-image cost)
+- Parallel-safe queue claiming (MySQL advisory lock + claim meta with expiry): several `wp lw-img optimize --all` workers, the cron worker, and poll assists can drain the same queue without double-processing — running multiple CLI workers in parallel is now the fastest path for huge libraries
+- CLI optimize progress is mirrored into an active background job, so the Bulk tab dashboard stays live while CLI workers run
 
 ### Fixed
-- On hosts with `DISABLE_WP_CRON` and a system-cron runner the background worker now uses a much larger per-tick budget under WP-CLI (4 minutes instead of 15 seconds), so runs no longer crawl in short bursts between cron passes
+- On hosts with `DISABLE_WP_CRON` and a system-cron runner the background worker now uses a much larger per-tick budget under WP-CLI (20 minutes instead of 15 seconds, with in-process cache hygiene to keep memory flat), so runs no longer crawl in short bursts between cron passes
+- JSON-escaped URLs in post_content (e.g. Gutenberg block attributes) are now rewritten too, not only in page-builder meta
+- HTTP 429 / rate-limit responses are classified as transient failures, so they are retried automatically instead of being stamped permanent
 - A lost bulk tick is automatically re-scheduled while a run is active (self-heal on init)
 - While the Bulk tab is open, the status poll itself processes a short burst when the run has stalled — runs keep moving even on hosts whose cron loopback request fails
 

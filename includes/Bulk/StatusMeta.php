@@ -19,6 +19,7 @@ final class StatusMeta {
 	public const META_STATUS    = '_lw_img_status';
 	public const META_DETAIL    = '_lw_img_status_detail';
 	public const META_TRANSIENT = '_lw_img_status_transient';
+	public const META_CLAIM     = '_lw_img_claimed';
 
 	public const OPTIMIZED = 'optimized';
 	public const SKIPPED   = 'skipped';
@@ -36,6 +37,7 @@ final class StatusMeta {
 	public static function write( int $attachment_id, string $status, string $detail, bool $transient = false ): void {
 		update_post_meta( $attachment_id, self::META_STATUS, $status );
 		update_post_meta( $attachment_id, self::META_DETAIL, $detail );
+		delete_post_meta( $attachment_id, self::META_CLAIM );
 
 		if ( $transient ) {
 			update_post_meta( $attachment_id, self::META_TRANSIENT, 1 );
@@ -54,6 +56,7 @@ final class StatusMeta {
 		delete_post_meta( $attachment_id, self::META_STATUS );
 		delete_post_meta( $attachment_id, self::META_DETAIL );
 		delete_post_meta( $attachment_id, self::META_TRANSIENT );
+		delete_post_meta( $attachment_id, self::META_CLAIM );
 	}
 
 	/**

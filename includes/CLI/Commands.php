@@ -12,9 +12,11 @@ namespace LightweightPlugins\Img\CLI;
 use LightweightPlugins\Img\Backup\BackupStore;
 use LightweightPlugins\Img\Backup\Restorer;
 use LightweightPlugins\Img\Bulk\AttachmentOptimizer;
+use LightweightPlugins\Img\Bulk\BackgroundWorker;
 use LightweightPlugins\Img\Bulk\BulkJob;
 use LightweightPlugins\Img\Bulk\StatusMeta;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
+use LightweightPlugins\Img\Media\RewriteBuffer;
 use LightweightPlugins\Img\Stats\SiteStats;
 use WP_CLI;
 
@@ -142,41 +144,32 @@ final class Commands {
 	 */
 	public function optimize( array $args, array $assoc_args ): void {
 		if ( BulkJob::is_running() ) {
-			WP_CLI::warning( 'A background bulk run is active — running both at once may double-process items. Cancel it on the Bulk tab first.' );
-		}
-
-		$ids = array_map( 'absint', $args );
-
-		if ( isset( $assoc_args['all'] ) ) {
-			$limit = isset( $assoc_args['limit'] ) ? max( 1, absint( $assoc_args['limit'] ) ) : PHP_INT_MAX;
-			$ids   = ( new UnoptimizedQuery() )->ids( min( $limit, 100000 ) );
-		}
-
-		if ( [] === $ids ) {
-			WP_CLI::success( 'Nothing to optimize.' );
-			return;
+			WP_CLI::log( 'A background bulk run is active — this process will cooperate with it (shared queue claims) and its progress shows up on the Bulk tab.' );
 		}
 
 		if ( isset( $assoc_args['dry-run'] ) ) {
-			foreach ( $ids as $id ) {
-				WP_CLI::log( sprintf( 'Would optimize #%d (%s)', $id, (string) get_attached_file( $id ) ) );
-			}
-			WP_CLI::success( sprintf( '%d image(s) would be processed.', count( $ids ) ) );
+			$this->dry_run( $args, $assoc_args );
 			return;
 		}
 
-		$optimizer = new AttachmentOptimizer();
+		$buffer    = new RewriteBuffer();
+		$optimizer = new AttachmentOptimizer( null, null, null, null, $buffer );
 		$counts    = [
 			AttachmentOptimizer::RESULT_OPTIMIZED => 0,
 			AttachmentOptimizer::RESULT_SKIPPED   => 0,
 			AttachmentOptimizer::RESULT_FAILED    => 0,
 		];
 
-		foreach ( $ids as $id ) {
-			$outcome = $optimizer->optimize( $id );
-			++$counts[ $outcome['result'] ];
-			WP_CLI::log( sprintf( '#%d: %s (%s)', $id, $outcome['result'], $outcome['detail'] ) );
+		if ( isset( $assoc_args['all'] ) ) {
+			$limit = isset( $assoc_args['limit'] ) ? max( 1, absint( $assoc_args['limit'] ) ) : PHP_INT_MAX;
+			$this->drain( $optimizer, $limit, $counts );
+		} else {
+			foreach ( array_map( 'absint', $args ) as $id ) {
+				$this->process_one( $optimizer, $id, $counts );
+			}
 		}
+
+		$buffer->flush();
 
 		WP_CLI::success(
 			sprintf(
@@ -186,6 +179,80 @@ final class Commands {
 				$counts[ AttachmentOptimizer::RESULT_FAILED ]
 			)
 		);
+	}
+
+	/**
+	 * List what would be optimized without touching anything.
+	 *
+	 * @param array<int, string>    $args       Positional arguments.
+	 * @param array<string, string> $assoc_args Named arguments.
+	 */
+	private function dry_run( array $args, array $assoc_args ): void {
+		$ids = array_map( 'absint', $args );
+
+		if ( isset( $assoc_args['all'] ) ) {
+			$limit = isset( $assoc_args['limit'] ) ? max( 1, absint( $assoc_args['limit'] ) ) : 100000;
+			$ids   = ( new UnoptimizedQuery() )->ids( $limit );
+		}
+
+		foreach ( $ids as $id ) {
+			WP_CLI::log( sprintf( 'Would optimize #%d (%s)', $id, (string) get_attached_file( $id ) ) );
+		}
+		WP_CLI::success( sprintf( '%d image(s) would be processed.', count( $ids ) ) );
+	}
+
+	/**
+	 * Claim and process pending images in small batches until the queue is
+	 * empty or the limit is reached. Claiming lets several parallel CLI
+	 * workers (and the cron worker) drain the same queue safely.
+	 *
+	 * @param AttachmentOptimizer $optimizer Optimizer wired to a rewrite buffer.
+	 * @param int                 $limit     Maximum number of images to process.
+	 * @param array<string, int>  $counts    Outcome counters (by reference).
+	 */
+	private function drain( AttachmentOptimizer $optimizer, int $limit, array &$counts ): void {
+		$query     = new UnoptimizedQuery();
+		$processed = 0;
+
+		while ( $processed < $limit ) {
+			$ids = $query->claim( (int) min( 10, $limit - $processed ) );
+			if ( [] === $ids ) {
+				break;
+			}
+
+			foreach ( $ids as $id ) {
+				$this->process_one( $optimizer, $id, $counts );
+
+				++$processed;
+				if ( 0 === $processed % 50 ) {
+					BackgroundWorker::free_memory();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Optimize one attachment, log it, and mirror the outcome into an
+	 * active background job so the Bulk tab dashboard stays live.
+	 *
+	 * @param AttachmentOptimizer $optimizer Optimizer instance.
+	 * @param int                 $id        Attachment ID.
+	 * @param array<string, int>  $counts    Outcome counters (by reference).
+	 */
+	private function process_one( AttachmentOptimizer $optimizer, int $id, array &$counts ): void {
+		$outcome = $optimizer->optimize( $id );
+		++$counts[ $outcome['result'] ];
+		WP_CLI::log( sprintf( '#%d: %s (%s)', $id, $outcome['result'], $outcome['detail'] ) );
+
+		if ( BulkJob::is_running() ) {
+			BulkJob::record(
+				$outcome['result'],
+				(string) get_the_title( $id ),
+				(int) ( $outcome['bytes_in'] ?? 0 ),
+				(int) ( $outcome['bytes_saved'] ?? 0 ),
+				(string) $outcome['detail']
+			);
+		}
 	}
 
 	/**

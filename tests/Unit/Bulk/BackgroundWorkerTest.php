@@ -111,6 +111,25 @@ final class BackgroundWorkerTest extends MonkeyTestCase {
 		);
 		$GLOBALS['lw_img_test_posts'] = [];
 
+		// The claim path asks MySQL for an advisory lock; report "no lock
+		// support" so it degrades to the plain single-process pick.
+		$GLOBALS['wpdb'] = new class() {
+			/**
+			 * @param string $sql  Query with placeholders.
+			 * @param mixed  ...$args Values (ignored).
+			 */
+			public function prepare( string $sql, ...$args ): string {
+				return $sql;
+			}
+
+			/**
+			 * @param string $sql Query (ignored).
+			 */
+			public function get_var( string $sql ): string {
+				return '0';
+			}
+		};
+
 		Functions\when( 'wp_parse_args' )->alias(
 			static function ( array $args, array $defaults ): array {
 				return array_merge( $defaults, $args );
@@ -131,7 +150,7 @@ final class BackgroundWorkerTest extends MonkeyTestCase {
 
 		BackgroundWorker::assist();
 
-		unset( $GLOBALS['lw_img_test_posts'] );
+		unset( $GLOBALS['lw_img_test_posts'], $GLOBALS['wpdb'] );
 		$this->assertTrue( true );
 	}
 }
