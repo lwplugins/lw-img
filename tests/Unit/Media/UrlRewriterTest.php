@@ -51,6 +51,31 @@ final class UrlRewriterTest extends MonkeyTestCase {
 		$this->assertSame( 42, $result['c'] );
 	}
 
+	/**
+	 * @dataProvider provide_prefix_cases
+	 *
+	 * @param array<int, string> $strings  Input strings.
+	 * @param string             $expected Expected common prefix.
+	 */
+	public function test_common_prefix( array $strings, string $expected ): void {
+		$this->assertSame( $expected, UrlRewriter::common_prefix( $strings ) );
+	}
+
+	/**
+	 * @return array<string, array{array<int, string>, string}>
+	 */
+	public static function provide_prefix_cases(): array {
+		return [
+			'shared uploads base'  => [
+				[ 'https://ex.com/up/2026/08/a.jpg', 'https://ex.com/up/2026/07/b.png', 'https://ex.com/up/2010/01/c.gif' ],
+				'https://ex.com/up/20',
+			],
+			'single string'        => [ [ 'https://ex.com/up/a.jpg' ], 'https://ex.com/up/a.jpg' ],
+			'no common prefix'     => [ [ 'https://a.com/x.jpg', 'https://b.com/y.jpg' ], 'https://' ],
+			'completely different' => [ [ 'abc', 'xyz' ], '' ],
+		];
+	}
+
 	public function test_serialized_length_prefixes_stay_correct_after_reserialize(): void {
 		// .jpeg -> .webp is same-length, so make the change length-affecting
 		// via the pair below to prove the unserialize->replace->serialize path.

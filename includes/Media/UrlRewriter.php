@@ -43,13 +43,12 @@ final class UrlRewriter {
 		],
 	];
 
-	private const PAIRS_PER_QUERY = 100;
+	private const PREFIX_MODE_MIN_PAIRS = 30;
+
+	private const MIN_PREFIX_LENGTH = 20;
 
 	/**
 	 * Apply the pairs to posts, all meta tables, and options.
-	 *
-	 * Large batches are split so a single query never carries an unbounded
-	 * number of LIKE conditions.
 	 *
 	 * @param array<string, string> $pairs Map of old URL => new URL.
 	 * @return void
@@ -61,18 +60,10 @@ final class UrlRewriter {
 			ARRAY_FILTER_USE_BOTH
 		);
 
-		foreach ( array_chunk( $pairs, self::PAIRS_PER_QUERY, true ) as $chunk ) {
-			$this->apply( $chunk );
+		if ( [] === $pairs ) {
+			return;
 		}
-	}
 
-	/**
-	 * Apply one chunk of pairs to every content table.
-	 *
-	 * @param array<string, string> $pairs Map of old URL => new URL.
-	 * @return void
-	 */
-	private function apply( array $pairs ): void {
 		$this->rewrite_posts( $pairs );
 
 		foreach ( array_keys( self::META_TABLES ) as $table ) {
@@ -80,6 +71,24 @@ final class UrlRewriter {
 		}
 
 		$this->rewrite_options( $pairs );
+	}
+
+	/**
+	 * Longest common prefix of the given strings.
+	 *
+	 * @param array<int, string> $strings Non-empty list of strings.
+	 * @return string
+	 */
+	public static function common_prefix( array $strings ): string {
+		$prefix = (string) array_shift( $strings );
+
+		foreach ( $strings as $candidate ) {
+			while ( '' !== $prefix && ! str_starts_with( $candidate, $prefix ) ) {
+				$prefix = substr( $prefix, 0, -1 );
+			}
+		}
+
+		return $prefix;
 	}
 
 	/**
@@ -159,7 +168,12 @@ final class UrlRewriter {
 	}
 
 	/**
-	 * Build the "value contains any old URL" condition (raw + JSON-escaped).
+	 * Build the "value may contain an old URL" condition (raw + JSON-escaped).
+	 *
+	 * Large batches match on the pairs' common URL prefix instead of one
+	 * LIKE per pair: the scan cost stays flat no matter how many images a
+	 * batch carries, and the per-row PHP replace is exact anyway — the SQL
+	 * condition only has to be a superset filter.
 	 *
 	 * @param string                $column Column name to match against.
 	 * @param array<string, string> $pairs  Map of old URL => new URL.
@@ -168,10 +182,20 @@ final class UrlRewriter {
 	private function like_condition( string $column, array $pairs ): array {
 		global $wpdb;
 
+		$targets = array_keys( $pairs );
+
+		if ( count( $pairs ) >= self::PREFIX_MODE_MIN_PAIRS ) {
+			$prefix = self::common_prefix( $targets );
+
+			if ( strlen( $prefix ) >= self::MIN_PREFIX_LENGTH ) {
+				$targets = [ $prefix ];
+			}
+		}
+
 		$likes  = [];
 		$params = [];
 
-		foreach ( array_keys( $pairs ) as $old_url ) {
+		foreach ( $targets as $old_url ) {
 			$likes[]  = $column . ' LIKE %s';
 			$params[] = '%' . $wpdb->esc_like( $old_url ) . '%';
 			$likes[]  = $column . ' LIKE %s';
