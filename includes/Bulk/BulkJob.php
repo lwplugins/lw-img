@@ -100,6 +100,36 @@ final class BulkJob {
 	}
 
 	/**
+	 * Record the automatic transient-retry pass: mark it used and roll the
+	 * re-queued items out of the failed counter so totals stay consistent.
+	 *
+	 * @param int $requeued Number of re-queued attachments.
+	 * @return void
+	 */
+	public static function mark_retried( int $requeued ): void {
+		$job = self::get();
+
+		if ( [] === $job ) {
+			return;
+		}
+
+		$job['retried']    = 1;
+		$job['failed']     = max( 0, (int) ( $job['failed'] ?? 0 ) - $requeued );
+		$job['updated_at'] = time();
+
+		update_option( self::OPTION_NAME, $job, false );
+	}
+
+	/**
+	 * Whether the automatic transient-retry pass already ran.
+	 *
+	 * @return bool
+	 */
+	public static function has_retried(): bool {
+		return ! empty( self::get()['retried'] );
+	}
+
+	/**
 	 * Move the run to a terminal state.
 	 *
 	 * @param string $state STATE_DONE or STATE_CANCELLED.

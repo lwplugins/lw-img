@@ -51,7 +51,7 @@ final class SettingsSanitizer {
 
 		if ( 'level' === $key ) {
 			$value = sanitize_text_field( (string) $value );
-			return in_array( $value, [ 'normal', 'aggressive', 'ultra' ], true ) ? $value : (string) $fallback;
+			return in_array( $value, [ 'lossless', 'normal', 'aggressive', 'ultra' ], true ) ? $value : (string) $fallback;
 		}
 
 		if ( 'output_format' === $key ) {

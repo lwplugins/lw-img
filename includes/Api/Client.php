@@ -138,6 +138,12 @@ final class Client {
 		$status = (int) wp_remote_retrieve_response_code( $response );
 		$body   = json_decode( (string) wp_remote_retrieve_body( $response ), true );
 
+		// Slow job: the API hands back a job id and poll URL — wait for it
+		// instead of failing, the work is already in flight server-side.
+		if ( 408 === $status && is_array( $body ) && ! empty( $body['poll_url'] ) ) {
+			return $this->poll_job( (string) $body['poll_url'] );
+		}
+
 		if ( 200 !== $status ) {
 			[ $code, $message ] = self::error_parts( $body, $status );
 			Logger::error(
@@ -162,6 +168,46 @@ final class Client {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Poll a slow job for a bounded time.
+	 *
+	 * @param string $poll_url Poll URL returned by the 408 response.
+	 * @return OptimizeResult
+	 * @throws ApiException When the job fails or is still processing after the budget.
+	 */
+	private function poll_job( string $poll_url ): OptimizeResult {
+		if ( ! str_starts_with( $poll_url, 'https://' ) ) {
+			throw new ApiException( 'Invalid poll URL from API', 'invalid_response', 408 );
+		}
+
+		for ( $attempt = 0; $attempt < 5; $attempt++ ) {
+			sleep( 3 );
+
+			$response = wp_remote_get( $poll_url, [ 'timeout' => 10 ] );
+			if ( is_wp_error( $response ) ) {
+				continue;
+			}
+
+			$body = json_decode( (string) wp_remote_retrieve_body( $response ), true );
+			if ( ! is_array( $body ) ) {
+				continue;
+			}
+
+			$job_status = (string) ( $body['status'] ?? '' );
+
+			if ( 'completed' === $job_status ) {
+				return OptimizeResult::from_response( $body );
+			}
+
+			if ( 'failed' === $job_status ) {
+				$message = is_string( $body['error'] ?? null ) ? (string) $body['error'] : 'Processing failed';
+				throw new ApiException( esc_html( $message ), 'processing_failed', 422 );
+			}
+		}
+
+		throw new ApiException( 'Optimization still processing after extended wait', 'timeout', 408 );
 	}
 
 	private function build_multipart_body( OptimizeRequest $request, string $boundary ): string {

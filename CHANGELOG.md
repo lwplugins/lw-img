@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.4.0] - 2026-08-17
+
+### Added
+- Slow-job handling: when the API returns 408 with a poll URL, the job is polled for a bounded time instead of failing — slow optimizations complete instead of erroring
+- Transient/permanent failure classification (based on the documented HelloImg error codes): network errors, timeouts, and 5xx responses are marked transient
+- Automatic retry pass: at the end of a background bulk run, transiently-failed images are re-queued once automatically; permanent failures still wait for an explicit "Retry failed"
+- Lossless optimization level (pixel-perfect) in settings, re-optimize actions, and CLI
+- Request timeout setting on the General tab (5–120 s)
+
 ## [1.3.0] - 2026-08-17
 
 ### Added

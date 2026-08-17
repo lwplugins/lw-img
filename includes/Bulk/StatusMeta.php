@@ -16,8 +16,9 @@ namespace LightweightPlugins\Img\Bulk;
  */
 final class StatusMeta {
 
-	public const META_STATUS = '_lw_img_status';
-	public const META_DETAIL = '_lw_img_status_detail';
+	public const META_STATUS    = '_lw_img_status';
+	public const META_DETAIL    = '_lw_img_status_detail';
+	public const META_TRANSIENT = '_lw_img_status_transient';
 
 	public const OPTIMIZED = 'optimized';
 	public const SKIPPED   = 'skipped';
@@ -29,11 +30,18 @@ final class StatusMeta {
 	 * @param int    $attachment_id Attachment post ID.
 	 * @param string $status        One of the status constants.
 	 * @param string $detail        Human-readable reason/detail.
+	 * @param bool   $transient     Whether a failure looks transient (worth an automatic retry).
 	 * @return void
 	 */
-	public static function write( int $attachment_id, string $status, string $detail ): void {
+	public static function write( int $attachment_id, string $status, string $detail, bool $transient = false ): void {
 		update_post_meta( $attachment_id, self::META_STATUS, $status );
 		update_post_meta( $attachment_id, self::META_DETAIL, $detail );
+
+		if ( $transient ) {
+			update_post_meta( $attachment_id, self::META_TRANSIENT, 1 );
+		} else {
+			delete_post_meta( $attachment_id, self::META_TRANSIENT );
+		}
 	}
 
 	/**
@@ -45,6 +53,30 @@ final class StatusMeta {
 	public static function clear( int $attachment_id ): void {
 		delete_post_meta( $attachment_id, self::META_STATUS );
 		delete_post_meta( $attachment_id, self::META_DETAIL );
+		delete_post_meta( $attachment_id, self::META_TRANSIENT );
+	}
+
+	/**
+	 * Re-queue every attachment whose last failure was transient.
+	 *
+	 * @return int Number of attachments re-queued.
+	 */
+	public static function requeue_transient(): int {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- targeted id-list lookup; results are acted on immediately via meta API (which handles caches).
+		$ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s",
+				self::META_TRANSIENT
+			)
+		);
+
+		foreach ( $ids as $id ) {
+			self::clear( (int) $id );
+		}
+
+		return count( $ids );
 	}
 
 	/**

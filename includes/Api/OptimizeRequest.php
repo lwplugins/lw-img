@@ -16,6 +16,7 @@ use LightweightPlugins\Img\Options;
  */
 final class OptimizeRequest {
 
+	public const LEVEL_LOSSLESS   = 'lossless';
 	public const LEVEL_NORMAL     = 'normal';
 	public const LEVEL_AGGRESSIVE = 'aggressive';
 	public const LEVEL_ULTRA      = 'ultra';
@@ -88,7 +89,7 @@ final class OptimizeRequest {
 	public static function valid_level( string $level ): bool {
 		return in_array(
 			$level,
-			[ self::LEVEL_NORMAL, self::LEVEL_AGGRESSIVE, self::LEVEL_ULTRA ],
+			[ self::LEVEL_LOSSLESS, self::LEVEL_NORMAL, self::LEVEL_AGGRESSIVE, self::LEVEL_ULTRA ],
 			true
 		);
 	}

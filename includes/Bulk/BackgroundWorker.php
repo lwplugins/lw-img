@@ -103,6 +103,17 @@ final class BackgroundWorker {
 		delete_transient( self::LOCK );
 
 		if ( $drained ) {
+			// One automatic second pass for transient failures (timeouts,
+			// network errors) before declaring the run finished.
+			if ( ! BulkJob::has_retried() ) {
+				$requeued = StatusMeta::requeue_transient();
+				if ( $requeued > 0 ) {
+					BulkJob::mark_retried( $requeued );
+					self::kick( 5 );
+					return;
+				}
+			}
+
 			BulkJob::finish( BulkJob::STATE_DONE );
 			return;
 		}

@@ -90,7 +90,7 @@ final class InfoMetabox {
 		echo '<a class="button" href="' . esc_url( RestoreHandler::url( $post->ID ) ) . '">' . esc_html__( 'Restore backup', 'lw-img' ) . '</a></p>';
 
 		echo '<p class="description">' . esc_html__( 'Re-optimize from the backup at another level:', 'lw-img' ) . '</p><p>';
-		foreach ( [ 'normal', 'aggressive', 'ultra' ] as $target_level ) {
+		foreach ( [ 'lossless', 'normal', 'aggressive', 'ultra' ] as $target_level ) {
 			if ( $target_level === $level ) {
 				continue;
 			}

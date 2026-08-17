@@ -31,6 +31,7 @@ final class OptimizeRequestTest extends MonkeyTestCase {
 	 */
 	public static function provide_levels(): array {
 		return [
+			'lossless'     => [ 'lossless', true ],
 			'normal'       => [ 'normal', true ],
 			'aggressive'   => [ 'aggressive', true ],
 			'ultra'        => [ 'ultra', true ],

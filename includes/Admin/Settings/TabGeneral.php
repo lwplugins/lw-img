@@ -51,6 +51,21 @@ final class TabGeneral implements TabInterface {
 					?>
 				</td>
 			</tr>
+			<tr>
+				<th><label for="request_timeout"><?php esc_html_e( 'Request timeout (s)', 'lw-img' ); ?></label></th>
+				<td>
+					<?php
+					$this->render_number_field(
+						[
+							'name'        => 'request_timeout',
+							'min'         => '5',
+							'max'         => '120',
+							'description' => __( 'How long to wait for the API per image. Slow jobs past the API\'s own 30 s window are polled automatically before giving up.', 'lw-img' ),
+						]
+					);
+					?>
+				</td>
+			</tr>
 		</table>
 
 		<?php $this->render_account_status(); ?>

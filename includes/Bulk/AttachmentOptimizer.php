@@ -106,7 +106,7 @@ final class AttachmentOptimizer {
 			return $this->convert( $attachment_id, $file, $mime );
 		} catch ( ApiException $e ) {
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
-			return $this->finish( $attachment_id, self::RESULT_FAILED, $e->getMessage() );
+			return $this->finish( $attachment_id, self::RESULT_FAILED, $e->getMessage(), $e->is_transient() );
 		} catch ( Throwable $e ) {
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
 			return $this->finish( $attachment_id, self::RESULT_FAILED, $e->getMessage() );
@@ -119,10 +119,11 @@ final class AttachmentOptimizer {
 	 * @param int    $attachment_id Attachment post ID.
 	 * @param string $result        Outcome constant.
 	 * @param string $detail        Human-readable detail.
+	 * @param bool   $transient     Whether a failure looks transient.
 	 * @return array{result: string, detail: string}
 	 */
-	private function finish( int $attachment_id, string $result, string $detail ): array {
-		StatusMeta::write( $attachment_id, $result, $detail );
+	private function finish( int $attachment_id, string $result, string $detail, bool $transient = false ): array {
+		StatusMeta::write( $attachment_id, $result, $detail, $transient );
 
 		return [
 			'result' => $result,

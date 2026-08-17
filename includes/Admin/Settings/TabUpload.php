@@ -56,6 +56,7 @@ final class TabUpload implements TabInterface {
 						[
 							'name'        => 'level',
 							'options'     => [
+								'lossless'   => __( 'Lossless — pixel-perfect, larger files', 'lw-img' ),
 								'normal'     => __( 'Normal — balanced', 'lw-img' ),
 								'aggressive' => __( 'Aggressive — smaller files', 'lw-img' ),
 								'ultra'      => __( 'Ultra — maximum compression', 'lw-img' ),

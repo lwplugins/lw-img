@@ -63,9 +63,8 @@ final class SettingsSanitizerTest extends MonkeyTestCase {
 	}
 
 	public function test_valid_level_is_kept(): void {
-		$sanitized = SettingsSanitizer::sanitize( [ 'level' => 'ultra' ] );
-
-		$this->assertSame( 'ultra', $sanitized['level'] );
+		$this->assertSame( 'ultra', SettingsSanitizer::sanitize( [ 'level' => 'ultra' ] )['level'] );
+		$this->assertSame( 'lossless', SettingsSanitizer::sanitize( [ 'level' => 'lossless' ] )['level'] );
 	}
 
 	public function test_unknown_level_falls_back_to_current_value(): void {

@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,12 @@ Yes — use the Bulk tab (or `wp lw-img optimize --all`). The run happens in the
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.4.0 =
+* New: Slow jobs are polled instead of failing (API 408 + poll URL handling)
+* New: Transient failures (timeouts, network, 5xx) are retried automatically once at the end of a bulk run
+* New: Lossless optimization level
+* New: Request timeout setting on the General tab
 
 = 1.3.0 =
 * New: Content URL rewrite extended to all meta tables (post/comment/term/user) and options
