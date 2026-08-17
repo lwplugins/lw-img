@@ -75,16 +75,29 @@ final class SettingsPage {
 			'lw-img-admin',
 			LW_IMG_URL . 'assets/css/admin.css',
 			[],
-			LW_IMG_VERSION
+			$this->asset_version( 'assets/css/admin.css' )
 		);
 
 		wp_enqueue_script(
 			'lw-img-admin',
 			LW_IMG_URL . 'assets/js/admin.js',
 			[],
-			LW_IMG_VERSION,
+			$this->asset_version( 'assets/js/admin.js' ),
 			true
 		);
+	}
+
+	/**
+	 * Cache-busting asset version based on the file's modification time,
+	 * so edge/browser caches refresh whenever the asset actually changes.
+	 *
+	 * @param string $relative Plugin-relative asset path.
+	 * @return string
+	 */
+	private function asset_version( string $relative ): string {
+		$mtime = @filemtime( LW_IMG_PATH . $relative ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- missing file falls back to the plugin version below.
+
+		return false !== $mtime ? (string) $mtime : LW_IMG_VERSION;
 	}
 
 	public function register_settings(): void {
