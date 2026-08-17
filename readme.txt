@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,7 +30,12 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 * Free tier: 1,000 images/month via HelloImg
 
 * Bulk optimize the existing Media Library in the background (WP-Cron worker, resumable, or WP-CLI for huge libraries)
-* Content URL rewrite on bulk convert/restore (post content + page-builder data, serialization-aware)
+* Built for scale: parallel-safe queue claiming, processing-speed profiles (gentle/normal/fast), and a CPU load guard so a bulk run never starves the site
+* Content URL rewrite on bulk convert/restore (post content + page-builder data, serialization-aware) plus a 301 redirect from old image URLs
+* Tabbed admin: General, Stats, Upload, Bulk, Backup, Tester, and Log
+* Tester tab: environment checks (database table engines, WebP thumbnail support, cron loopback, disk space, API reachability) that catch hosting problems before a bulk run
+* Stats tab: total savings, biggest wins, backup folder size, and leftover backup folders from other optimizers
+* Recognizes images already optimized by ShortPixel, TinyPNG, or Imagify and leaves them untouched
 * Media Library savings column, "Optimize now" / "Restore original" row actions, attachment info box, Compare, Re-optimize
 * Exclusion patterns (wildcard filename/path rules) and min/max file size limits
 * WP-CLI: wp lw-img status / optimize / restore / requeue
@@ -45,7 +50,7 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 1. Upload `lw-img` to `/wp-content/plugins/`
 2. Activate the plugin through the 'Plugins' menu
 3. Get an API key at [dashboard.helloimg.io/api-keys](https://dashboard.helloimg.io/api-keys)
-4. Go to LW Plugins → Img and paste your API key
+4. Go to LW Plugins → Image and paste your API key
 5. Upload images — they'll be converted to WebP automatically
 
 == Frequently Asked Questions ==
@@ -67,6 +72,17 @@ Yes — use the Bulk tab (or `wp lw-img optimize --all`). The run happens in the
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.6.1 =
+* Security: prevent cross-extension overwrite — a converted upload can no longer overwrite an unrelated attachment's file (wp_unique_filename on the target)
+* Security: stop PHP object injection in the content URL rewrite — foreign serialized meta/option rows are decoded with objects disallowed and left untouched if they contain any
+* Security: pin the slow-job poll URL to the API host (SSRF) and contain backup file paths against directory traversal
+* Security: protect the backup folder (index.php + .htaccess) and stop autoloading the API key option
+* Fix: "Log cleared" and "Settings saved" confirmations now actually appear
+* Fix: numeric settings are clamped server-side; invalid non-array option writes no longer fatal
+* Accessibility: every settings field has an accessible name again, and the tab rail shows a keyboard focus ring
+* Hardening: guard against a bulk-queue SQL error on empty mime types, a CPU-detection TypeError, and a white screen if the remote plugin registry is malformed
+* Docs: refreshed README and repository metadata for the LW Image name
 
 = 1.6.0 =
 * Change: display name is now LW Image (slugs and text domain stay lw-img)

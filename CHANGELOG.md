@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.6.1] - 2026-08-17
+
+### Security
+- Prevent cross-extension overwrite: an optimized target path is now de-duplicated with `wp_unique_filename()`, so converting `photo.jpg` can no longer overwrite (and orphan) an unrelated `photo.webp`
+- Stop PHP object injection in the content URL rewrite: foreign serialized meta/option values are decoded with `allowed_classes=false` and rows containing any object are left untouched, so a serialized gadget is never instantiated
+- Pin the slow-job poll URL to the API host over HTTPS and fetch it via `wp_safe_remote_get` with redirects disabled and a size cap (SSRF)
+- Contain backup file paths: `BackupStore::resolve()` rejects directory traversal and off-root symlinks, making every backup file operation a no-op on hostile `_lw_img_backup_path` values
+- Protect the backup folder with an `index.php` and `.htaccess` (no directory listing, no PHP execution; Apache-only, folder-name hardening planned), and create the options row with `autoload=false` so the API key is not held in memory every request
+
+### Fixed
+- "Log cleared" redirected to a non-matching tab anchor and rendered into a hidden panel; the success notice now appears (and "Settings saved." is shown via `settings_errors()` on this custom-menu page)
+- Numeric settings are clamped server-side (e.g. request timeout 5–120) instead of trusting the field min/max; a non-array option write no longer fatals
+- Bulk queue no longer builds `IN ()` when the mime list is empty; CPU detection no longer risks a `count(false)` TypeError; a malformed remote plugin registry no longer white-screens the LW Plugins page
+
+### Accessibility
+- Every settings field has an accessible name again (the redesign had replaced `<label for>` with plain spans) via `aria-label` on the API key, size, and retention fields
+- Restored the keyboard focus ring on the settings tab rail with a contrast-safe outline
+
+### Changed
+- Refreshed README and repository description/topics for the LW Image name
+
 ## [1.6.0] - 2026-08-17
 
 ### Changed
