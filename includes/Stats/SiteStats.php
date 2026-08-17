@@ -150,14 +150,67 @@ final class SiteStats {
 		}
 
 		return [
-			'count'        => (int) ( $row->cnt ?? 0 ),
-			'original'     => $original,
-			'optimized'    => $optimized,
-			'saved'        => max( 0, $original - $optimized ),
-			'percent'      => self::savings_percent( $original, $optimized ),
-			'backup'       => self::dir_stats( ( new BackupStore() )->root() ),
-			'leftovers'    => $leftovers,
-			'generated_at' => time(),
+			'count'         => (int) ( $row->cnt ?? 0 ),
+			'original'      => $original,
+			'optimized'     => $optimized,
+			'saved'         => max( 0, $original - $optimized ),
+			'percent'       => self::savings_percent( $original, $optimized ),
+			'backup'        => self::dir_stats( ( new BackupStore() )->root() ),
+			'leftovers'     => $leftovers,
+			'library_total' => self::library_total(),
+			'wins'          => self::biggest_wins(),
+			'generated_at'  => time(),
 		];
+	}
+
+	/**
+	 * Total number of image attachments in the Media Library.
+	 *
+	 * @return int
+	 */
+	private static function library_total(): int {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- single aggregate; result is transient-cached by the caller.
+		return (int) $wpdb->get_var(
+			"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_status = 'inherit' AND post_mime_type LIKE 'image/%'"
+		);
+	}
+
+	/**
+	 * The images with the largest absolute savings.
+	 *
+	 * @param int $limit Number of rows.
+	 * @return array<int, array{file: string, original: int, new: int}>
+	 */
+	private static function biggest_wins( int $limit = 5 ): array {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- top-N over the plugin's own meta; result is transient-cached by the caller.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT o.post_id, CAST(o.meta_value AS UNSIGNED) AS orig, CAST(n.meta_value AS UNSIGNED) AS new_size
+				 FROM {$wpdb->postmeta} o
+				 INNER JOIN {$wpdb->postmeta} n ON n.post_id = o.post_id AND n.meta_key = %s
+				 WHERE o.meta_key = %s
+				 ORDER BY CAST(o.meta_value AS UNSIGNED) - CAST(n.meta_value AS UNSIGNED) DESC
+				 LIMIT %d",
+				'_lw_img_new_size',
+				'_lw_img_original_size',
+				$limit
+			)
+		);
+
+		$wins = [];
+		foreach ( $rows as $win ) {
+			$file   = (string) get_post_meta( (int) $win->post_id, '_wp_attached_file', true );
+			$wins[] = [
+				'file'     => '' !== $file ? basename( $file ) : '#' . (int) $win->post_id,
+				'original' => (int) $win->orig,
+				'new'      => (int) $win->new_size,
+			];
+		}
+
+		return $wins;
 	}
 }
