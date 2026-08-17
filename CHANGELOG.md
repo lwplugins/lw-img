@@ -8,6 +8,9 @@
 ### Added
 - Redesigned General tab: status-first connection hero (Connected / Not connected / Error pill, API key field with show/hide toggle, Test connection), account tiles — balance shows "Unlimited" during the open beta, free-tier gauge with progress bar, and this site's own optimization total linking to Stats — plus a "current defaults" strip (output format, level, EXIF, backups, bulk speed) whose chips jump to the tab where each setting lives
 - First-run onboarding: with no API key the General tab shows a three-step guide (get a key, upload as usual, bulk-optimize the library) and a reversibility note
+- Redesigned Stats tab: savings hero with a before/after bar, tiles (share of the Media Library, average saving per image, backup folder), a Biggest wins top-5 list from the plugin's own size meta, the leftover-backup notice as a warning card, and an empty state that points to the Bulk tab
+- Redesigned Upload tab: master auto-convert toggle with a pipeline strip (Upload → Convert → Back up → Thumbnails), settings grouped into Conversion / Size limits / Skip & exclude / After conversion, segmented controls for output format and level, toggle switches, a file-size range row, and clickable exclusion-pattern examples; turning auto-convert off dims the sections
+- Admin UI uses icons (Dashicons/SVG) everywhere — no emoji
 
 ## [1.5.0] - 2026-08-17
 

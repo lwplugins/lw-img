@@ -70,6 +70,8 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 = 1.6.0 =
 * Change: display name is now LW Image (slugs and text domain stay lw-img)
+* New: Redesigned Stats tab — savings hero with before/after bar, biggest-wins list, leftover-backup warning card, and an empty state
+* New: Redesigned Upload tab — master toggle with pipeline strip, grouped settings, segmented controls, and clickable exclusion examples
 * New: Redesigned General tab — connection status pill with the API key field and show/hide toggle, account tiles (balance shows Unlimited during the open beta, free-tier gauge, this site's optimization total), a "current defaults" strip linking to each setting's tab, and a three-step onboarding when no key is set
 
 = 1.5.0 =

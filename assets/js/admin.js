@@ -264,10 +264,50 @@
 		});
 	}
 
+	// Upload tab: master-toggle dimming, segment descriptions, pattern chips.
+	function initUpload() {
+		var master = document.getElementById('auto_convert');
+		var state  = document.getElementById('lw-img-up-state');
+
+		if (master && state) {
+			master.addEventListener('change', function () {
+				var sections = document.querySelector('.lw-img-up-sections');
+				if (sections) {
+					sections.classList.toggle('lw-img-up-dim', !this.checked);
+				}
+				state.textContent = this.checked ? state.getAttribute('data-on') : state.getAttribute('data-off');
+				state.classList.toggle('lw-img-up-state-off', !this.checked);
+			});
+		}
+
+		document.querySelectorAll('.lw-img-seg-ctl').forEach(function (seg) {
+			seg.addEventListener('change', function (e) {
+				var desc = seg.parentElement ? seg.parentElement.querySelector('.lw-img-seg-desc') : null;
+				if (desc && e.target && e.target.getAttribute('data-desc')) {
+					desc.textContent = e.target.getAttribute('data-desc');
+				}
+			});
+		});
+
+		document.querySelectorAll('.lw-img-up-hint').forEach(function (hint) {
+			hint.addEventListener('click', function () {
+				var area = document.getElementById('exclusion_patterns');
+				if (!area) {
+					return;
+				}
+				var pattern = this.getAttribute('data-pattern') || '';
+				area.value = area.value.replace(/\s+$/, '');
+				area.value += (area.value ? '\n' : '') + pattern;
+				area.focus();
+			});
+		});
+	}
+
 	function init() {
 		initTabs();
 		initBulk();
 		initKeyToggle();
+		initUpload();
 	}
 
 	if (document.readyState === 'loading') {

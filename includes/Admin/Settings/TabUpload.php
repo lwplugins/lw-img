@@ -1,6 +1,6 @@
 <?php
 /**
- * Upload tab — auto-conversion settings.
+ * Upload tab — auto-conversion settings, grouped by question.
  *
  * @package LightweightPlugins\Img
  */
@@ -9,12 +9,17 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Admin\Settings;
 
+use LightweightPlugins\Img\Options;
+
 /**
- * Upload tab: auto-conversion settings.
+ * A master toggle with a pipeline strip, then Conversion / Size limits /
+ * Skip & exclude / After conversion sections. When auto-convert is off,
+ * the sections dim (admin.js keeps this live).
  */
 final class TabUpload implements TabInterface {
 
 	use FieldRendererTrait;
+	use ControlRendererTrait;
 
 	public function get_slug(): string {
 		return 'upload';
@@ -29,178 +34,237 @@ final class TabUpload implements TabInterface {
 	}
 
 	public function render(): void {
-		?>
-		<h2><?php esc_html_e( 'Auto-convert uploads', 'lw-img' ); ?></h2>
-		<p><?php esc_html_e( 'When a non-WebP image is uploaded, it is sent to HelloImg and replaced with the optimized WebP. WordPress sub-sizes are then generated from the WebP source.', 'lw-img' ); ?></p>
+		echo '<h2>' . esc_html__( 'Upload', 'lw-img' ) . '</h2>';
+		echo '<p class="lw-img-sub">' . esc_html__( 'What happens to every new image upload.', 'lw-img' ) . '</p>';
 
-		<table class="form-table">
-			<tr>
-				<th><?php esc_html_e( 'Auto-convert', 'lw-img' ); ?></th>
-				<td>
-					<?php
-					$this->render_checkbox_field(
-						[
-							'name'        => 'auto_convert',
-							'label'       => __( 'Convert non-WebP uploads to WebP automatically', 'lw-img' ),
-							'description' => __( 'Disable to leave uploads untouched.', 'lw-img' ),
-						]
-					);
-					?>
-				</td>
-			</tr>
-			<tr>
-				<th><label for="level"><?php esc_html_e( 'Optimization level', 'lw-img' ); ?></label></th>
-				<td>
-					<?php
-					$this->render_select_field(
-						[
-							'name'        => 'level',
-							'options'     => [
-								'lossless'   => __( 'Lossless — pixel-perfect, larger files', 'lw-img' ),
-								'normal'     => __( 'Normal — balanced', 'lw-img' ),
-								'aggressive' => __( 'Aggressive — smaller files', 'lw-img' ),
-								'ultra'      => __( 'Ultra — maximum compression', 'lw-img' ),
-							],
-							'description' => __( 'Higher levels save more bytes but may show visible compression.', 'lw-img' ),
-						]
-					);
-					?>
-				</td>
-			</tr>
-			<tr>
-				<th><label for="output_format"><?php esc_html_e( 'Output format', 'lw-img' ); ?></label></th>
-				<td>
-					<?php
-					$this->render_select_field(
-						[
-							'name'        => 'output_format',
-							'options'     => [
-								'webp' => __( 'WebP — widest support', 'lw-img' ),
-								'avif' => __( 'AVIF — smaller, modern browsers', 'lw-img' ),
-							],
-							'description' => __( 'The format uploads are converted to. If the converted file would not be smaller than the original, the original is kept.', 'lw-img' ),
-						]
-					);
-					?>
-				</td>
-			</tr>
-			<tr>
-				<th><?php esc_html_e( 'Resize large images', 'lw-img' ); ?></th>
-				<td>
-					<?php
-					$this->render_number_field(
-						[
-							'name'        => 'max_width',
-							'min'         => '0',
-							'max'         => '10000',
-							'description' => __( 'Max width (px). 0 = no limit.', 'lw-img' ),
-						]
-					);
-					$this->render_number_field(
-						[
-							'name'        => 'max_height',
-							'min'         => '0',
-							'max'         => '10000',
-							'description' => __( 'Max height (px). 0 = no limit. Images are scaled down proportionally to fit; small images are never upscaled.', 'lw-img' ),
-						]
-					);
-					?>
-				</td>
-			</tr>
-			<tr>
-				<th><?php esc_html_e( 'EXIF metadata', 'lw-img' ); ?></th>
-				<td>
-					<?php
-					$this->render_checkbox_field(
-						[
-							'name'        => 'keep_exif',
-							'label'       => __( 'Keep EXIF metadata (camera info, GPS, copyright)', 'lw-img' ),
-							'description' => __( 'Off by default — smaller files and removes potentially sensitive data.', 'lw-img' ),
-						]
-					);
-					?>
-				</td>
-			</tr>
-			<tr>
-				<th><?php esc_html_e( 'Skip rules', 'lw-img' ); ?></th>
-				<td>
-					<?php
-					$this->render_checkbox_field(
-						[
-							'name'  => 'skip_already_webp',
-							'label' => __( 'Skip already-WebP / AVIF uploads (recommended)', 'lw-img' ),
-						]
-					);
-					echo '<br>';
-					$this->render_checkbox_field(
-						[
-							'name'        => 'skip_animated_gif',
-							'label'       => __( 'Skip animated GIFs', 'lw-img' ),
-							'description' => __( 'Off by default: animated GIFs are converted to animated WebP with frames and timing preserved. Turn on to leave animated GIFs untouched. If the animated WebP would be larger than the GIF, the original is kept automatically.', 'lw-img' ),
-						]
-					);
-					?>
-				</td>
-			</tr>
-			<tr>
-				<th><label for="exclusion_patterns"><?php esc_html_e( 'Exclusions', 'lw-img' ); ?></label></th>
-				<td>
-					<?php
-					$this->render_textarea_field(
-						[
-							'name'        => 'exclusion_patterns',
-							'placeholder' => "*-original.jpg\n2026/08/*",
-							'description' => __( 'One pattern per line, * matches anything. Patterns without / match the filename; patterns with / match anywhere in the file path. Matching files are never converted.', 'lw-img' ),
-						]
-					);
-					?>
-				</td>
-			</tr>
-			<tr>
-				<th><label for="max_filesize_mb"><?php esc_html_e( 'Max file size (MB)', 'lw-img' ); ?></label></th>
-				<td>
-					<?php
-					$this->render_number_field(
-						[
-							'name'        => 'max_filesize_mb',
-							'min'         => '1',
-							'max'         => '10',
-							'description' => __( 'HelloImg rejects images over 10 MB. Larger uploads are skipped (original kept).', 'lw-img' ),
-						]
-					);
-					?>
-				</td>
-			</tr>
-			<tr>
-				<th><?php esc_html_e( 'Old URL redirect', 'lw-img' ); ?></th>
-				<td>
-					<?php
-					$this->render_checkbox_field(
-						[
-							'name'        => 'redirect_missing_images',
-							'label'       => __( 'Redirect old image URLs to the converted file (recommended)', 'lw-img' ),
-							'description' => __( 'If a converted image is still requested by its old URL (external links, sent newsletters, search engines), respond with a 301 redirect to the new file instead of a 404.', 'lw-img' ),
-						]
-					);
-					?>
-				</td>
-			</tr>
-			<tr>
-				<th><label for="min_filesize_kb"><?php esc_html_e( 'Min file size (KB)', 'lw-img' ); ?></label></th>
-				<td>
-					<?php
-					$this->render_number_field(
-						[
-							'name'        => 'min_filesize_kb',
-							'min'         => '0',
-							'max'         => '10240',
-							'description' => __( 'Skip images below this size — tiny files rarely benefit from conversion. 0 = no minimum.', 'lw-img' ),
-						]
-					);
-					?>
-				</td>
-			</tr>
-		</table>
-		<?php
+		$this->render_master();
+
+		echo '<div class="lw-img-up-sections' . ( Options::get( 'auto_convert' ) ? '' : ' lw-img-up-dim' ) . '">';
+		$this->render_conversion();
+		$this->render_size_limits();
+		$this->render_skip_exclude();
+		$this->render_after();
+		echo '</div>';
+	}
+
+	/**
+	 * Master toggle card with the pipeline strip.
+	 *
+	 * @return void
+	 */
+	private function render_master(): void {
+		$on = (bool) Options::get( 'auto_convert' );
+
+		echo '<div class="lw-img-up-hero">';
+		echo '<div class="lw-img-up-master">';
+		$this->render_switch(
+			[
+				'name'  => 'auto_convert',
+				'label' => __( 'Auto-convert uploads', 'lw-img' ),
+			]
+		);
+		printf(
+			'<span class="lw-img-up-state%s" id="lw-img-up-state" data-on="%s" data-off="%s">%s</span>',
+			$on ? '' : ' lw-img-up-state-off',
+			esc_attr__( 'On', 'lw-img' ),
+			esc_attr__( 'Off — uploads are left untouched', 'lw-img' ),
+			esc_html( $on ? __( 'On', 'lw-img' ) : __( 'Off — uploads are left untouched', 'lw-img' ) )
+		);
+		echo '</div>';
+
+		$steps = [
+			[ 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12', __( 'Upload', 'lw-img' ) ],
+			[ 'M13 2 3 14h9l-1 8 10-12h-9l1-8z', __( 'Convert', 'lw-img' ) ],
+			[ 'M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2zM17 21v-8H7v8M7 3v5h8', __( 'Back up original', 'lw-img' ) ],
+			[ 'M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM10 8.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM21 15l-5-5L5 21', __( 'Thumbnails', 'lw-img' ) ],
+		];
+
+		echo '<div class="lw-img-up-pipeline">';
+		foreach ( $steps as $index => $step ) {
+			if ( $index > 0 ) {
+				echo '<span class="lw-img-up-arrow" aria-hidden="true">&rarr;</span>';
+			}
+			printf(
+				'<span class="lw-img-up-step"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="%s"/></svg>%s</span>',
+				esc_attr( $step[0] ),
+				esc_html( $step[1] )
+			);
+		}
+		echo '</div></div>';
+	}
+
+	/**
+	 * Format, level, EXIF.
+	 *
+	 * @return void
+	 */
+	private function render_conversion(): void {
+		echo '<h3 class="lw-img-gen-heading">' . esc_html__( 'Conversion', 'lw-img' ) . '</h3>';
+
+		$this->row_open( __( 'Output format', 'lw-img' ) );
+		$this->render_segment(
+			[
+				'name'    => 'output_format',
+				'options' => [
+					'webp' => [ 'WebP', __( 'WebP — widest support. If the converted file would not be smaller than the original, the original is kept.', 'lw-img' ) ],
+					'avif' => [ 'AVIF', __( 'AVIF — smaller files, modern browsers. If the converted file would not be smaller than the original, the original is kept.', 'lw-img' ) ],
+				],
+			]
+		);
+		$this->row_close();
+
+		$this->row_open( __( 'Optimization level', 'lw-img' ) );
+		$this->render_segment(
+			[
+				'name'    => 'level',
+				'options' => [
+					'lossless'   => [ __( 'Lossless', 'lw-img' ), __( 'Lossless — pixel-perfect, larger files.', 'lw-img' ) ],
+					'normal'     => [ __( 'Normal', 'lw-img' ), __( 'Normal — balanced quality and size.', 'lw-img' ) ],
+					'aggressive' => [ __( 'Aggressive', 'lw-img' ), __( 'Aggressive — smaller files, slight compression may show.', 'lw-img' ) ],
+					'ultra'      => [ __( 'Ultra', 'lw-img' ), __( 'Ultra — maximum compression, visible on detailed images.', 'lw-img' ) ],
+				],
+			]
+		);
+		$this->row_close();
+
+		$this->row_open( __( 'EXIF metadata', 'lw-img' ) );
+		$this->render_switch(
+			[
+				'name'        => 'keep_exif',
+				'label'       => __( 'Keep EXIF metadata', 'lw-img' ),
+				'description' => __( 'Camera info, GPS, copyright. Off by default — smaller files and removes potentially sensitive data.', 'lw-img' ),
+			]
+		);
+		$this->row_close();
+	}
+
+	/**
+	 * Resize and file-size range.
+	 *
+	 * @return void
+	 */
+	private function render_size_limits(): void {
+		echo '<h3 class="lw-img-gen-heading">' . esc_html__( 'Size limits', 'lw-img' ) . '</h3>';
+
+		$this->row_open( __( 'Resize large images', 'lw-img' ) );
+		echo '<span class="lw-img-up-dims">';
+		$this->render_number_field(
+			[
+				'name' => 'max_width',
+				'min'  => '0',
+				'max'  => '10000',
+			]
+		);
+		echo '<span class="lw-img-up-x">&times;</span>';
+		$this->render_number_field(
+			[
+				'name' => 'max_height',
+				'min'  => '0',
+				'max'  => '10000',
+			]
+		);
+		echo '<span class="lw-img-up-x">px</span></span>';
+		echo '<p class="description">' . esc_html__( 'Images are scaled down proportionally to fit; small images are never upscaled. 0 = no limit.', 'lw-img' ) . '</p>';
+		$this->row_close();
+
+		$this->row_open( __( 'File size range', 'lw-img' ) );
+		echo '<span class="lw-img-up-dims">';
+		$this->render_number_field(
+			[
+				'name' => 'min_filesize_kb',
+				'min'  => '0',
+				'max'  => '10240',
+			]
+		);
+		echo '<span class="lw-img-up-x">' . esc_html__( 'KB min', 'lw-img' ) . '</span><span class="lw-img-up-x">&mdash;</span>';
+		$this->render_number_field(
+			[
+				'name' => 'max_filesize_mb',
+				'min'  => '1',
+				'max'  => '10',
+			]
+		);
+		echo '<span class="lw-img-up-x">' . esc_html__( 'MB max', 'lw-img' ) . '</span></span>';
+		echo '<p class="description">' . esc_html__( 'Files outside the range are skipped (original kept). Tiny files rarely benefit; the API rejects images over 10 MB.', 'lw-img' ) . '</p>';
+		$this->row_close();
+	}
+
+	/**
+	 * Skip rules and exclusion patterns.
+	 *
+	 * @return void
+	 */
+	private function render_skip_exclude(): void {
+		echo '<h3 class="lw-img-gen-heading">' . esc_html__( 'Skip & exclude', 'lw-img' ) . '</h3>';
+
+		$this->row_open( __( 'Skip rules', 'lw-img' ) );
+		$this->render_switch(
+			[
+				'name'        => 'skip_already_webp',
+				'label'       => __( 'Skip already-WebP / AVIF uploads', 'lw-img' ),
+				'description' => __( 'Recommended — no API call, no credit usage.', 'lw-img' ),
+			]
+		);
+		$this->render_switch(
+			[
+				'name'        => 'skip_animated_gif',
+				'label'       => __( 'Skip animated GIFs', 'lw-img' ),
+				'description' => __( 'Off by default: animated GIFs become animated WebP with frames and timing preserved. If the WebP would be larger, the original is kept automatically.', 'lw-img' ),
+			]
+		);
+		$this->row_close();
+
+		$this->row_open( __( 'Exclusions', 'lw-img' ) );
+		$this->render_textarea_field(
+			[
+				'name'        => 'exclusion_patterns',
+				'placeholder' => "*-original.jpg\n2026/08/*",
+			]
+		);
+		echo '<span class="lw-img-up-hints">' . esc_html__( 'Examples:', 'lw-img' );
+		foreach ( [ '*-logo.png', '2026/08/*', 'clients/*/raw-*' ] as $example ) {
+			echo ' <button type="button" class="lw-img-up-hint" data-pattern="' . esc_attr( $example ) . '"><code>' . esc_html( $example ) . '</code></button>';
+		}
+		echo '</span>';
+		echo '<p class="description">' . esc_html__( 'One pattern per line, * matches anything. Patterns without / match the filename; with / they match anywhere in the path. Matching files are never converted.', 'lw-img' ) . '</p>';
+		$this->row_close();
+	}
+
+	/**
+	 * Post-conversion behavior.
+	 *
+	 * @return void
+	 */
+	private function render_after(): void {
+		echo '<h3 class="lw-img-gen-heading">' . esc_html__( 'After conversion', 'lw-img' ) . '</h3>';
+
+		$this->row_open( __( 'Old URL redirect', 'lw-img' ) );
+		$this->render_switch(
+			[
+				'name'        => 'redirect_missing_images',
+				'label'       => __( 'Redirect old image URLs to the converted file', 'lw-img' ),
+				'description' => __( 'Recommended. External links, sent newsletters, and search engines still pointing at photo.jpg get a 301 to photo.webp instead of a 404.', 'lw-img' ),
+			]
+		);
+		$this->row_close();
+	}
+
+	/**
+	 * Open a label + control row.
+	 *
+	 * @param string $label Row label.
+	 * @return void
+	 */
+	private function row_open( string $label ): void {
+		echo '<div class="lw-img-up-row"><span class="lw-img-up-label">' . esc_html( $label ) . '</span><div class="lw-img-up-ctl">';
+	}
+
+	/**
+	 * Close a row.
+	 *
+	 * @return void
+	 */
+	private function row_close(): void {
+		echo '</div></div>';
 	}
 }
