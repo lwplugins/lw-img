@@ -15,6 +15,7 @@ use LightweightPlugins\Img\Bulk\AttachmentOptimizer;
 use LightweightPlugins\Img\Bulk\BulkJob;
 use LightweightPlugins\Img\Bulk\StatusMeta;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
+use LightweightPlugins\Img\Stats\SiteStats;
 use WP_CLI;
 
 /**
@@ -32,6 +33,7 @@ final class Commands {
 	public function status(): void {
 		$counts = StatusMeta::counts();
 		$query  = new UnoptimizedQuery();
+		$stats  = SiteStats::get( true );
 
 		$items = [
 			[
@@ -50,7 +52,29 @@ final class Commands {
 				'metric' => 'failed',
 				'value'  => $counts[ StatusMeta::FAILED ],
 			],
+			[
+				'metric' => 'storage saved',
+				'value'  => size_format( (int) $stats['saved'] ) . ' (-' . round( (float) $stats['percent'], 1 ) . '%)',
+			],
+			[
+				'metric' => 'backup folder',
+				'value'  => size_format( (int) $stats['backup']['bytes'] ) . ' / ' . $stats['backup']['files'] . ' files',
+			],
 		];
+
+		foreach ( (array) $stats['leftovers'] as $name => $dir ) {
+			$items[] = [
+				'metric' => $name . ' leftover backups',
+				'value'  => size_format( (int) $dir['bytes'] ) . ' / ' . $dir['files'] . ' files',
+			];
+		}
+
+		foreach ( StatusMeta::skip_reasons() as $reason => $total ) {
+			$items[] = [
+				'metric' => 'skip: ' . $reason,
+				'value'  => $total,
+			];
+		}
 
 		WP_CLI\Utils\format_items( 'table', $items, [ 'metric', 'value' ] );
 	}

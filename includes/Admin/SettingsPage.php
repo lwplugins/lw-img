@@ -13,6 +13,7 @@ use LightweightPlugins\Img\Admin\Settings\TabBackup;
 use LightweightPlugins\Img\Admin\Settings\TabBulk;
 use LightweightPlugins\Img\Admin\Settings\TabGeneral;
 use LightweightPlugins\Img\Admin\Settings\TabLog;
+use LightweightPlugins\Img\Admin\Settings\TabStats;
 use LightweightPlugins\Img\Admin\Settings\TabUpload;
 use LightweightPlugins\Img\Options;
 
@@ -35,6 +36,7 @@ final class SettingsPage {
 	public function __construct() {
 		$this->tabs = [
 			new TabGeneral(),
+			new TabStats(),
 			new TabUpload(),
 			new TabBulk(),
 			new TabBackup(),

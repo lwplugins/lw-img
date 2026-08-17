@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.5.0] - 2026-08-17
+
+### Added
+- Stats tab: optimized image count, total storage saved with ratio, LW Img backup folder size, and detection of leftover backup folders from other optimizers (e.g. a previously installed ShortPixel) with size and file count — cached for an hour with a refresh button
+- Bulk progress now shows elapsed time, an estimated time remaining, and the item currently being processed; the Status row updates live during a run
+- Skip-reason breakdown on the Bulk tab and in `wp lw-img status` (e.g. "file missing" for ghost attachment records)
+- `wp lw-img status` also reports storage saved and backup folder sizes
+
+### Fixed
+- On hosts with `DISABLE_WP_CRON` and a system-cron runner the background worker now uses a much larger per-tick budget under WP-CLI (4 minutes instead of 15 seconds), so runs no longer crawl in short bursts between cron passes
+- A lost bulk tick is automatically re-scheduled while a run is active (self-heal on init)
+
 ## [1.4.0] - 2026-08-17
 
 ### Added

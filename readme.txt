@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,13 @@ Yes — use the Bulk tab (or `wp lw-img optimize --all`). The run happens in the
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.5.0 =
+* New: Stats tab — total savings, backup folder size, and leftover backup folders from other optimizers (e.g. ShortPixel)
+* New: Bulk progress shows elapsed time, estimated time remaining, and the current item; live-updating counters
+* New: Skip-reason breakdown on the Bulk tab and in wp lw-img status
+* Fix: much larger background worker budget under WP-CLI system cron (DISABLE_WP_CRON hosts no longer crawl)
+* Fix: lost bulk ticks are re-scheduled automatically while a run is active
 
 = 1.4.0 =
 * New: Slow jobs are polled instead of failing (API 408 + poll URL handling)

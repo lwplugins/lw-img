@@ -40,7 +40,8 @@ final class StatusEndpoint {
 			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'lw-img' ) ], 403 );
 		}
 
-		$job = BulkJob::get();
+		$job        = BulkJob::get();
+		$started_at = (int) ( $job['started_at'] ?? 0 );
 
 		wp_send_json_success(
 			[
@@ -50,6 +51,8 @@ final class StatusEndpoint {
 				'skipped'   => (int) ( $job['skipped'] ?? 0 ),
 				'failed'    => (int) ( $job['failed'] ?? 0 ),
 				'processed' => BulkJob::processed(),
+				'elapsed'   => $started_at > 0 ? max( 0, time() - $started_at ) : 0,
+				'current'   => (string) ( $job['current'] ?? '' ),
 			]
 		);
 	}

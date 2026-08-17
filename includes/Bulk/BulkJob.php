@@ -69,10 +69,11 @@ final class BulkJob {
 	/**
 	 * Record one processed item.
 	 *
-	 * @param string $status Outcome (StatusMeta constant).
+	 * @param string $status  Outcome (StatusMeta constant).
+	 * @param string $current Label of the item just processed (shown as progress).
 	 * @return void
 	 */
-	public static function record( string $status ): void {
+	public static function record( string $status, string $current = '' ): void {
 		$job = self::get();
 
 		if ( ( $job['state'] ?? '' ) !== self::STATE_RUNNING ) {
@@ -81,6 +82,10 @@ final class BulkJob {
 
 		if ( isset( $job[ $status ] ) ) {
 			$job[ $status ] = (int) $job[ $status ] + 1;
+		}
+
+		if ( '' !== $current ) {
+			$job['current'] = $current;
 		}
 
 		$job['updated_at'] = time();

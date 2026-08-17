@@ -90,6 +90,27 @@
 			}
 		}
 
+		function setCount(id, value) {
+			var el = document.getElementById(id);
+			if (el) {
+				el.textContent = value.toLocaleString();
+			}
+		}
+
+		function formatDuration(seconds) {
+			seconds = Math.max(0, Math.round(seconds));
+			var h = Math.floor(seconds / 3600);
+			var m = Math.floor((seconds % 3600) / 60);
+			var s = seconds % 60;
+			if (h > 0) {
+				return h + 'h ' + m + 'm';
+			}
+			if (m > 0) {
+				return m + 'm ' + s + 's';
+			}
+			return s + 's';
+		}
+
 		function poll() {
 			var body = new FormData();
 			body.append('action', 'lw_img_bulk_status');
@@ -108,11 +129,28 @@
 						barFill.style.width = Math.min(100, Math.round((d.processed / d.total) * 100)) + '%';
 					}
 
+					setCount('lw-img-count-pending', Math.max(0, d.total - d.processed));
+					setCount('lw-img-count-optimized', d.optimized);
+					setCount('lw-img-count-skipped', d.skipped);
+					setCount('lw-img-count-failed', d.failed);
+
 					if (d.state === 'running') {
-						setStatus(
-							d.processed + ' / ' + d.total + ' — ' +
-							d.optimized + ' optimized, ' + d.skipped + ' skipped, ' + d.failed + ' failed'
-						);
+						var line = d.processed + ' / ' + d.total + ' — ' +
+							d.optimized + ' optimized, ' + d.skipped + ' skipped, ' + d.failed + ' failed';
+
+						if (d.elapsed > 0) {
+							line += ' · ' + formatDuration(d.elapsed) + ' elapsed';
+							if (d.processed > 0 && d.total > d.processed) {
+								var eta = (d.total - d.processed) * (d.elapsed / d.processed);
+								line += ' · ~' + formatDuration(eta) + ' left';
+							}
+						}
+
+						if (d.current) {
+							line += ' · Now: ' + d.current;
+						}
+
+						setStatus(line);
 						window.setTimeout(poll, 3000);
 					} else if (!finished) {
 						finished = true;

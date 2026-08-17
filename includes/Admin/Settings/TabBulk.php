@@ -51,10 +51,10 @@ final class TabBulk implements TabInterface {
 				<th><?php esc_html_e( 'Status', 'lw-img' ); ?></th>
 				<td>
 					<p>
-						<strong><?php echo esc_html( number_format_i18n( $pending ) ); ?></strong> <?php esc_html_e( 'pending', 'lw-img' ); ?> ·
-						<strong><?php echo esc_html( number_format_i18n( $optimized ) ); ?></strong> <?php esc_html_e( 'optimized', 'lw-img' ); ?> ·
-						<strong><?php echo esc_html( number_format_i18n( $counts[ StatusMeta::SKIPPED ] ) ); ?></strong> <?php esc_html_e( 'skipped', 'lw-img' ); ?> ·
-						<strong><?php echo esc_html( number_format_i18n( $counts[ StatusMeta::FAILED ] ) ); ?></strong> <?php esc_html_e( 'failed', 'lw-img' ); ?>
+						<strong id="lw-img-count-pending"><?php echo esc_html( number_format_i18n( $pending ) ); ?></strong> <?php esc_html_e( 'pending', 'lw-img' ); ?> ·
+						<strong id="lw-img-count-optimized"><?php echo esc_html( number_format_i18n( $optimized ) ); ?></strong> <?php esc_html_e( 'optimized', 'lw-img' ); ?> ·
+						<strong id="lw-img-count-skipped"><?php echo esc_html( number_format_i18n( $counts[ StatusMeta::SKIPPED ] ) ); ?></strong> <?php esc_html_e( 'skipped', 'lw-img' ); ?> ·
+						<strong id="lw-img-count-failed"><?php echo esc_html( number_format_i18n( $counts[ StatusMeta::FAILED ] ) ); ?></strong> <?php esc_html_e( 'failed', 'lw-img' ); ?>
 					</p>
 				</td>
 			</tr>
@@ -103,6 +103,18 @@ final class TabBulk implements TabInterface {
 						</a>
 					<?php endif; ?>
 					<p class="description"><?php esc_html_e( 'Skipped and failed images are not retried automatically. Re-queue them after changing settings or fixing the cause — details are in the Log tab.', 'lw-img' ); ?></p>
+					<?php $reasons = StatusMeta::skip_reasons(); ?>
+					<?php if ( [] !== $reasons ) : ?>
+						<p class="description"><strong><?php esc_html_e( 'Skip reasons:', 'lw-img' ); ?></strong>
+						<?php
+						$parts = [];
+						foreach ( $reasons as $reason => $total ) {
+							$parts[] = $reason . ' (' . number_format_i18n( $total ) . ')';
+						}
+						echo esc_html( implode( ' · ', $parts ) );
+						?>
+						</p>
+					<?php endif; ?>
 				</td>
 			</tr>
 			<?php endif; ?>

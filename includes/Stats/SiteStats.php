@@ -1,0 +1,163 @@
+<?php
+/**
+ * Site-wide optimization and disk-usage statistics.
+ *
+ * @package LightweightPlugins\Img
+ */
+
+declare(strict_types=1);
+
+namespace LightweightPlugins\Img\Stats;
+
+use FilesystemIterator;
+use LightweightPlugins\Img\Backup\BackupStore;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+
+/**
+ * Aggregates saved bytes from the attachment meta and measures backup
+ * directories on disk — including leftover folders from other optimizers
+ * (currently ShortPixel, whose path is verified against its source), so
+ * users learn about forgotten backups even when that plugin is gone.
+ * Results are cached for an hour; the Stats tab offers a refresh.
+ */
+final class SiteStats {
+
+	public const REFRESH_ACTION = 'lw_img_refresh_stats';
+
+	private const CACHE_KEY = 'lw_img_stats';
+
+	/**
+	 * Hook the refresh action.
+	 *
+	 * @return void
+	 */
+	public static function register(): void {
+		add_action( 'admin_post_' . self::REFRESH_ACTION, [ self::class, 'refresh' ] );
+	}
+
+	/**
+	 * Collect (or serve cached) statistics.
+	 *
+	 * @param bool $fresh Skip the cache.
+	 * @return array<string, mixed>
+	 */
+	public static function get( bool $fresh = false ): array {
+		if ( ! $fresh ) {
+			$cached = get_transient( self::CACHE_KEY );
+			if ( is_array( $cached ) ) {
+				return $cached;
+			}
+		}
+
+		$stats = self::collect();
+		set_transient( self::CACHE_KEY, $stats, HOUR_IN_SECONDS );
+
+		return $stats;
+	}
+
+	/**
+	 * Clear the cache and go back to the Stats tab.
+	 *
+	 * @return void
+	 */
+	public static function refresh(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'lw-img' ), '', [ 'response' => 403 ] );
+		}
+
+		check_admin_referer( self::REFRESH_ACTION );
+
+		delete_transient( self::CACHE_KEY );
+
+		wp_safe_redirect( admin_url( 'admin.php?page=lw-img#stats' ) );
+		exit;
+	}
+
+	/**
+	 * The share of bytes saved, as a percentage.
+	 *
+	 * @param int $original  Total original bytes.
+	 * @param int $optimized Total optimized bytes.
+	 * @return float
+	 */
+	public static function savings_percent( int $original, int $optimized ): float {
+		if ( $original <= 0 ) {
+			return 0.0;
+		}
+
+		return max( 0.0, ( 1 - $optimized / $original ) * 100 );
+	}
+
+	/**
+	 * Recursive size and file count of a directory.
+	 *
+	 * @param string $path Absolute directory path.
+	 * @return array{bytes: int, files: int}
+	 */
+	public static function dir_stats( string $path ): array {
+		$bytes = 0;
+		$files = 0;
+
+		if ( is_dir( $path ) ) {
+			$iterator = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator( $path, FilesystemIterator::SKIP_DOTS )
+			);
+
+			foreach ( $iterator as $file ) {
+				if ( $file->isFile() ) {
+					$bytes += (int) $file->getSize();
+					++$files;
+				}
+			}
+		}
+
+		return [
+			'bytes' => $bytes,
+			'files' => $files,
+		];
+	}
+
+	/**
+	 * Gather everything.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private static function collect(): array {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- aggregate SUM over meta values; no meta-API equivalent, result is transient-cached by the caller.
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT COUNT(*) AS cnt, SUM(CAST(o.meta_value AS UNSIGNED)) AS orig_sum, SUM(CAST(n.meta_value AS UNSIGNED)) AS new_sum
+				 FROM {$wpdb->postmeta} o
+				 INNER JOIN {$wpdb->postmeta} n ON n.post_id = o.post_id AND n.meta_key = %s
+				 WHERE o.meta_key = %s",
+				'_lw_img_new_size',
+				'_lw_img_original_size'
+			)
+		);
+
+		$original  = (int) ( $row->orig_sum ?? 0 );
+		$optimized = (int) ( $row->new_sum ?? 0 );
+		$uploads   = (string) wp_get_upload_dir()['basedir'];
+
+		$leftovers = [];
+		// Path verified against the ShortPixel source: <uploads>/ShortpixelBackups.
+		$shortpixel = self::dir_stats( $uploads . '/ShortpixelBackups' );
+		if ( $shortpixel['files'] > 0 ) {
+			$leftovers['ShortPixel'] = $shortpixel;
+		}
+
+		return [
+			'count'        => (int) ( $row->cnt ?? 0 ),
+			'original'     => $original,
+			'optimized'    => $optimized,
+			'saved'        => max( 0, $original - $optimized ),
+			'percent'      => self::savings_percent( $original, $optimized ),
+			'backup'       => self::dir_stats( ( new BackupStore() )->root() ),
+			'leftovers'    => $leftovers,
+			'generated_at' => time(),
+		];
+	}
+}

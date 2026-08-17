@@ -105,6 +105,38 @@ final class StatusMeta {
 	}
 
 	/**
+	 * Skip-reason breakdown (most frequent first).
+	 *
+	 * @param int $limit Maximum number of reasons.
+	 * @return array<string, int> Map of reason => count.
+	 */
+	public static function skip_reasons( int $limit = 5 ): array {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- aggregate stats query; no meta-API equivalent, shown on demand only.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT d.meta_value AS reason, COUNT(*) AS total
+				 FROM {$wpdb->postmeta} s
+				 INNER JOIN {$wpdb->postmeta} d ON d.post_id = s.post_id AND d.meta_key = %s
+				 WHERE s.meta_key = %s AND s.meta_value = %s
+				 GROUP BY d.meta_value ORDER BY total DESC LIMIT %d",
+				self::META_DETAIL,
+				self::META_STATUS,
+				self::SKIPPED,
+				$limit
+			)
+		);
+
+		$reasons = [];
+		foreach ( $rows as $row ) {
+			$reasons[ (string) $row->reason ] = (int) $row->total;
+		}
+
+		return $reasons;
+	}
+
+	/**
 	 * Counts of stamped attachments grouped by status.
 	 *
 	 * @return array<string, int>

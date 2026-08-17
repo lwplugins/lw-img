@@ -24,12 +24,43 @@ final class BackgroundWorker {
 	private const BUDGET_SEC = 15;
 
 	/**
-	 * Hook the cron callback.
+	 * Hook the cron callback and the lost-event self-heal.
 	 *
 	 * @return void
 	 */
 	public static function register(): void {
 		add_action( self::HOOK, [ self::class, 'tick' ] );
+		add_action( 'init', [ self::class, 'ensure_scheduled' ] );
+	}
+
+	/**
+	 * Re-schedule a lost tick while a run is active (e.g. after a killed
+	 * process or on hosts where cron events occasionally vanish).
+	 *
+	 * @return void
+	 */
+	public static function ensure_scheduled(): void {
+		if ( BulkJob::is_running() && false === wp_next_scheduled( self::HOOK ) && false === get_transient( self::LOCK ) ) {
+			wp_schedule_single_event( time(), self::HOOK );
+		}
+	}
+
+	/**
+	 * Per-tick time budget.
+	 *
+	 * Under WP-CLI (the typical DISABLE_WP_CRON system-cron runner, e.g.
+	 * `wp cron event run --due-now` every 5 minutes) there is no PHP time
+	 * limit and the next chance to run may be minutes away — so work much
+	 * longer per tick. Web-spawned cron keeps the short budget.
+	 *
+	 * @return int Seconds.
+	 */
+	private static function budget(): int {
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			return 240;
+		}
+
+		return self::BUDGET_SEC;
 	}
 
 	/**
@@ -72,9 +103,10 @@ final class BackgroundWorker {
 			return;
 		}
 
-		set_transient( self::LOCK, 1, 2 * MINUTE_IN_SECONDS );
+		$budget = self::budget();
+		set_transient( self::LOCK, 1, $budget + MINUTE_IN_SECONDS );
 
-		$deadline  = time() + self::BUDGET_SEC;
+		$deadline  = time() + $budget;
 		$query     = new UnoptimizedQuery();
 		$optimizer = new AttachmentOptimizer();
 		$drained   = false;
@@ -92,7 +124,7 @@ final class BackgroundWorker {
 
 			foreach ( $ids as $attachment_id ) {
 				$outcome = $optimizer->optimize( $attachment_id );
-				BulkJob::record( $outcome['result'] );
+				BulkJob::record( $outcome['result'], (string) get_the_title( $attachment_id ) );
 
 				if ( time() >= $deadline || ! BulkJob::is_running() ) {
 					break;

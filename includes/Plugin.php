@@ -27,6 +27,7 @@ use LightweightPlugins\Img\Media\InfoMetabox;
 use LightweightPlugins\Img\Media\NotFoundRedirect;
 use LightweightPlugins\Img\Media\RowActions;
 use LightweightPlugins\Img\Media\SavingsColumn;
+use LightweightPlugins\Img\Stats\SiteStats;
 use LightweightPlugins\Img\Upload\UploadInterceptor;
 
 /**
@@ -53,6 +54,7 @@ final class Plugin {
 
 		if ( is_admin() ) {
 			CompetitorNotice::register();
+			SiteStats::register();
 			ClearHandler::register();
 			RestoreHandler::register();
 			OptimizeHandler::register();
