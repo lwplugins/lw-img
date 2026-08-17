@@ -413,3 +413,5 @@
 .lw-img-gen-num { width: 26px; height: 26px; border-radius: 50%; background: #e6f6f0; color: #00a876; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .lw-img-gen-steps strong { display: block; margin-bottom: 2px; }
 .lw-img-gen-steps p { margin: 0; color: #646970; max-width: 62ch; }
+.lw-img-key-toggle .dashicons { vertical-align: text-bottom; }
+.lw-img-done .dashicons { vertical-align: text-bottom; }

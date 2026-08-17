@@ -247,9 +247,20 @@
 		}
 
 		toggle.addEventListener('click', function () {
-			var show = input.type === 'password';
+			var show  = input.type === 'password';
+			var icon  = this.querySelector('.dashicons');
+			var label = show ? this.getAttribute('data-label-hide') : this.getAttribute('data-label-show');
+
 			input.type = show ? 'text' : 'password';
 			this.setAttribute('aria-pressed', show ? 'true' : 'false');
+			if (label) {
+				this.setAttribute('aria-label', label);
+				this.setAttribute('title', label);
+			}
+			if (icon) {
+				icon.classList.toggle('dashicons-visibility', !show);
+				icon.classList.toggle('dashicons-hidden', show);
+			}
 		});
 	}
 

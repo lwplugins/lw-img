@@ -97,8 +97,9 @@ final class TabGeneral implements TabInterface {
 			]
 		);
 		printf(
-			'<button type="button" class="button lw-img-key-toggle" aria-pressed="false" title="%1$s" aria-label="%1$s">&#128065;</button>',
-			esc_attr__( 'Show key', 'lw-img' )
+			'<button type="button" class="button lw-img-key-toggle" aria-pressed="false" title="%1$s" aria-label="%1$s" data-label-show="%1$s" data-label-hide="%2$s"><span class="dashicons dashicons-visibility" aria-hidden="true"></span></button>',
+			esc_attr__( 'Show key', 'lw-img' ),
+			esc_attr__( 'Hide key', 'lw-img' )
 		);
 
 		if ( '' === $api_key ) {

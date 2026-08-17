@@ -133,7 +133,7 @@ final class TabBulk implements TabInterface {
 		$in       = (int) ( $job['bytes_in'] ?? 0 );
 
 		printf(
-			'<div class="lw-img-done">✓ %s</div>',
+			'<div class="lw-img-done"><span class="dashicons dashicons-yes" aria-hidden="true"></span> %s</div>',
 			esc_html(
 				sprintf(
 					/* translators: 1: image count, 2: duration, 3: saved size, 4: percentage. */
