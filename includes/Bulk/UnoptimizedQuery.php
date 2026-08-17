@@ -161,7 +161,14 @@ final class UnoptimizedQuery {
 	private function pending_from_where( int $after_id ): array {
 		global $wpdb;
 
-		$mimes        = (array) Options::get( 'mime_types' );
+		$mimes = array_values( array_filter( (array) Options::get( 'mime_types' ) ) );
+
+		// An empty mime list would render "IN ()" — a SQL syntax error. Match
+		// nothing instead (there is nothing to optimize without allowed types).
+		if ( [] === $mimes ) {
+			return [ 'FROM ' . $wpdb->posts . ' p WHERE 1 = 0', [] ];
+		}
+
 		$placeholders = implode( ',', array_fill( 0, count( $mimes ), '%s' ) );
 
 		$sql = "FROM {$wpdb->posts} p

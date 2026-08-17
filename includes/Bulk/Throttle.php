@@ -136,7 +136,7 @@ final class Throttle {
 		$count = 0;
 		if ( is_readable( '/proc/cpuinfo' ) ) {
 			$lines = (array) file( '/proc/cpuinfo' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file -- reading a kernel pseudo-file, not site content.
-			$count = count( preg_grep( '/^processor\s/', $lines ) );
+			$count = count( (array) preg_grep( '/^processor\s/', $lines ) );
 		}
 
 		self::$cores = $count > 0 ? $count : 2;

@@ -114,11 +114,29 @@ final class ParentPage {
 	}
 
 	private static function render_plugin_card( array $plugin ): void {
-		$is_active = defined( $plugin['constant'] );
+		// The registry can come from a remote JSON file — normalize it so a
+		// missing key cannot throw (defined(null) is a TypeError under
+		// strict_types) and a hostile icon_color cannot break out of the
+		// inline style.
+		$plugin = array_merge(
+			[
+				'constant'      => '',
+				'icon'          => 'dashicons-admin-plugins',
+				'icon_color'    => '#00a876',
+				'name'          => '',
+				'description'   => '',
+				'github'        => '',
+				'settings_page' => '',
+			],
+			$plugin
+		);
+
+		$icon_color = preg_match( '/^#[0-9a-f]{3,8}$/i', (string) $plugin['icon_color'] ) ? (string) $plugin['icon_color'] : '#00a876';
+		$is_active  = '' !== (string) $plugin['constant'] && defined( (string) $plugin['constant'] );
 		?>
 		<div class="lw-plugin-card" style="background: #fff; border: 1px solid #ccd0d4; border-radius: 4px; padding: 20px; width: 300px;">
 			<h2 style="margin-top: 0;">
-				<span class="dashicons <?php echo esc_attr( (string) $plugin['icon'] ); ?>" style="color: <?php echo esc_attr( (string) $plugin['icon_color'] ); ?>;"></span>
+				<span class="dashicons <?php echo esc_attr( (string) $plugin['icon'] ); ?>" style="color: <?php echo esc_attr( $icon_color ); ?>;"></span>
 				<?php echo esc_html( (string) $plugin['name'] ); ?>
 				<?php if ( $is_active ) : ?>
 					<span style="display: inline-block; background: #00a32a; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; margin-left: 8px; vertical-align: middle;"><?php esc_html_e( 'Active', 'lw-img' ); ?></span>
