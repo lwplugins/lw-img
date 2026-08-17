@@ -14,34 +14,6 @@ use LightweightPlugins\Img\Bulk\BackgroundWorker;
 use LightweightPlugins\Img\Bulk\BulkJob;
 use LightweightPlugins\Img\Tests\Unit\MonkeyTestCase;
 
-// Minimal WP_Query stand-in: WordPress is not loaded in unit tests. The
-// posts list a test wants back is injected via $GLOBALS['lw_img_test_posts'].
-if ( ! class_exists( '\WP_Query' ) ) {
-	class_alias( FakeWpQuery::class, '\WP_Query' );
-}
-
-/**
- * Returns the globally injected posts list.
- */
-final class FakeWpQuery {
-
-	/**
-	 * Post IDs "found" by the query.
-	 *
-	 * @var array<int, int>
-	 */
-	public array $posts;
-
-	/**
-	 * Ignores the args and serves the injected list.
-	 *
-	 * @param array<string, mixed> $args Ignored.
-	 */
-	public function __construct( array $args = [] ) {
-		$this->posts = $GLOBALS['lw_img_test_posts'] ?? [];
-	}
-}
-
 /**
  * assist() must only take over a run that is genuinely stalled.
  */
@@ -108,8 +80,6 @@ final class BackgroundWorkerTest extends MonkeyTestCase {
 				'retried'    => 1,
 			]
 		);
-		$GLOBALS['lw_img_test_posts'] = [];
-
 		// The claim path asks MySQL for an advisory lock and picks pending
 		// IDs via direct SQL; report "no lock support" and an empty queue.
 		$GLOBALS['wpdb'] = new class() {
@@ -169,7 +139,7 @@ final class BackgroundWorkerTest extends MonkeyTestCase {
 		$this->assertCount( 1, $job_updates );
 		$this->assertSame( BulkJob::STATE_DONE, $job_updates[0]['state'] );
 
-		unset( $GLOBALS['lw_img_test_posts'], $GLOBALS['wpdb'] );
+		unset( $GLOBALS['wpdb'] );
 		$this->assertTrue( true );
 	}
 }

@@ -41,7 +41,7 @@ final class Commands {
 		$items = [
 			[
 				'metric' => 'pending',
-				'value'  => $query->count(),
+				'value'  => $query->count( true ),
 			],
 			[
 				'metric' => 'optimized',

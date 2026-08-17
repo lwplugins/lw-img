@@ -59,7 +59,7 @@ final class JobHandlers {
 		self::authorize( self::ACTION_START );
 
 		if ( ! BulkJob::is_running() ) {
-			BulkJob::start( ( new UnoptimizedQuery() )->count() );
+			BulkJob::start( ( new UnoptimizedQuery() )->count( true ) );
 			BackgroundWorker::kick();
 		}
 

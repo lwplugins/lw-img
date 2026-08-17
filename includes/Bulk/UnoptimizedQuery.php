@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace LightweightPlugins\Img\Bulk;
 
 use LightweightPlugins\Img\Options;
-use WP_Query;
 
 /**
  * Queries attachments in the allowed mime list without the optimized meta.
@@ -23,6 +22,8 @@ final class UnoptimizedQuery {
 
 	public const CURSOR_OPTION = 'lw_img_bulk_cursor';
 
+	public const COUNT_TRANSIENT = 'lw_img_pending_count';
+
 	/**
 	 * IDs of unoptimized image attachments.
 	 *
@@ -30,15 +31,7 @@ final class UnoptimizedQuery {
 	 * @return array<int, int>
 	 */
 	public function ids( int $limit ): array {
-		$args = $this->args( $limit );
-
-		// Picking a batch must not pay for a full COUNT of the remaining
-		// queue — on ~100k-image libraries that count takes minutes.
-		$args['no_found_rows'] = true;
-
-		$query = new WP_Query( $args );
-
-		return array_map( 'intval', $query->posts );
+		return $this->pending_after( 0, $limit );
 	}
 
 	/**
@@ -100,30 +93,12 @@ final class UnoptimizedQuery {
 	private function pending_after( int $after_id, int $limit ): array {
 		global $wpdb;
 
-		$mimes        = (array) Options::get( 'mime_types' );
-		$placeholders = implode( ',', array_fill( 0, count( $mimes ), '%s' ) );
+		[ $from_where, $params ] = $this->pending_from_where( $after_id );
+		$params[]                = $limit;
 
-		$params = array_merge(
-			[ StatusMeta::META_STATUS, '_lw_img_optimized', StatusMeta::META_CLAIM ],
-			array_map( 'strval', $mimes ),
-			[ $after_id, time() - self::CLAIM_TTL, $limit ]
-		);
-
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- hot-path queue pick; the interpolated fragment consists of %s placeholders only and the whole query is prepared here with a matching parameter list.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- hot-path queue pick; the fragment consists of %s/%d placeholders only and the whole query is prepared here with a matching parameter list.
 		$ids = $wpdb->get_col(
-			$wpdb->prepare(
-				"SELECT p.ID FROM {$wpdb->posts} p
-				 LEFT JOIN {$wpdb->postmeta} s ON p.ID = s.post_id AND s.meta_key = %s
-				 LEFT JOIN {$wpdb->postmeta} o ON p.ID = o.post_id AND o.meta_key = %s
-				 LEFT JOIN {$wpdb->postmeta} c ON p.ID = c.post_id AND c.meta_key = %s
-				 WHERE p.post_type = 'attachment' AND p.post_status = 'inherit'
-				   AND p.post_mime_type IN ($placeholders)
-				   AND p.ID > %d
-				   AND s.post_id IS NULL AND o.post_id IS NULL
-				   AND ( c.post_id IS NULL OR c.meta_value + 0 < %d )
-				 ORDER BY p.ID ASC LIMIT %d",
-				$params
-			)
+			$wpdb->prepare( "SELECT p.ID {$from_where} ORDER BY p.ID ASC LIMIT %d", $params )
 		);
 		// phpcs:enable
 
@@ -133,12 +108,34 @@ final class UnoptimizedQuery {
 	/**
 	 * Number of unoptimized image attachments.
 	 *
+	 * The full count probes every attachment row, which is expensive on
+	 * huge libraries, so it is cached for a minute unless $fresh is set.
+	 * (The old WP_Query version additionally paid SQL_CALC_FOUND_ROWS and
+	 * an unconstrained self-join for the claim clause — 9s per call on a
+	 * 771k-row postmeta table.)
+	 *
+	 * @param bool $fresh Bypass and refresh the cached value.
 	 * @return int
 	 */
-	public function count(): int {
-		$query = new WP_Query( $this->args( 1 ) );
+	public function count( bool $fresh = false ): int {
+		if ( ! $fresh ) {
+			$cached = get_transient( self::COUNT_TRANSIENT );
+			if ( false !== $cached ) {
+				return (int) $cached;
+			}
+		}
 
-		return (int) $query->found_posts;
+		global $wpdb;
+
+		[ $from_where, $params ] = $this->pending_from_where( 0 );
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- the fragment consists of %s/%d placeholders only and the whole query is prepared here; cached via transient above.
+		$count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) {$from_where}", $params ) );
+		// phpcs:enable
+
+		set_transient( self::COUNT_TRANSIENT, $count, MINUTE_IN_SECONDS );
+
+		return $count;
 	}
 
 	/**
@@ -147,61 +144,42 @@ final class UnoptimizedQuery {
 	 * @return int
 	 */
 	public function optimized_count(): int {
-		$args = $this->args( 1 );
+		global $wpdb;
 
-		$args['post_mime_type'] = 'image';
-		$args['meta_query']     = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- admin/CLI-only stats query.
-			[
-				'key'     => '_lw_img_optimized',
-				'compare' => 'EXISTS',
-			],
-		];
-
-		$query = new WP_Query( $args );
-
-		return (int) $query->found_posts;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- indexed single-key count; shown on demand only.
+		return (int) $wpdb->get_var(
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s", '_lw_img_optimized' )
+		);
 	}
 
 	/**
-	 * Shared WP_Query arguments.
+	 * Shared FROM/WHERE fragment of the pending-queue queries.
 	 *
-	 * @param int $limit Posts per page.
-	 * @return array<string, mixed>
+	 * @param int $after_id Only consider IDs greater than this.
+	 * @return array{0: string, 1: array<int, int|string>} SQL fragment (placeholders only) and its parameters.
 	 */
-	private function args( int $limit ): array {
-		return [
-			'post_type'      => 'attachment',
-			'post_status'    => 'inherit',
-			'post_mime_type' => (array) Options::get( 'mime_types' ),
-			'posts_per_page' => $limit,
-			'orderby'        => 'ID',
-			'order'          => 'ASC',
-			'fields'         => 'ids',
-			'no_found_rows'  => false,
-			'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- admin/CLI-only listing; NOT EXISTS is required to find unprocessed items.
-				'relation' => 'AND',
-				[
-					'key'     => StatusMeta::META_STATUS,
-					'compare' => 'NOT EXISTS',
-				],
-				[
-					'key'     => '_lw_img_optimized',
-					'compare' => 'NOT EXISTS',
-				],
-				[
-					'relation' => 'OR',
-					[
-						'key'     => StatusMeta::META_CLAIM,
-						'compare' => 'NOT EXISTS',
-					],
-					[
-						'key'     => StatusMeta::META_CLAIM,
-						'value'   => time() - self::CLAIM_TTL,
-						'compare' => '<',
-						'type'    => 'NUMERIC',
-					],
-				],
-			],
-		];
+	private function pending_from_where( int $after_id ): array {
+		global $wpdb;
+
+		$mimes        = (array) Options::get( 'mime_types' );
+		$placeholders = implode( ',', array_fill( 0, count( $mimes ), '%s' ) );
+
+		$sql = "FROM {$wpdb->posts} p
+			 LEFT JOIN {$wpdb->postmeta} s ON p.ID = s.post_id AND s.meta_key = %s
+			 LEFT JOIN {$wpdb->postmeta} o ON p.ID = o.post_id AND o.meta_key = %s
+			 LEFT JOIN {$wpdb->postmeta} c ON p.ID = c.post_id AND c.meta_key = %s
+			 WHERE p.post_type = 'attachment' AND p.post_status = 'inherit'
+			   AND p.post_mime_type IN ($placeholders)
+			   AND p.ID > %d
+			   AND s.post_id IS NULL AND o.post_id IS NULL
+			   AND ( c.post_id IS NULL OR c.meta_value + 0 < %d )";
+
+		$params = array_merge(
+			[ StatusMeta::META_STATUS, '_lw_img_optimized', StatusMeta::META_CLAIM ],
+			array_map( 'strval', $mimes ),
+			[ $after_id, time() - self::CLAIM_TTL ]
+		);
+
+		return [ $sql, $params ];
 	}
 }
