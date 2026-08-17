@@ -79,6 +79,10 @@ final class StatusMeta {
 			self::clear( (int) $id );
 		}
 
+		if ( [] !== $ids ) {
+			delete_option( UnoptimizedQuery::CURSOR_OPTION );
+		}
+
 		return count( $ids );
 	}
 
@@ -102,6 +106,10 @@ final class StatusMeta {
 
 		foreach ( $ids as $id ) {
 			self::clear( (int) $id );
+		}
+
+		if ( [] !== $ids ) {
+			delete_option( UnoptimizedQuery::CURSOR_OPTION );
 		}
 
 		return count( $ids );

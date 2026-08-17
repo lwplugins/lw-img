@@ -30,6 +30,7 @@ final class BulkJobTest extends MonkeyTestCase {
 		$this->stored = [];
 
 		Functions\when( 'get_option' )->alias( fn () => $this->stored );
+		Functions\when( 'delete_option' )->justReturn( true );
 		Functions\when( 'update_option' )->alias(
 			function ( $name, $value ) {
 				$this->stored = $value;

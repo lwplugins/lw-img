@@ -50,6 +50,7 @@ final class BulkJob {
 	 * @return void
 	 */
 	public static function start( int $total ): void {
+		delete_option( UnoptimizedQuery::CURSOR_OPTION );
 		update_option(
 			self::OPTION_NAME,
 			[

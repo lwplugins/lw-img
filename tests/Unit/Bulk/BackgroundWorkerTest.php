@@ -13,7 +13,6 @@ use Brain\Monkey\Functions;
 use LightweightPlugins\Img\Bulk\BackgroundWorker;
 use LightweightPlugins\Img\Bulk\BulkJob;
 use LightweightPlugins\Img\Tests\Unit\MonkeyTestCase;
-use Mockery;
 
 // Minimal WP_Query stand-in: WordPress is not loaded in unit tests. The
 // posts list a test wants back is injected via $GLOBALS['lw_img_test_posts'].
@@ -111,9 +110,17 @@ final class BackgroundWorkerTest extends MonkeyTestCase {
 		);
 		$GLOBALS['lw_img_test_posts'] = [];
 
-		// The claim path asks MySQL for an advisory lock; report "no lock
-		// support" so it degrades to the plain single-process pick.
+		// The claim path asks MySQL for an advisory lock and picks pending
+		// IDs via direct SQL; report "no lock support" and an empty queue.
 		$GLOBALS['wpdb'] = new class() {
+			/**
+			 * Table name properties referenced by the picker SQL.
+			 *
+			 * @var string
+			 */
+			public string $posts    = 'wp_posts';
+			public string $postmeta = 'wp_postmeta'; // phpcs:ignore Squiz.Commenting.VariableComment.Missing -- same role as $posts above.
+
 			/**
 			 * @param string $sql  Query with placeholders.
 			 * @param mixed  ...$args Values (ignored).
@@ -128,6 +135,14 @@ final class BackgroundWorkerTest extends MonkeyTestCase {
 			public function get_var( string $sql ): string {
 				return '0';
 			}
+
+			/**
+			 * @param string $sql Query (ignored).
+			 * @return array<int, string>
+			 */
+			public function get_col( string $sql ): array {
+				return [];
+			}
 		};
 
 		Functions\when( 'wp_parse_args' )->alias(
@@ -138,17 +153,21 @@ final class BackgroundWorkerTest extends MonkeyTestCase {
 		Functions\when( 'get_transient' )->justReturn( false );
 		Functions\expect( 'set_transient' )->once();
 		Functions\expect( 'delete_transient' )->once();
-		Functions\expect( 'update_option' )->once()->with(
-			BulkJob::OPTION_NAME,
-			Mockery::on(
-				static function ( array $job ): bool {
-					return BulkJob::STATE_DONE === $job['state'];
+
+		$job_updates = [];
+		Functions\when( 'update_option' )->alias(
+			static function ( string $name, $value ) use ( &$job_updates ): bool {
+				if ( BulkJob::OPTION_NAME === $name ) {
+					$job_updates[] = $value;
 				}
-			),
-			false
+				return true;
+			}
 		);
 
 		BackgroundWorker::assist();
+
+		$this->assertCount( 1, $job_updates );
+		$this->assertSame( BulkJob::STATE_DONE, $job_updates[0]['state'] );
 
 		unset( $GLOBALS['lw_img_test_posts'], $GLOBALS['wpdb'] );
 		$this->assertTrue( true );
