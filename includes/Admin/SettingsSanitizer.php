@@ -16,7 +16,29 @@ use LightweightPlugins\Img\Options;
  */
 final class SettingsSanitizer {
 
-	public static function sanitize( array $input ): array {
+	/**
+	 * Server-side clamps for numeric options (mirrors the field min/max, but
+	 * enforced here so a hand-crafted POST cannot set out-of-range values).
+	 *
+	 * @var array<string, array{0: int, 1: int}>
+	 */
+	private const CLAMPS = [
+		'request_timeout'       => [ 5, 120 ],
+		'max_filesize_mb'       => [ 1, 10 ],
+		'min_filesize_kb'       => [ 0, 10240 ],
+		'max_width'             => [ 0, 10000 ],
+		'max_height'            => [ 0, 10000 ],
+		'backup_retention_days' => [ 0, 3650 ],
+	];
+
+	/**
+	 * Sanitize submitted settings against the known defaults.
+	 *
+	 * @param mixed $input Submitted option value (array from the settings form).
+	 * @return array<string, mixed>
+	 */
+	public static function sanitize( mixed $input ): array {
+		$input     = is_array( $input ) ? $input : [];
 		$defaults  = Options::get_defaults();
 		$current   = Options::get_all();
 		$sanitized = [];
@@ -39,7 +61,13 @@ final class SettingsSanitizer {
 		}
 
 		if ( is_int( $default ) ) {
-			return null === $value ? (int) $fallback : absint( $value );
+			$number = null === $value ? (int) $fallback : absint( $value );
+
+			if ( isset( self::CLAMPS[ $key ] ) ) {
+				$number = max( self::CLAMPS[ $key ][0], min( self::CLAMPS[ $key ][1], $number ) );
+			}
+
+			return $number;
 		}
 
 		if ( is_array( $default ) ) {

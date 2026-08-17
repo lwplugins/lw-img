@@ -25,7 +25,7 @@ final class SettingsPage {
 
 	public const SLUG = 'lw-img';
 
-	private const SETTINGS_GROUP = 'lw_img_settings';
+	public const SETTINGS_GROUP = 'lw_img_settings';
 
 	/**
 	 * Settings tabs in render order.
@@ -114,7 +114,7 @@ final class SettingsPage {
 		);
 	}
 
-	public function sanitize_settings( array $input ): array {
+	public function sanitize_settings( mixed $input ): array {
 		return SettingsSanitizer::sanitize( $input );
 	}
 

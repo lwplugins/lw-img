@@ -31,8 +31,10 @@ final class SettingsRenderer {
 			<h1>
 				<img src="<?php echo esc_url( LW_IMG_URL . 'assets/img/title-icon.svg' ); ?>" alt="" class="lw-title-icon" />
 				<?php esc_html_e( 'LW Image', 'lw-img' ); ?>
-				<span style="font-size: 13px; font-weight: 400; color: #888;">(<?php echo esc_html( LW_IMG_VERSION ); ?>)</span>
+				<span class="lw-img-version">(<?php echo esc_html( LW_IMG_VERSION ); ?>)</span>
 			</h1>
+
+			<?php settings_errors( $settings_group ); ?>
 
 			<?php
 			/**

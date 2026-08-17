@@ -574,3 +574,5 @@
 .lw-img-log-pages { margin-left: auto; display: flex; gap: 4px; }
 .lw-img-log-pages button { font: inherit; padding: 4px 10px; border: 1px solid #dcdcde; border-radius: 3px; background: #fff; color: #646970; cursor: pointer; }
 .lw-img-log-pages .lw-img-log-page-on { border-color: #00a876; color: #00a876; font-weight: 700; }
+
+.lw-img-version { font-size: 13px; font-weight: 400; color: #50575e; }

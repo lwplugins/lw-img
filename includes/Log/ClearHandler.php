@@ -47,7 +47,7 @@ final class ClearHandler {
 					'cleared' => '1',
 				],
 				admin_url( 'admin.php' )
-			) . '#tab-log'
+			) . '#log'
 		);
 		exit;
 	}
