@@ -12,7 +12,7 @@ namespace LightweightPlugins\Img\Media;
 use LightweightPlugins\Img\Backup\BackupStore;
 
 /**
- * Side-by-side view; reachable from the attachment "LW Img" box.
+ * Side-by-side view; reachable from the attachment "LW Image" box.
  */
 final class ComparePage {
 

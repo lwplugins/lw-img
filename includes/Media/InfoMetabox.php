@@ -1,6 +1,6 @@
 <?php
 /**
- * "LW Img" box on the attachment edit screen.
+ * "LW Image" box on the attachment edit screen.
  *
  * @package LightweightPlugins\Img
  */
@@ -32,7 +32,7 @@ final class InfoMetabox {
 		add_action(
 			'add_meta_boxes_attachment',
 			static function (): void {
-				add_meta_box( 'lw-img-info', __( 'LW Img', 'lw-img' ), [ self::class, 'render' ], 'attachment', 'side' );
+				add_meta_box( 'lw-img-info', __( 'LW Image', 'lw-img' ), [ self::class, 'render' ], 'attachment', 'side' );
 			}
 		);
 	}
@@ -112,7 +112,7 @@ final class InfoMetabox {
 				'<p class="description">%s</p>',
 				esc_html(
 					/* translators: %s: competitor plugin name. */
-					sprintf( __( 'Already optimized by %s — LW Img leaves this image untouched.', 'lw-img' ), $owner )
+					sprintf( __( 'Already optimized by %s — LW Image leaves this image untouched.', 'lw-img' ), $owner )
 				)
 			);
 			return;

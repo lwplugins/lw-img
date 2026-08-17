@@ -54,7 +54,7 @@ final class ParentPage {
 	private static function get_local_fallback(): array {
 		return [
 			'lw-img' => [
-				'name'          => 'LW Img',
+				'name'          => 'LW Image',
 				'description'   => 'Lightweight image optimization — auto-convert uploads to WebP via HelloImg.',
 				'icon'          => 'dashicons-format-image',
 				'icon_color'    => '#00a876',

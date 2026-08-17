@@ -55,8 +55,8 @@ final class SettingsPage {
 
 		add_submenu_page(
 			ParentPage::SLUG,
-			__( 'Img', 'lw-img' ),
-			__( 'Img', 'lw-img' ),
+			__( 'Image', 'lw-img' ),
+			__( 'Image', 'lw-img' ),
 			'manage_options',
 			self::SLUG,
 			[ $this, 'render' ]

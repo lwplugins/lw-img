@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace LightweightPlugins\Img\Compat;
 
 /**
- * Warning only — nothing is blocked or deactivated. Shown on the LW Img
+ * Warning only — nothing is blocked or deactivated. Shown on the LW Image
  * settings page, the Media Library, and the Plugins screen; dismissible,
  * and it returns if the set of active competitors changes.
  */
@@ -56,7 +56,7 @@ final class CompetitorNotice {
 
 		printf(
 			'<div class="notice notice-warning"><p><strong>%s</strong> %s</p><p>%s <a href="%s">%s</a></p></div>',
-			esc_html__( 'LW Img:', 'lw-img' ),
+			esc_html__( 'LW Image:', 'lw-img' ),
 			esc_html(
 				sprintf(
 					/* translators: %s: comma-separated plugin names. */
@@ -64,7 +64,7 @@ final class CompetitorNotice {
 					implode( ', ', $active )
 				)
 			),
-			esc_html__( 'Images already optimized by them are left untouched by LW Img.', 'lw-img' ),
+			esc_html__( 'Images already optimized by them are left untouched by LW Image.', 'lw-img' ),
 			esc_url( $dismiss_url ),
 			esc_html__( 'Dismiss this notice', 'lw-img' )
 		);

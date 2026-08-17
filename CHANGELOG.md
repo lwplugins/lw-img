@@ -2,6 +2,9 @@
 
 ## [1.6.0] - 2026-08-17
 
+### Changed
+- Display name is now **LW Image** (plugin header, admin page title, menu item, Media Library column, attachment box) — slugs, text domain, and the repository stay `lw-img`
+
 ### Added
 - Redesigned General tab: status-first connection hero (Connected / Not connected / Error pill, API key field with show/hide toggle, Test connection), account tiles — balance shows "Unlimited" during the open beta, free-tier gauge with progress bar, and this site's own optimization total linking to Stats — plus a "current defaults" strip (output format, level, EXIF, backups, bulk speed) whose chips jump to the tab where each setting lives
 - First-run onboarding: with no API key the General tab shows a three-step guide (get a key, upload as usual, bulk-optimize the library) and a reversibility note

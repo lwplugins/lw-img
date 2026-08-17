@@ -1,6 +1,6 @@
 <?php
 /**
- * "LW Img" column in the Media Library list view.
+ * "LW Image" column in the Media Library list view.
  *
  * @package LightweightPlugins\Img
  */
@@ -31,7 +31,7 @@ final class SavingsColumn {
 	 * @return array<string, string>
 	 */
 	public static function add_column( array $columns ): array {
-		$columns['lw_img'] = __( 'LW Img', 'lw-img' );
+		$columns['lw_img'] = __( 'LW Image', 'lw-img' );
 
 		return $columns;
 	}
