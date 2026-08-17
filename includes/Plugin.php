@@ -24,6 +24,7 @@ use LightweightPlugins\Img\Log\ClearHandler;
 use LightweightPlugins\Img\Log\EventLog;
 use LightweightPlugins\Img\Media\ComparePage;
 use LightweightPlugins\Img\Media\InfoMetabox;
+use LightweightPlugins\Img\Media\NotFoundRedirect;
 use LightweightPlugins\Img\Media\RowActions;
 use LightweightPlugins\Img\Media\SavingsColumn;
 use LightweightPlugins\Img\Upload\UploadInterceptor;
@@ -47,6 +48,7 @@ final class Plugin {
 		RetentionCleaner::register();
 		AttachmentDeleteCleanup::register();
 		BackgroundWorker::register();
+		NotFoundRedirect::register();
 		new UploadInterceptor();
 
 		if ( is_admin() ) {

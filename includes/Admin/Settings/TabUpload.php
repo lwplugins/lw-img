@@ -171,6 +171,20 @@ final class TabUpload implements TabInterface {
 				</td>
 			</tr>
 			<tr>
+				<th><?php esc_html_e( 'Old URL redirect', 'lw-img' ); ?></th>
+				<td>
+					<?php
+					$this->render_checkbox_field(
+						[
+							'name'        => 'redirect_missing_images',
+							'label'       => __( 'Redirect old image URLs to the converted file (recommended)', 'lw-img' ),
+							'description' => __( 'If a converted image is still requested by its old URL (external links, sent newsletters, search engines), respond with a 301 redirect to the new file instead of a 404.', 'lw-img' ),
+						]
+					);
+					?>
+				</td>
+			</tr>
+			<tr>
 				<th><label for="min_filesize_kb"><?php esc_html_e( 'Min file size (KB)', 'lw-img' ); ?></label></th>
 				<td>
 					<?php

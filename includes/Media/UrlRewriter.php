@@ -10,18 +10,41 @@ declare(strict_types=1);
 namespace LightweightPlugins\Img\Media;
 
 /**
- * Applies URL pairs to post_content (plain text replace) and to postmeta
- * (serialization-aware: values are unserialized, rewritten recursively —
- * including JSON-escaped variants used by page-builder data — and
- * re-serialized, so PHP-serialized length prefixes stay correct).
- * Widgets/options are not covered.
+ * Applies URL pairs to post_content (plain text replace), to every meta
+ * table (post/comment/term/user), and to options — all serialization-aware:
+ * values are unserialized, rewritten recursively (including JSON-escaped
+ * variants used by page-builder data) and re-serialized, so PHP-serialized
+ * length prefixes stay correct. Transients are intentionally skipped.
  */
 final class UrlRewriter {
 
 	private const META_BATCH = 100;
 
+	private const META_TABLES = [
+		'postmeta'    => [
+			'id_column'    => 'meta_id',
+			'owner_column' => 'post_id',
+			'cache_group'  => 'post_meta',
+		],
+		'commentmeta' => [
+			'id_column'    => 'meta_id',
+			'owner_column' => 'comment_id',
+			'cache_group'  => 'comment_meta',
+		],
+		'termmeta'    => [
+			'id_column'    => 'meta_id',
+			'owner_column' => 'term_id',
+			'cache_group'  => 'term_meta',
+		],
+		'usermeta'    => [
+			'id_column'    => 'umeta_id',
+			'owner_column' => 'user_id',
+			'cache_group'  => 'user_meta',
+		],
+	];
+
 	/**
-	 * Apply the pairs to posts and postmeta.
+	 * Apply the pairs to posts, all meta tables, and options.
 	 *
 	 * @param array<string, string> $pairs Map of old URL => new URL.
 	 * @return void
@@ -38,7 +61,12 @@ final class UrlRewriter {
 		}
 
 		$this->rewrite_posts( $pairs );
-		$this->rewrite_postmeta( $pairs );
+
+		foreach ( array_keys( self::META_TABLES ) as $table ) {
+			$this->rewrite_meta_table( $table, $pairs );
+		}
+
+		$this->rewrite_options( $pairs );
 	}
 
 	/**
@@ -113,48 +141,113 @@ final class UrlRewriter {
 	}
 
 	/**
-	 * Serialization-aware replace in postmeta.
+	 * Build the "value contains any old URL" condition (raw + JSON-escaped).
 	 *
-	 * @param array<string, string> $pairs Map of old URL => new URL.
-	 * @return void
+	 * @param string                $column Column name to match against.
+	 * @param array<string, string> $pairs  Map of old URL => new URL.
+	 * @return array{0: string, 1: array<int, string>} Condition SQL (placeholders only) and its parameters.
 	 */
-	private function rewrite_postmeta( array $pairs ): void {
+	private function like_condition( string $column, array $pairs ): array {
 		global $wpdb;
 
 		$likes  = [];
 		$params = [];
 
 		foreach ( array_keys( $pairs ) as $old_url ) {
-			$likes[]  = 'meta_value LIKE %s';
+			$likes[]  = $column . ' LIKE %s';
 			$params[] = '%' . $wpdb->esc_like( $old_url ) . '%';
-			$likes[]  = 'meta_value LIKE %s';
+			$likes[]  = $column . ' LIKE %s';
 			$params[] = '%' . $wpdb->esc_like( str_replace( '/', '\/', $old_url ) ) . '%';
 		}
 
-		$where   = '(' . implode( ' OR ', $likes ) . ") AND meta_key NOT LIKE '\_lw\_img\_%'";
+		return [ '(' . implode( ' OR ', $likes ) . ')', $params ];
+	}
+
+	/**
+	 * Serialization-aware replace in one meta table.
+	 *
+	 * @param string                $table Key of self::META_TABLES.
+	 * @param array<string, string> $pairs Map of old URL => new URL.
+	 * @return void
+	 */
+	private function rewrite_meta_table( string $table, array $pairs ): void {
+		global $wpdb;
+
+		$config    = self::META_TABLES[ $table ];
+		$id_column = $config['id_column'];
+		$owner     = $config['owner_column'];
+		$wp_table  = $wpdb->{$table};
+
+		[ $condition, $params ] = $this->like_condition( 'meta_value', $pairs );
+
+		$where   = $condition . " AND meta_key NOT LIKE '\_lw\_img\_%'";
 		$last_id = 0;
 
 		do {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- candidate scan for the rewrite; the interpolated condition consists of %s placeholders only and the whole query is prepared here.
-			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT meta_id, post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_id > %d AND {$where} ORDER BY meta_id ASC LIMIT %d", array_merge( [ $last_id ], $params, [ self::META_BATCH ] ) ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- candidate scan for the rewrite; table/column names come from a class constant, conditions consist of %s placeholders only, and the whole query is prepared here.
+			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT {$id_column} AS id, {$owner} AS owner_id, meta_value FROM {$wp_table} WHERE {$id_column} > %d AND {$where} ORDER BY {$id_column} ASC LIMIT %d", array_merge( [ $last_id ], $params, [ self::META_BATCH ] ) ) );
 
 			$row_count = count( $rows );
 
 			foreach ( $rows as $row ) {
-				$last_id = (int) $row->meta_id;
+				$last_id = (int) $row->id;
 				$decoded = maybe_unserialize( (string) $row->meta_value );
 				$updated = self::replace_in_value( $decoded, $pairs );
 
 				if ( $updated !== $decoded ) {
-					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- targeted update by meta_id; the post's meta cache is flushed below.
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- targeted update by primary key; the owner's meta cache is flushed below.
 					$wpdb->update(
-						$wpdb->postmeta,
+						$wp_table,
 						[ 'meta_value' => maybe_serialize( $updated ) ], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- column update, not a query filter.
-						[ 'meta_id' => $row->meta_id ]
+						[ $id_column => $row->id ]
 					);
-					wp_cache_delete( (int) $row->post_id, 'post_meta' );
+					wp_cache_delete( (int) $row->owner_id, $config['cache_group'] );
 				}
 			}
 		} while ( self::META_BATCH === $row_count );
+	}
+
+	/**
+	 * Serialization-aware replace in options (transients skipped).
+	 *
+	 * @param array<string, string> $pairs Map of old URL => new URL.
+	 * @return void
+	 */
+	private function rewrite_options( array $pairs ): void {
+		global $wpdb;
+
+		[ $condition, $params ] = $this->like_condition( 'option_value', $pairs );
+
+		$where   = $condition . " AND option_name NOT LIKE '\_transient\_%' AND option_name NOT LIKE '\_site\_transient\_%' AND option_name NOT LIKE 'lw\_img\_%'";
+		$last_id = 0;
+		$touched = false;
+
+		do {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- candidate scan for the rewrite; conditions consist of %s placeholders only and the whole query is prepared here.
+			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT option_id, option_name, option_value FROM {$wpdb->options} WHERE option_id > %d AND {$where} ORDER BY option_id ASC LIMIT %d", array_merge( [ $last_id ], $params, [ self::META_BATCH ] ) ) );
+
+			$row_count = count( $rows );
+
+			foreach ( $rows as $row ) {
+				$last_id = (int) $row->option_id;
+				$decoded = maybe_unserialize( (string) $row->option_value );
+				$updated = self::replace_in_value( $decoded, $pairs );
+
+				if ( $updated !== $decoded ) {
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- targeted update by primary key; option caches are flushed below.
+					$wpdb->update(
+						$wpdb->options,
+						[ 'option_value' => maybe_serialize( $updated ) ],
+						[ 'option_id' => $row->option_id ]
+					);
+					wp_cache_delete( (string) $row->option_name, 'options' );
+					$touched = true;
+				}
+			}
+		} while ( self::META_BATCH === $row_count );
+
+		if ( $touched ) {
+			wp_cache_delete( 'alloptions', 'options' );
+		}
 	}
 }

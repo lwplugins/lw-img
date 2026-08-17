@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0] - 2026-08-17
+
+### Added
+- Content URL rewrite now covers every meta table (post, comment, term, user) and options too — the same serialization-aware replace, transients skipped
+- Old-URL 301 redirect: requests for a converted image's old URL (external links, sent newsletters, search engines) are permanently redirected to the new file instead of 404 — sub-size URLs are matched by width; enabled by default, can be turned off in the Upload tab
+
 ## [1.2.0] - 2026-08-16
 
 ### Added

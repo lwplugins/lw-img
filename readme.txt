@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,10 @@ Yes — use the Bulk tab (or `wp lw-img optimize --all`). The run happens in the
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.3.0 =
+* New: Content URL rewrite extended to all meta tables (post/comment/term/user) and options
+* New: Old-URL 301 redirect — requests for a converted image's old URL are redirected to the new file instead of 404 (default on)
 
 = 1.2.0 =
 * New: Images already optimized by ShortPixel, TinyPNG (Tinify), or Imagify are recognized and left untouched
