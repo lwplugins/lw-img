@@ -43,16 +43,28 @@ final class StatusEndpoint {
 		$job        = BulkJob::get();
 		$started_at = (int) ( $job['started_at'] ?? 0 );
 
+		$recent = [];
+		foreach ( (array) ( $job['recent'] ?? [] ) as $entry ) {
+			$recent[] = [
+				'ts'     => (int) ( $entry['ts'] ?? 0 ),
+				'label'  => (string) ( $entry['label'] ?? '' ),
+				'result' => (string) ( $entry['result'] ?? '' ),
+				'detail' => (string) ( $entry['detail'] ?? '' ),
+			];
+		}
+
 		wp_send_json_success(
 			[
-				'state'     => (string) ( $job['state'] ?? '' ),
-				'total'     => (int) ( $job['total'] ?? 0 ),
-				'optimized' => (int) ( $job['optimized'] ?? 0 ),
-				'skipped'   => (int) ( $job['skipped'] ?? 0 ),
-				'failed'    => (int) ( $job['failed'] ?? 0 ),
-				'processed' => BulkJob::processed(),
-				'elapsed'   => $started_at > 0 ? max( 0, time() - $started_at ) : 0,
-				'current'   => (string) ( $job['current'] ?? '' ),
+				'state'       => (string) ( $job['state'] ?? '' ),
+				'total'       => (int) ( $job['total'] ?? 0 ),
+				'optimized'   => (int) ( $job['optimized'] ?? 0 ),
+				'skipped'     => (int) ( $job['skipped'] ?? 0 ),
+				'failed'      => (int) ( $job['failed'] ?? 0 ),
+				'processed'   => BulkJob::processed(),
+				'elapsed'     => $started_at > 0 ? max( 0, time() - $started_at ) : 0,
+				'current'     => (string) ( $job['current'] ?? '' ),
+				'bytes_saved' => (int) ( $job['bytes_saved'] ?? 0 ),
+				'recent'      => $recent,
 			]
 		);
 	}

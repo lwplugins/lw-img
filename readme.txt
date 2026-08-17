@@ -70,7 +70,7 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 = 1.5.0 =
 * New: Stats tab — total savings, backup folder size, and leftover backup folders from other optimizers (e.g. ShortPixel)
-* New: Bulk progress shows elapsed time, estimated time remaining, and the current item; live-updating counters
+* New: Redesigned Bulk tab — progress dashboard with segmented bar, stat tiles, elapsed/speed/ETA, live activity feed, and a finish summary
 * New: Skip-reason breakdown on the Bulk tab and in wp lw-img status
 * Fix: much larger background worker budget under WP-CLI system cron (DISABLE_WP_CRON hosts no longer crawl)
 * Fix: lost bulk ticks are re-scheduled automatically while a run is active

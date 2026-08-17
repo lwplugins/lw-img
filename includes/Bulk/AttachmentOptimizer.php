@@ -79,7 +79,7 @@ final class AttachmentOptimizer {
 	 * removes it from the pending queue until it is explicitly re-queued.
 	 *
 	 * @param int $attachment_id Attachment post ID.
-	 * @return array{result: string, detail: string} Outcome and a human-readable detail.
+	 * @return array{result: string, detail: string, bytes_in?: int, bytes_saved?: int} Outcome, detail, and size info for optimized items.
 	 */
 	public function optimize( int $attachment_id ): array {
 		if ( get_post_meta( $attachment_id, '_lw_img_optimized', true ) ) {
@@ -137,7 +137,7 @@ final class AttachmentOptimizer {
 	 * @param int    $attachment_id Attachment post ID.
 	 * @param string $file          Absolute path of the current main file.
 	 * @param string $mime          Mime type before conversion.
-	 * @return array{result: string, detail: string}
+	 * @return array{result: string, detail: string, bytes_in?: int, bytes_saved?: int}
 	 */
 	private function convert( int $attachment_id, string $file, string $mime ): array {
 		$override = ( 'image/gif' === $mime && AnimatedGifProbe::is_animated( $file ) )
@@ -194,6 +194,10 @@ final class AttachmentOptimizer {
 			]
 		);
 
-		return $this->finish( $attachment_id, self::RESULT_OPTIMIZED, sprintf( '-%.1f%%', $result->percent ) );
+		$outcome                = $this->finish( $attachment_id, self::RESULT_OPTIMIZED, sprintf( '-%.1f%%', $result->percent ) );
+		$outcome['bytes_in']    = $result->original_size;
+		$outcome['bytes_saved'] = max( 0, $result->original_size - $result->new_size );
+
+		return $outcome;
 	}
 }

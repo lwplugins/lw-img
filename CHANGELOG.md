@@ -4,7 +4,7 @@
 
 ### Added
 - Stats tab: optimized image count, total storage saved with ratio, LW Img backup folder size, and detection of leftover backup folders from other optimizers (e.g. a previously installed ShortPixel) with size and file count — cached for an hour with a refresh button
-- Bulk progress now shows elapsed time, an estimated time remaining, and the item currently being processed; the Status row updates live during a run
+- Redesigned Bulk tab: progress dashboard with a segmented bar (optimized/skipped/failed composition), semantic stat tiles, elapsed/speed/ETA/saved-so-far row, a live "Now processing" line, a recent-activity feed with result chips, skip-reason chips, count-aware action buttons, and a summary banner when a run finishes
 - Skip-reason breakdown on the Bulk tab and in `wp lw-img status` (e.g. "file missing" for ghost attachment records)
 - `wp lw-img status` also reports storage saved and backup folder sizes
 

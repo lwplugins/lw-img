@@ -24,7 +24,7 @@ final class BulkJob {
 	/**
 	 * Current job record (empty array when none exists).
 	 *
-	 * @return array<string, int|string>
+	 * @return array<string, mixed>
 	 */
 	public static function get(): array {
 		$job = get_option( self::OPTION_NAME, [] );
@@ -69,11 +69,14 @@ final class BulkJob {
 	/**
 	 * Record one processed item.
 	 *
-	 * @param string $status  Outcome (StatusMeta constant).
-	 * @param string $current Label of the item just processed (shown as progress).
+	 * @param string $status      Outcome (StatusMeta constant).
+	 * @param string $current     Label of the item just processed (shown as progress).
+	 * @param int    $bytes_in    Original size in bytes (optimized items).
+	 * @param int    $bytes_saved Bytes saved (optimized items).
+	 * @param string $detail      Human-readable outcome detail for the activity feed.
 	 * @return void
 	 */
-	public static function record( string $status, string $current = '' ): void {
+	public static function record( string $status, string $current = '', int $bytes_in = 0, int $bytes_saved = 0, string $detail = '' ): void {
 		$job = self::get();
 
 		if ( ( $job['state'] ?? '' ) !== self::STATE_RUNNING ) {
@@ -87,6 +90,21 @@ final class BulkJob {
 		if ( '' !== $current ) {
 			$job['current'] = $current;
 		}
+
+		$job['bytes_in']    = (int) ( $job['bytes_in'] ?? 0 ) + $bytes_in;
+		$job['bytes_saved'] = (int) ( $job['bytes_saved'] ?? 0 ) + $bytes_saved;
+
+		$recent = is_array( $job['recent'] ?? null ) ? $job['recent'] : [];
+		array_unshift(
+			$recent,
+			[
+				'ts'     => time(),
+				'label'  => $current,
+				'result' => $status,
+				'detail' => $detail,
+			]
+		);
+		$job['recent'] = array_slice( $recent, 0, 5 );
 
 		$job['updated_at'] = time();
 

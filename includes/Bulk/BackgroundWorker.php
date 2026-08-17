@@ -124,7 +124,13 @@ final class BackgroundWorker {
 
 			foreach ( $ids as $attachment_id ) {
 				$outcome = $optimizer->optimize( $attachment_id );
-				BulkJob::record( $outcome['result'], (string) get_the_title( $attachment_id ) );
+				BulkJob::record(
+					$outcome['result'],
+					(string) get_the_title( $attachment_id ),
+					(int) ( $outcome['bytes_in'] ?? 0 ),
+					(int) ( $outcome['bytes_saved'] ?? 0 ),
+					(string) $outcome['detail']
+				);
 
 				if ( time() >= $deadline || ! BulkJob::is_running() ) {
 					break;
