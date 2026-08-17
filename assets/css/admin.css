@@ -370,3 +370,21 @@
 }
 
 .lw-img-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 6px 0 4px; }
+
+/* Tester tab (health report) */
+.lw-img-health-summary { margin: 0 0 16px; }
+.lw-img-health { margin-bottom: 20px; }
+.lw-img-health-cell { width: 90px; }
+.lw-img-health th[scope="row"] { width: 240px; font-weight: 600; }
+.lw-img-health-pill {
+	display: inline-block;
+	padding: 2px 10px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.6;
+}
+.lw-img-health-pill--ok { background: #d5f5e3; color: #1e8449; }
+.lw-img-health-pill--warning { background: #fdf2d0; color: #9a6700; }
+.lw-img-health-pill--critical { background: #fadbd8; color: #b03a2e; }
+.lw-img-health-pill--info { background: #eaecee; color: #566573; }

@@ -20,6 +20,7 @@ use LightweightPlugins\Img\Bulk\ReoptimizeHandler;
 use LightweightPlugins\Img\Bulk\StatusEndpoint;
 use LightweightPlugins\Img\CLI\Commands as CLICommands;
 use LightweightPlugins\Img\Compat\CompetitorNotice;
+use LightweightPlugins\Img\Health\HealthReport;
 use LightweightPlugins\Img\Log\ClearHandler;
 use LightweightPlugins\Img\Log\EventLog;
 use LightweightPlugins\Img\Media\ComparePage;
@@ -55,6 +56,7 @@ final class Plugin {
 		if ( is_admin() ) {
 			CompetitorNotice::register();
 			SiteStats::register();
+			HealthReport::register();
 			ClearHandler::register();
 			RestoreHandler::register();
 			OptimizeHandler::register();

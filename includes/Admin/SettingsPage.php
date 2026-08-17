@@ -14,6 +14,7 @@ use LightweightPlugins\Img\Admin\Settings\TabBulk;
 use LightweightPlugins\Img\Admin\Settings\TabGeneral;
 use LightweightPlugins\Img\Admin\Settings\TabLog;
 use LightweightPlugins\Img\Admin\Settings\TabStats;
+use LightweightPlugins\Img\Admin\Settings\TabTester;
 use LightweightPlugins\Img\Admin\Settings\TabUpload;
 use LightweightPlugins\Img\Options;
 
@@ -40,6 +41,7 @@ final class SettingsPage {
 			new TabUpload(),
 			new TabBulk(),
 			new TabBackup(),
+			new TabTester(),
 			new TabLog(),
 		];
 

@@ -13,6 +13,7 @@
 - Processing speed setting (gentle / normal / fast) on the Bulk tab and as `wp lw-img optimize --speed=...` — controls batch size, pause between images, and cron tick spacing
 - CPU load guard: long-running workers back off in 5-second steps while the server's 1-minute load average exceeds the profile's share of the CPU cores, so bulk runs cannot starve the site
 - Quota halt: when the API reports the balance is exhausted (402 / insufficient_balance), the run stops immediately instead of stamping every remaining image as failed — pending images stay queued and resume after a top-up
+- Tester tab: environment checks with status pills — database engine per core table (MyISAM/Aria tables get a conversion hint: with table-level locking a bulk run can freeze the whole site), PHP version and memory, cURL, Imagick/GD with WebP/AVIF thumbnail support, uploads/backup writability, free disk space, WP-Cron mode and loopback reachability, HelloImg API reachability, and active competitor optimizers; cached for 10 minutes with a re-run button
 
 ### Fixed
 - On hosts with `DISABLE_WP_CRON` and a system-cron runner the background worker now uses a much larger per-tick budget under WP-CLI (20 minutes instead of 15 seconds, with in-process cache hygiene to keep memory flat), so runs no longer crawl in short bursts between cron passes
