@@ -303,11 +303,51 @@
 		});
 	}
 
+	// Backup tab: master-toggle status + danger card, retention presets.
+	function initBackup() {
+		var master = document.getElementById('backup_enabled');
+		var state  = document.getElementById('lw-img-bk-state');
+		var danger = document.getElementById('lw-img-bk-danger');
+
+		if (master && state) {
+			master.addEventListener('change', function () {
+				state.textContent = this.checked ? state.getAttribute('data-on') : state.getAttribute('data-off');
+				state.classList.toggle('lw-img-bk-state-off', !this.checked);
+				if (danger) {
+					danger.classList.toggle('lw-img-hidden', this.checked);
+				}
+			});
+		}
+
+		var days = document.getElementById('backup_retention_days');
+		var presets = document.querySelectorAll('.lw-img-bk-preset');
+
+		function syncPresets() {
+			presets.forEach(function (preset) {
+				preset.classList.toggle('lw-img-bk-preset-on', days && preset.getAttribute('data-days') === days.value);
+			});
+		}
+
+		presets.forEach(function (preset) {
+			preset.addEventListener('click', function () {
+				if (days) {
+					days.value = this.getAttribute('data-days');
+				}
+				syncPresets();
+			});
+		});
+
+		if (days) {
+			days.addEventListener('input', syncPresets);
+		}
+	}
+
 	function init() {
 		initTabs();
 		initBulk();
 		initKeyToggle();
 		initUpload();
+		initBackup();
 	}
 
 	if (document.readyState === 'loading') {
