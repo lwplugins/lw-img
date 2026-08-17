@@ -362,6 +362,86 @@
 		});
 	}
 
+	// Log tab: client-side status filter, filename search, pagination.
+	function initLog() {
+		var feed = document.getElementById('lw-img-log-feed');
+
+		if (!feed) {
+			return;
+		}
+
+		var PER_PAGE = 25;
+		var rows     = Array.prototype.slice.call(feed.querySelectorAll('li'));
+		var summary  = document.getElementById('lw-img-log-summary');
+		var pagesEl  = document.getElementById('lw-img-log-pages');
+		var search   = document.getElementById('lw-img-log-search');
+		var chips    = document.querySelectorAll('.lw-img-log-fchip');
+		var state    = { status: 'all', query: '', page: 1 };
+
+		function matches(row) {
+			if (state.status !== 'all' && row.getAttribute('data-status') !== state.status) {
+				return false;
+			}
+			return !state.query || (row.getAttribute('data-file') || '').indexOf(state.query) !== -1;
+		}
+
+		function apply() {
+			var matched = rows.filter(matches);
+			var pages   = Math.max(1, Math.ceil(matched.length / PER_PAGE));
+			state.page  = Math.min(state.page, pages);
+
+			var from = (state.page - 1) * PER_PAGE;
+			var to   = Math.min(from + PER_PAGE, matched.length);
+
+			rows.forEach(function (row) { row.style.display = 'none'; });
+			matched.slice(from, to).forEach(function (row) { row.style.display = ''; });
+
+			if (summary) {
+				summary.textContent = matched.length
+					? 'Showing ' + (from + 1) + '–' + to + ' of ' + matched.length
+					: 'No matching events';
+			}
+
+			if (pagesEl) {
+				pagesEl.textContent = '';
+				if (pages > 1) {
+					for (var i = 1; i <= pages; i++) {
+						var button = document.createElement('button');
+						button.type = 'button';
+						button.textContent = String(i);
+						if (i === state.page) {
+							button.className = 'lw-img-log-page-on';
+						}
+						button.addEventListener('click', (function (page) {
+							return function () { state.page = page; apply(); };
+						}(i)));
+						pagesEl.appendChild(button);
+					}
+				}
+			}
+		}
+
+		chips.forEach(function (chip) {
+			chip.addEventListener('click', function () {
+				chips.forEach(function (other) { other.classList.remove('lw-img-log-fchip-on'); });
+				this.classList.add('lw-img-log-fchip-on');
+				state.status = this.getAttribute('data-status') || 'all';
+				state.page   = 1;
+				apply();
+			});
+		});
+
+		if (search) {
+			search.addEventListener('input', function () {
+				state.query = this.value.trim().toLowerCase();
+				state.page  = 1;
+				apply();
+			});
+		}
+
+		apply();
+	}
+
 	function init() {
 		initTabs();
 		initBulk();
@@ -369,6 +449,7 @@
 		initUpload();
 		initBackup();
 		initTester();
+		initLog();
 	}
 
 	if (document.readyState === 'loading') {

@@ -12,6 +12,7 @@
 - Redesigned Upload tab: master auto-convert toggle with a pipeline strip (Upload → Convert → Back up → Thumbnails), settings grouped into Conversion / Size limits / Skip & exclude / After conversion, segmented controls for output format and level, toggle switches, a file-size range row, and clickable exclusion-pattern examples; turning auto-convert off dims the sections
 - Redesigned Backup tab: master toggle with a lifecycle strip (Original saved → backup folder → Restorable → Cleaned up after N days), live storage tiles, retention presets (7/30/90 days, 1 year, Forever), a restore guide, and a red warning card while backups are off — backups stay on by default
 - Redesigned Tester tab: verdict hero (all-green "ready for bulk optimization" or issue counts), a needs-attention block that lifts warnings and criticals above the sections with copyable fix commands (e.g. the InnoDB conversion), and section cards whose headers show each group's worst status
+- Redesigned Log tab: a control bar (logging toggle + clear), count-badged status filter chips with a filename search, feed-style rows (sizes and saving for conversions, red errors, skip reasons), client-side filtering and pagination without reloads, and an empty state
 - Admin UI uses icons (Dashicons/SVG) everywhere — no emoji
 
 ## [1.5.0] - 2026-08-17

@@ -1,6 +1,6 @@
 <?php
 /**
- * Log tab — toggle + recent events table.
+ * Log tab — event feed with client-side filtering.
  *
  * @package LightweightPlugins\Img
  */
@@ -13,11 +13,13 @@ use LightweightPlugins\Img\Log\ClearHandler;
 use LightweightPlugins\Img\Log\EventLog;
 
 /**
- * Log tab: logging toggle and recent events table.
+ * A control bar (logging toggle + clear), count-badged filter chips with
+ * a filename search, and feed-style rows. All entries (max 200) render
+ * once; admin.js filters and paginates them without reloads.
  */
 final class TabLog implements TabInterface {
 
-	use FieldRendererTrait;
+	use ControlRendererTrait;
 
 	public function get_slug(): string {
 		return 'log';
@@ -32,14 +34,32 @@ final class TabLog implements TabInterface {
 	}
 
 	public function render(): void {
+		$entries = EventLog::all();
+
+		echo '<h2>' . esc_html__( 'Log', 'lw-img' ) . '</h2>';
+		echo '<p class="lw-img-sub">' . esc_html__( 'The last 200 upload events — what converted, what was skipped, and why.', 'lw-img' ) . '</p>';
+
 		$this->maybe_render_cleared_notice();
-		$this->render_toggle();
-		$this->render_clear_button();
-		$this->render_table( EventLog::all() );
+		$this->render_bar( [] !== $entries );
+
+		if ( [] === $entries ) {
+			$this->render_empty();
+			return;
+		}
+
+		$this->render_filters( $entries );
+		$this->render_feed( $entries );
+
+		echo '<div class="lw-img-log-nav"><span id="lw-img-log-summary"></span><span class="lw-img-log-pages" id="lw-img-log-pages"></span></div>';
 	}
 
+	/**
+	 * Success notice after a clear.
+	 *
+	 * @return void
+	 */
 	private function maybe_render_cleared_notice(): void {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display flag set by the nonce-checked clear handler.
 		if ( ! isset( $_GET['cleared'] ) ) {
 			return;
 		}
@@ -50,197 +70,168 @@ final class TabLog implements TabInterface {
 		);
 	}
 
-	private function render_toggle(): void {
-		?>
-		<h2><?php esc_html_e( 'Logging', 'lw-img' ); ?></h2>
-		<p><?php esc_html_e( 'Records the last 200 upload events: converted, skipped, or failed. Disable to stop recording (existing entries remain until cleared).', 'lw-img' ); ?></p>
-
-		<table class="form-table">
-			<tr>
-				<th><?php esc_html_e( 'Status', 'lw-img' ); ?></th>
-				<td>
-					<?php
-					$this->render_checkbox_field(
-						[
-							'name'  => 'enable_log',
-							'label' => __( 'Enable upload event logging', 'lw-img' ),
-						]
-					);
-					?>
-				</td>
-			</tr>
-		</table>
-		<?php
-	}
-
-	private function render_clear_button(): void {
-		?>
-		<p style="margin: 12px 0 24px;">
-			<button type="submit" form="<?php echo esc_attr( ClearHandler::FORM_ID ); ?>" class="button" onclick="return confirm('<?php echo esc_js( __( 'Clear all log entries?', 'lw-img' ) ); ?>');">
-				<span class="dashicons dashicons-trash" style="vertical-align: text-bottom;"></span>
-				<?php esc_html_e( 'Clear log', 'lw-img' ); ?>
-			</button>
-		</p>
-		<?php
-	}
-
-	private const PER_PAGE = 25;
-
-	private function render_table( array $entries ): void {
-		?>
-		<h3><?php esc_html_e( 'Recent events', 'lw-img' ); ?></h3>
-
-		<?php if ( empty( $entries ) ) : ?>
-			<p class="description"><?php esc_html_e( 'No events logged yet. Upload an image to populate this list.', 'lw-img' ); ?></p>
-			<?php return; ?>
-		<?php endif; ?>
-
-		<?php
-		$total       = count( $entries );
-		$per_page    = self::PER_PAGE;
-		$total_pages = max( 1, (int) ceil( $total / $per_page ) );
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$current = isset( $_GET['lwlog_page'] ) ? (int) $_GET['lwlog_page'] : 1;
-		$current = max( 1, min( $total_pages, $current ) );
-
-		$offset       = ( $current - 1 ) * $per_page;
-		$page_entries = array_slice( $entries, $offset, $per_page );
-		?>
-
-		<table class="widefat striped">
-			<thead>
-				<tr>
-					<th style="width: 150px;"><?php esc_html_e( 'When', 'lw-img' ); ?></th>
-					<th style="width: 100px;"><?php esc_html_e( 'Status', 'lw-img' ); ?></th>
-					<th><?php esc_html_e( 'File', 'lw-img' ); ?></th>
-					<th><?php esc_html_e( 'Details', 'lw-img' ); ?></th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php foreach ( $page_entries as $entry ) : ?>
-					<tr>
-						<td><?php echo esc_html( $this->format_time( (int) ( $entry['ts'] ?? 0 ) ) ); ?></td>
-						<td><?php $this->render_status_badge( (string) ( $entry['status'] ?? '' ) ); ?></td>
-						<td><code><?php echo esc_html( (string) ( $entry['file'] ?? '' ) ); ?></code></td>
-						<td><?php echo wp_kses_post( $this->format_details( $entry ) ); ?></td>
-					</tr>
-				<?php endforeach; ?>
-			</tbody>
-		</table>
-
-		<?php $this->render_pagination( $total, $current, $total_pages ); ?>
-		<?php
-	}
-
-	private function render_pagination( int $total, int $current, int $total_pages ): void {
-		$range_from = ( ( $current - 1 ) * self::PER_PAGE ) + 1;
-		$range_to   = min( $current * self::PER_PAGE, $total );
-
-		$summary = sprintf(
-			/* translators: 1: range start, 2: range end, 3: total count */
-			__( 'Showing %1$s–%2$s of %3$s', 'lw-img' ),
-			number_format_i18n( $range_from ),
-			number_format_i18n( $range_to ),
-			number_format_i18n( $total )
-		);
-		?>
-		<div class="lw-img-tablenav">
-			<span><?php echo esc_html( $summary ); ?></span>
-			<?php if ( $total_pages > 1 ) : ?>
-				<span class="pagination-links">
-					<?php echo wp_kses_post( $this->build_pagination_links( $current, $total_pages ) ); ?>
-				</span>
-			<?php endif; ?>
-		</div>
-		<?php
-	}
-
-	private function build_pagination_links( int $current, int $total_pages ): string {
-		$base = remove_query_arg( 'lwlog_page' );
-		$base = add_query_arg( 'lwlog_page', '%#%', $base );
-
-		$links = paginate_links(
+	/**
+	 * Control bar: logging toggle and the clear button.
+	 *
+	 * @param bool $has_entries Whether the clear button makes sense.
+	 * @return void
+	 */
+	private function render_bar( bool $has_entries ): void {
+		echo '<div class="lw-img-log-bar">';
+		$this->render_switch(
 			[
-				'base'         => $base,
-				'format'       => '',
-				'total'        => $total_pages,
-				'current'      => $current,
-				'prev_text'    => '&laquo;',
-				'next_text'    => '&raquo;',
-				'add_fragment' => '#tab-log',
-				'type'         => 'plain',
+				'name'  => 'enable_log',
+				'label' => __( 'Logging enabled', 'lw-img' ),
 			]
 		);
+		echo '<span class="description">' . esc_html__( 'existing entries remain until cleared', 'lw-img' ) . '</span>';
 
-		return is_string( $links ) ? $links : '';
-	}
-
-	private function format_time( int $ts ): string {
-		if ( 0 === $ts ) {
-			return '—';
-		}
-		return wp_date( 'Y-m-d H:i:s', $ts );
-	}
-
-	private function render_status_badge( string $status ): void {
-		printf(
-			'<span class="lw-img-badge lw-img-badge--%1$s">%2$s</span>',
-			esc_attr( $status ),
-			esc_html( $status )
-		);
-	}
-
-	private function format_details( array $entry ): string {
-		$status = (string) ( $entry['status'] ?? '' );
-
-		if ( EventLog::STATUS_CONVERTED === $status ) {
-			$in    = (int) ( $entry['size_in'] ?? 0 );
-			$out   = (int) ( $entry['size_out'] ?? 0 );
-			$pct   = (float) ( $entry['percent'] ?? 0 );
-			$mime  = (string) ( $entry['mime'] ?? '' );
-			$mt    = (string) ( $entry['mime_to'] ?? '' );
-			$jobid = (string) ( $entry['job_id'] ?? '' );
-
-			$in_label  = size_format( $in );
-			$out_label = size_format( $out );
-
-			$details = sprintf(
-				'<code>%s</code> &rarr; <code>%s</code> &nbsp; %s &rarr; %s <strong>(%s%%)</strong>',
-				esc_html( $mime ),
-				esc_html( $mt ),
-				esc_html( is_string( $in_label ) ? $in_label : $in . ' B' ),
-				esc_html( is_string( $out_label ) ? $out_label : $out . ' B' ),
-				esc_html( number_format_i18n( $pct, 1 ) )
+		if ( $has_entries ) {
+			printf(
+				'<button type="submit" form="%s" class="button lw-img-log-clear" onclick="return confirm(\'%s\');"><span class="dashicons dashicons-trash" aria-hidden="true"></span> %s</button>',
+				esc_attr( ClearHandler::FORM_ID ),
+				esc_js( __( 'Clear all log entries?', 'lw-img' ) ),
+				esc_html__( 'Clear log', 'lw-img' )
 			);
+		}
+		echo '</div>';
+	}
 
-			if ( '' !== $jobid ) {
-				$details .= sprintf( '<br><span class="description"><code>%s</code></span>', esc_html( $jobid ) );
+	/**
+	 * Count-badged filter chips and the filename search.
+	 *
+	 * @param array<int, array<string, mixed>> $entries Log entries.
+	 * @return void
+	 */
+	private function render_filters( array $entries ): void {
+		$counts = [
+			EventLog::STATUS_CONVERTED => 0,
+			EventLog::STATUS_SKIPPED   => 0,
+			EventLog::STATUS_FAILED    => 0,
+			EventLog::STATUS_RESTORED  => 0,
+		];
+		foreach ( $entries as $entry ) {
+			$status = (string) ( $entry['status'] ?? '' );
+			if ( isset( $counts[ $status ] ) ) {
+				++$counts[ $status ];
 			}
-			return $details;
 		}
 
-		if ( EventLog::STATUS_SKIPPED === $status ) {
+		$chips = array_merge(
+			[ [ 'all', __( 'All', 'lw-img' ), count( $entries ) ] ],
+			array_map(
+				fn ( string $status ): array => [ $status, $this->status_label( $status ), $counts[ $status ] ],
+				array_keys( $counts )
+			)
+		);
+
+		echo '<div class="lw-img-log-filters">';
+		foreach ( $chips as $chip ) {
+			if ( 'all' !== $chip[0] && 0 === $chip[2] ) {
+				continue;
+			}
+			printf(
+				'<button type="button" class="lw-img-log-fchip%s" data-status="%s">%s <i>%s</i></button>',
+				'all' === $chip[0] ? ' lw-img-log-fchip-on' : '',
+				esc_attr( $chip[0] ),
+				esc_html( $chip[1] ),
+				esc_html( number_format_i18n( $chip[2] ) )
+			);
+		}
+		printf(
+			'<input type="search" class="lw-img-log-search" id="lw-img-log-search" placeholder="%1$s" aria-label="%1$s" />',
+			esc_attr__( 'Filter by filename…', 'lw-img' )
+		);
+		echo '</div>';
+	}
+
+	/**
+	 * The full event feed (admin.js shows 25 rows at a time).
+	 *
+	 * @param array<int, array<string, mixed>> $entries Log entries.
+	 * @return void
+	 */
+	private function render_feed( array $entries ): void {
+		echo '<ul class="lw-img-log-feed" id="lw-img-log-feed">';
+		foreach ( $entries as $entry ) {
+			$status = (string) ( $entry['status'] ?? '' );
+			$file   = basename( (string) ( $entry['file'] ?? '' ) );
+			$ts     = (int) ( $entry['ts'] ?? 0 );
+
+			printf(
+				'<li data-status="%s" data-file="%s"><span class="lw-img-log-t">%s</span><span class="lw-img-chip lw-img-log-chip--%s">%s</span><span class="lw-img-log-f">%s</span>%s</li>',
+				esc_attr( $status ),
+				esc_attr( strtolower( $file ) ),
+				esc_html( $ts > 0 ? (string) wp_date( 'Y-m-d H:i', $ts ) : '—' ),
+				esc_attr( $status ),
+				esc_html( $this->status_label( $status ) ),
+				esc_html( $file ),
+				wp_kses_post( $this->details_html( $entry, $status ) )
+			);
+		}
+		echo '</ul>';
+	}
+
+	/**
+	 * Compact details span for one entry.
+	 *
+	 * @param array<string, mixed> $entry  Log entry.
+	 * @param string               $status Entry status.
+	 * @return string
+	 */
+	private function details_html( array $entry, string $status ): string {
+		if ( EventLog::STATUS_CONVERTED === $status ) {
+			$size_in  = (int) ( $entry['size_in'] ?? 0 );
+			$size_out = (int) ( $entry['size_out'] ?? 0 );
+			$title    = trim( (string) ( $entry['mime'] ?? '' ) . ' → ' . (string) ( $entry['mime_to'] ?? '' ) . ' ' . (string) ( $entry['job_id'] ?? '' ) );
+
 			return sprintf(
-				'<span class="description">%s</span>',
-				esc_html( (string) ( $entry['reason'] ?? '' ) )
+				'<span class="lw-img-log-d" title="%s">%s → %s <strong>&minus;%s%%</strong></span>',
+				esc_attr( $title ),
+				esc_html( (string) size_format( max( 0, $size_in ) ) ),
+				esc_html( (string) size_format( max( 0, $size_out ) ) ),
+				esc_html( number_format_i18n( (float) ( $entry['percent'] ?? 0 ), 1 ) )
 			);
 		}
 
 		if ( EventLog::STATUS_FAILED === $status ) {
-			return sprintf(
-				'<span style="color:#d63638;">%s</span>',
-				esc_html( (string) ( $entry['error'] ?? '' ) )
-			);
+			return '<span class="lw-img-log-d lw-img-log-d-err">' . esc_html( (string) ( $entry['error'] ?? '' ) ) . '</span>';
 		}
 
 		if ( EventLog::STATUS_RESTORED === $status ) {
-			return sprintf(
-				'<span class="description">%s</span>',
-				esc_html__( 'original restored from backup', 'lw-img' )
-			);
+			return '<span class="lw-img-log-d">' . esc_html__( 'original restored from backup', 'lw-img' ) . '</span>';
 		}
 
-		return '';
+		return '<span class="lw-img-log-d">' . esc_html( (string) ( $entry['reason'] ?? '' ) ) . '</span>';
+	}
+
+	/**
+	 * Empty state.
+	 *
+	 * @return void
+	 */
+	private function render_empty(): void {
+		echo '<div class="lw-img-stats-empty">';
+		echo '<span class="dashicons dashicons-media-text" aria-hidden="true"></span>';
+		echo '<h4>' . esc_html__( 'No events yet', 'lw-img' ) . '</h4>';
+		echo '<p>' . esc_html__( 'Upload an image or run a bulk optimization — every conversion, skip, and failure lands here with its reason.', 'lw-img' ) . '</p>';
+		echo '</div>';
+	}
+
+	/**
+	 * Human label for a status.
+	 *
+	 * @param string $status Status slug.
+	 * @return string
+	 */
+	private function status_label( string $status ): string {
+		$labels = [
+			EventLog::STATUS_CONVERTED => __( 'Converted', 'lw-img' ),
+			EventLog::STATUS_SKIPPED   => __( 'Skipped', 'lw-img' ),
+			EventLog::STATUS_FAILED    => __( 'Failed', 'lw-img' ),
+			EventLog::STATUS_RESTORED  => __( 'Restored', 'lw-img' ),
+		];
+
+		return $labels[ $status ] ?? $status;
 	}
 }
