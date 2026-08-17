@@ -131,6 +131,62 @@ final class UrlRewriter {
 	}
 
 	/**
+	 * Safely decode a stored value for rewriting.
+	 *
+	 * A stored meta/option value can be an attacker-controlled serialized
+	 * string (e.g. a subscriber's own profile field). Passing it to
+	 * maybe_unserialize() — i.e. unserialize() with no allowed_classes —
+	 * would instantiate arbitrary classes and fire their __wakeup /
+	 * __destruct gadgets (PHP object injection). We decode with objects
+	 * disallowed and refuse to rewrite anything that contained an object,
+	 * rather than risk corrupting it on re-serialize.
+	 *
+	 * @param string $raw Raw column value.
+	 * @return array{0: mixed, 1: bool} Decoded value and whether it is safe to rewrite.
+	 */
+	public static function decode_for_rewrite( string $raw ): array {
+		if ( ! is_serialized( $raw ) ) {
+			return [ $raw, true ];
+		}
+
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize, WordPress.PHP.NoSilencedErrors.Discouraged -- objects disallowed (object-injection guard); the @ mirrors core maybe_unserialize(), silencing the notice on corrupt data that we handle via the false return below.
+		$decoded = @unserialize( $raw, [ 'allowed_classes' => false ] );
+
+		if ( false === $decoded || self::contains_object( $decoded ) ) {
+			// Undecodable, literal false, or contained an object: leave the row untouched.
+			return [ null, false ];
+		}
+
+		return [ $decoded, true ];
+	}
+
+	/**
+	 * Whether a decoded graph contains any object.
+	 *
+	 * With allowed_classes=false every serialized object decodes to
+	 * __PHP_Incomplete_Class, so a present object here means the source
+	 * carried one — such rows are left untouched.
+	 *
+	 * @param mixed $value Decoded value.
+	 * @return bool
+	 */
+	private static function contains_object( mixed $value ): bool {
+		if ( is_object( $value ) ) {
+			return true;
+		}
+
+		if ( is_array( $value ) ) {
+			foreach ( $value as $item ) {
+				if ( self::contains_object( $item ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Replace in post_content (raw and JSON-escaped forms, e.g. Gutenberg
 	 * block attributes) via candidate select + targeted per-row update.
 	 *
@@ -233,7 +289,12 @@ final class UrlRewriter {
 
 			foreach ( $rows as $row ) {
 				$last_id = (int) $row->id;
-				$decoded = maybe_unserialize( (string) $row->meta_value );
+
+				[ $decoded, $rewritable ] = self::decode_for_rewrite( (string) $row->meta_value );
+				if ( ! $rewritable ) {
+					continue;
+				}
+
 				$updated = self::replace_in_value( $decoded, $pairs );
 
 				if ( $updated !== $decoded ) {
@@ -272,7 +333,12 @@ final class UrlRewriter {
 
 			foreach ( $rows as $row ) {
 				$last_id = (int) $row->option_id;
-				$decoded = maybe_unserialize( (string) $row->option_value );
+
+				[ $decoded, $rewritable ] = self::decode_for_rewrite( (string) $row->option_value );
+				if ( ! $rewritable ) {
+					continue;
+				}
+
 				$updated = self::replace_in_value( $decoded, $pairs );
 
 				if ( $updated !== $decoded ) {

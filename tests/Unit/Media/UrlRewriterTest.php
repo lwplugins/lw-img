@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Tests\Unit\Media;
 
+use Brain\Monkey\Functions;
 use LightweightPlugins\Img\Media\UrlRewriter;
 use LightweightPlugins\Img\Tests\Unit\MonkeyTestCase;
 
@@ -74,6 +75,58 @@ final class UrlRewriterTest extends MonkeyTestCase {
 			'no common prefix'     => [ [ 'https://a.com/x.jpg', 'https://b.com/y.jpg' ], 'https://' ],
 			'completely different' => [ [ 'abc', 'xyz' ], '' ],
 		];
+	}
+
+	/**
+	 * Stub is_serialized() with a realistic prefix check.
+	 *
+	 * @return void
+	 */
+	private function stub_is_serialized(): void {
+		Functions\when( 'is_serialized' )->alias(
+			static fn ( $data ): bool => is_string( $data ) && ( 'N;' === $data || (bool) preg_match( '/^[aOsibd]:/', $data ) )
+		);
+	}
+
+	public function test_decode_passes_plain_strings_through_as_rewritable(): void {
+		$this->stub_is_serialized();
+
+		$this->assertSame(
+			[ 'https://ex.com/up/a.jpg', true ],
+			UrlRewriter::decode_for_rewrite( 'https://ex.com/up/a.jpg' )
+		);
+	}
+
+	public function test_decode_returns_array_for_safe_serialized_data(): void {
+		$this->stub_is_serialized();
+		$raw = serialize( [ 'url' => 'https://ex.com/up/a.jpg', 'w' => 100 ] ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- test fixture.
+
+		[ $decoded, $rewritable ] = UrlRewriter::decode_for_rewrite( $raw );
+
+		$this->assertTrue( $rewritable );
+		$this->assertSame( [ 'url' => 'https://ex.com/up/a.jpg', 'w' => 100 ], $decoded );
+	}
+
+	public function test_decode_refuses_serialized_objects_object_injection_guard(): void {
+		$this->stub_is_serialized();
+		// A serialized stdClass — maybe_unserialize would instantiate it.
+		$raw = 'O:8:"stdClass":1:{s:3:"url";s:23:"https://ex.com/up/a.jpg";}';
+
+		$this->assertSame( [ null, false ], UrlRewriter::decode_for_rewrite( $raw ) );
+	}
+
+	public function test_decode_refuses_objects_nested_in_arrays(): void {
+		$this->stub_is_serialized();
+		$raw = 'a:1:{s:2:"pl";O:8:"stdClass":0:{}}';
+
+		$this->assertSame( [ null, false ], UrlRewriter::decode_for_rewrite( $raw ) );
+	}
+
+	public function test_decode_refuses_literal_false_and_undecodable(): void {
+		$this->stub_is_serialized();
+
+		$this->assertSame( [ null, false ], UrlRewriter::decode_for_rewrite( 'b:0;' ) );
+		$this->assertSame( [ null, false ], UrlRewriter::decode_for_rewrite( 'a:1:{s:1:"x"' ) );
 	}
 
 	public function test_serialized_length_prefixes_stay_correct_after_reserialize(): void {
