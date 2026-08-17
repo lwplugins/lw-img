@@ -58,6 +58,36 @@ final class BackupStoreTest extends MonkeyTestCase {
 		);
 	}
 
+	/**
+	 * @dataProvider provide_traversal
+	 */
+	public function test_resolve_rejects_paths_escaping_the_backup_root( string $relative ): void {
+		$this->assertSame( '', ( new BackupStore() )->resolve( $relative ) );
+	}
+
+	/**
+	 * @return array<string, array{string}>
+	 */
+	public static function provide_traversal(): array {
+		return [
+			'parent traversal'    => [ '../../wp-config.php' ],
+			'nested traversal'    => [ '2026/../../secret.txt' ],
+			'backslash traversal' => [ '..\\..\\win.ini' ],
+			'empty'               => [ '' ],
+			'only slashes'        => [ '///' ],
+		];
+	}
+
+	public function test_resolve_strips_leading_slashes_into_the_root(): void {
+		$store = new BackupStore();
+
+		// An absolute-looking path is contained under the backup root, not honored as absolute.
+		$this->assertSame(
+			self::BASEDIR . '/' . BackupStore::BACKUP_DIR . '/etc/passwd',
+			$store->resolve( '/etc/passwd' )
+		);
+	}
+
 	public function test_unique_relative_returns_input_when_free(): void {
 		$store = new BackupStore();
 

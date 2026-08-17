@@ -74,7 +74,7 @@ final class BackupStore {
 		$relative = $this->unique_relative( $relative, fn ( string $rel ): bool => $this->exists( $rel ) );
 		$target   = $this->resolve( $relative );
 
-		if ( ! wp_mkdir_p( dirname( $target ) ) ) {
+		if ( '' === $target || ! wp_mkdir_p( dirname( $target ) ) ) {
 			return null;
 		}
 
@@ -87,13 +87,37 @@ final class BackupStore {
 	}
 
 	/**
-	 * Absolute path for a backup-relative path.
+	 * Absolute path for a backup-relative path, contained to the backup root.
+	 *
+	 * The relative path can originate from postmeta (_lw_img_backup_path),
+	 * which the plugin itself only ever writes as a validated value — but any
+	 * other actor (importer, wp post meta update, a compromised admin) could
+	 * set "../../wp-config.php". Rejecting traversal and off-root symlinks here
+	 * turns every backup file operation (exists/delete/restore/compare) into a
+	 * no-op on such input, since they all route through resolve().
 	 *
 	 * @param string $relative Backup-relative path.
-	 * @return string
+	 * @return string Absolute path, or '' when it escapes the backup root.
 	 */
 	public function resolve( string $relative ): string {
-		return $this->root() . '/' . $relative;
+		$relative = ltrim( $relative, '/\\' );
+
+		if ( '' === $relative || str_contains( $relative, '../' ) || str_contains( $relative, '..\\' ) ) {
+			return '';
+		}
+
+		$root = $this->root();
+		$path = $root . '/' . $relative;
+
+		// If the target already exists, it must physically resolve inside the
+		// backup root (this also defeats symlinks pointing outside).
+		$real      = realpath( $path );
+		$real_root = realpath( $root );
+		if ( false !== $real && false !== $real_root && ! str_starts_with( $real, $real_root . DIRECTORY_SEPARATOR ) ) {
+			return '';
+		}
+
+		return $path;
 	}
 
 	/**
