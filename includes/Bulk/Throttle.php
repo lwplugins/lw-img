@@ -23,19 +23,19 @@ final class Throttle {
 	private const PROFILES = [
 		'gentle' => [
 			'batch'       => 2,
-			'pause_ms'    => 3000,
+			'pause_ms'    => 2000,
 			'tick_gap'    => 10,
 			'load_factor' => 0.7,
 		],
 		'normal' => [
-			'batch'       => 3,
-			'pause_ms'    => 1000,
-			'tick_gap'    => 5,
+			'batch'       => 5,
+			'pause_ms'    => 500,
+			'tick_gap'    => 3,
 			'load_factor' => 1.0,
 		],
 		'fast'   => [
-			'batch'       => 5,
-			'pause_ms'    => 250,
+			'batch'       => 10,
+			'pause_ms'    => 0,
 			'tick_gap'    => 1,
 			'load_factor' => 1.5,
 		],
@@ -176,10 +176,13 @@ final class Throttle {
 	}
 
 	/**
-	 * Block while the server is overloaded (long-running workers only).
+	 * Back off briefly while the server is overloaded (long workers only).
 	 *
 	 * Only active under WP-CLI or a real cron request — a browser-driven
-	 * assist burst must respond quickly, so it never waits here.
+	 * assist burst must respond quickly, so it never waits here. The wait
+	 * is capped at 30 seconds: in containers the load average often
+	 * reflects the whole host, so the guard must only slow processing
+	 * down, never starve it.
 	 *
 	 * @param int $deadline Unix timestamp after which waiting stops.
 	 * @return void
@@ -191,7 +194,9 @@ final class Throttle {
 			return;
 		}
 
-		while ( time() + 5 <= $deadline && self::is_overloaded() ) {
+		$wait_until = min( $deadline, time() + 30 );
+
+		while ( time() + 5 <= $wait_until && self::is_overloaded() ) {
 			sleep( 5 );
 		}
 	}
