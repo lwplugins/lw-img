@@ -513,3 +513,35 @@
 .lw-img-bk-restore svg { color: #00a876; flex-shrink: 0; margin-top: 2px; }
 .lw-img-bk-restore b { display: block; }
 .lw-img-bk-restore p { margin: 0; color: #646970; font-size: 12px; max-width: 64ch; }
+
+/* Tester tab (v1.6.0 redesign) */
+.lw-img-ts-hero { display: flex; align-items: center; gap: 14px; border: 1px solid #dcdcde; border-radius: 6px; padding: 14px 18px; margin-bottom: 6px; flex-wrap: wrap; }
+.lw-img-ts-verdict { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; }
+.lw-img-ts-verdict .dashicons { font-size: 20px; width: 20px; height: 20px; }
+.lw-img-ts-verdict--critical .dashicons { color: #d63638; }
+.lw-img-ts-verdict--warning .dashicons { color: #996800; }
+.lw-img-ts-verdict--ok .dashicons { color: #00a876; }
+.lw-img-ts-counts { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+.lw-img-ts-actions { display: flex; align-items: center; gap: 10px; width: 100%; }
+.lw-img-ts-attn { list-style: none; margin: 0 0 4px; padding: 0; display: grid; gap: 10px; }
+.lw-img-ts-attn li { display: flex; gap: 12px; padding: 13px 16px; border-radius: 6px; align-items: flex-start; margin: 0; }
+.lw-img-ts-attn--critical { background: #fcf0f1; border: 1px solid #d63638; }
+.lw-img-ts-attn--warning { background: #fcf9e8; border: 1px solid #dba617; }
+.lw-img-ts-attn .dashicons { flex-shrink: 0; margin-top: 1px; }
+.lw-img-ts-attn--critical .dashicons { color: #d63638; }
+.lw-img-ts-attn--warning .dashicons { color: #996800; }
+.lw-img-ts-attn b { display: block; }
+.lw-img-ts-attn p { margin: 0; color: #646970; font-size: 12px; max-width: 66ch; }
+.lw-img-ts-fix { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.lw-img-ts-fix code { background: #fff; border: 1px solid #dcdcde; border-radius: 3px; padding: 2px 8px; font-size: 12px; }
+.lw-img-ts-copy { font-size: 11px; color: #00a876; background: none; border: 0; cursor: pointer; padding: 0; font-weight: 600; }
+.lw-img-ts-sect { border: 1px solid #dcdcde; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+.lw-img-ts-sect-head { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #f6f7f7; border-bottom: 1px solid #dcdcde; font-weight: 600; }
+.lw-img-ts-sect-head .dashicons { color: #646970; font-size: 16px; width: 16px; height: 16px; }
+.lw-img-ts-sect-head .lw-img-health-pill { margin-left: auto; }
+.lw-img-ts-sect ul { list-style: none; margin: 0; padding: 0; }
+.lw-img-ts-sect li { display: flex; gap: 12px; align-items: baseline; padding: 8px 16px; border-top: 1px solid #f6f7f7; margin: 0; font-variant-numeric: tabular-nums; }
+.lw-img-ts-sect li:first-child { border-top: 0; }
+.lw-img-ts-sect .lw-img-health-pill { flex-shrink: 0; width: 58px; text-align: center; }
+.lw-img-ts-lbl { width: 210px; flex-shrink: 0; font-weight: 600; }
+.lw-img-ts-msg { color: #646970; min-width: 0; }

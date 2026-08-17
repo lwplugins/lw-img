@@ -342,12 +342,33 @@
 		}
 	}
 
+	// Tester tab: copy buttons for fix commands.
+	function initTester() {
+		document.querySelectorAll('.lw-img-ts-copy').forEach(function (button) {
+			button.addEventListener('click', function () {
+				var code = this.parentElement ? this.parentElement.querySelector('code') : null;
+				if (!code || !navigator.clipboard) {
+					return;
+				}
+				var self  = this;
+				var label = this.textContent;
+				navigator.clipboard.writeText(code.textContent).then(function () {
+					self.textContent = self.getAttribute('data-copied') || label;
+					window.setTimeout(function () {
+						self.textContent = label;
+					}, 1500);
+				});
+			});
+		});
+	}
+
 	function init() {
 		initTabs();
 		initBulk();
 		initKeyToggle();
 		initUpload();
 		initBackup();
+		initTester();
 	}
 
 	if (document.readyState === 'loading') {

@@ -55,20 +55,18 @@ final class DatabaseChecks {
 			$engine = $engines[ $wpdb->{$table} ] ?? '';
 			$status = self::engine_status( $table, $engine );
 
-			$message = $engine;
-			if ( 'ok' !== $status && 'info' !== $status ) {
-				$message .= ' — ' . sprintf(
-					/* translators: %s: SQL statement. */
-					__( 'table-level locking can freeze the site during bulk runs; convert with: %s', 'lw-img' ),
-					"ALTER TABLE {$wpdb->{$table}} ENGINE=InnoDB"
-				);
-			}
-
-			$rows[] = [
+			$row = [
 				'label'   => $wpdb->{$table},
 				'status'  => $status,
-				'message' => $message,
+				'message' => $engine,
 			];
+
+			if ( 'ok' !== $status && 'info' !== $status ) {
+				$row['message'] = $engine . ' — ' . __( 'table-level locking can freeze the site during bulk runs', 'lw-img' );
+				$row['fix']     = "ALTER TABLE {$wpdb->{$table}} ENGINE=InnoDB";
+			}
+
+			$rows[] = $row;
 		}
 
 		return $rows;

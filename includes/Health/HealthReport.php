@@ -80,6 +80,50 @@ final class HealthReport {
 	}
 
 	/**
+	 * The most severe status among the given rows.
+	 *
+	 * @param array<int, array{label: string, status: string, message: string}> $rows Check rows.
+	 * @return string critical|warning|ok
+	 */
+	public static function worst_status( array $rows ): string {
+		$worst = 'ok';
+
+		foreach ( $rows as $row ) {
+			if ( 'critical' === $row['status'] ) {
+				return 'critical';
+			}
+			if ( 'warning' === $row['status'] ) {
+				$worst = 'warning';
+			}
+		}
+
+		return $worst;
+	}
+
+	/**
+	 * Every warning/critical row across all sections, criticals first.
+	 *
+	 * @param array<string, array<int, array<string, string>>> $sections Report sections.
+	 * @return array<int, array<string, string>>
+	 */
+	public static function attention_rows( array $sections ): array {
+		$critical = [];
+		$warning  = [];
+
+		foreach ( $sections as $rows ) {
+			foreach ( $rows as $row ) {
+				if ( 'critical' === $row['status'] ) {
+					$critical[] = $row;
+				} elseif ( 'warning' === $row['status'] ) {
+					$warning[] = $row;
+				}
+			}
+		}
+
+		return array_merge( $critical, $warning );
+	}
+
+	/**
 	 * Clear the cache and go back to the Tester tab.
 	 *
 	 * @return void

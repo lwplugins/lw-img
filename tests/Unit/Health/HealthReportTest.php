@@ -41,6 +41,65 @@ final class HealthReportTest extends MonkeyTestCase {
 		];
 	}
 
+	/**
+	 * @dataProvider provide_worst_cases
+	 *
+	 * @param array<int, string> $statuses Row statuses.
+	 * @param string             $expected Expected worst status.
+	 */
+	public function test_worst_status( array $statuses, string $expected ): void {
+		$rows = array_map(
+			static fn ( string $status ): array => [
+				'label'   => 'x',
+				'status'  => $status,
+				'message' => '',
+			],
+			$statuses
+		);
+
+		$this->assertSame( $expected, HealthReport::worst_status( $rows ) );
+	}
+
+	/**
+	 * @return array<string, array{array<int, string>, string}>
+	 */
+	public static function provide_worst_cases(): array {
+		return [
+			'critical beats warning' => [ [ 'ok', 'warning', 'critical' ], 'critical' ],
+			'warning beats ok'       => [ [ 'ok', 'info', 'warning' ], 'warning' ],
+			'info counts as ok'      => [ [ 'ok', 'info' ], 'ok' ],
+			'empty is ok'            => [ [], 'ok' ],
+		];
+	}
+
+	public function test_attention_rows_lifts_criticals_first(): void {
+		$sections = [
+			'a' => [
+				[
+					'label'   => 'warn-1',
+					'status'  => 'warning',
+					'message' => '',
+				],
+				[
+					'label'   => 'fine',
+					'status'  => 'ok',
+					'message' => '',
+				],
+			],
+			'b' => [
+				[
+					'label'   => 'crit-1',
+					'status'  => 'critical',
+					'message' => '',
+				],
+			],
+		];
+
+		$rows = HealthReport::attention_rows( $sections );
+
+		$this->assertSame( [ 'crit-1', 'warn-1' ], array_column( $rows, 'label' ) );
+	}
+
 	public function test_count_status_sums_across_sections(): void {
 		$sections = [
 			'a' => [
