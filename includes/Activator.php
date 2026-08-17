@@ -31,8 +31,12 @@ final class Activator {
 
 	private static function set_defaults(): void {
 		if ( false === get_option( Options::OPTION_NAME ) ) {
-			add_option( Options::OPTION_NAME, Options::get_defaults() );
+			// autoload=false: the options row holds the API key, no need to
+			// keep it in memory on every request.
+			add_option( Options::OPTION_NAME, Options::get_defaults(), '', false );
 		}
+
+		( new \LightweightPlugins\Img\Backup\BackupStore() )->ensure_protected();
 	}
 
 	private static function ensure_log_option(): void {

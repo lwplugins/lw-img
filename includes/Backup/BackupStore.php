@@ -78,6 +78,8 @@ final class BackupStore {
 			return null;
 		}
 
+		$this->ensure_protected();
+
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_copy -- copying within the uploads dir; WP_Filesystem adds nothing here.
 		if ( ! copy( $file_path, $target ) ) {
 			return null;
@@ -128,6 +130,36 @@ final class BackupStore {
 	 */
 	public function exists( string $relative ): bool {
 		return '' !== $relative && file_exists( $this->resolve( $relative ) );
+	}
+
+	/**
+	 * Drop an index.php and .htaccess into the backup root so the originals
+	 * are not directory-listed or executed. Idempotent and cheap.
+	 *
+	 * Note: .htaccess is Apache-only. On nginx the files remain reachable by
+	 * their (guessable) URL — the readme documents this, and hardening the
+	 * folder name is planned.
+	 *
+	 * @return void
+	 */
+	public function ensure_protected(): void {
+		$root = $this->root();
+
+		if ( ! wp_mkdir_p( $root ) ) {
+			return;
+		}
+
+		$guards = [
+			$root . '/index.php' => "<?php\n// Silence is golden.\n",
+			$root . '/.htaccess' => "Options -Indexes\n<FilesMatch \"\\.php$\">\nRequire all denied\n</FilesMatch>\n",
+		];
+
+		foreach ( $guards as $file => $contents ) {
+			if ( ! file_exists( $file ) ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- writing a static guard file into the uploads dir; WP_Filesystem adds nothing here.
+				file_put_contents( $file, $contents );
+			}
+		}
 	}
 
 	/**
