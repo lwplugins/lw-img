@@ -69,6 +69,26 @@
 				}
 			});
 		}
+
+		// In-content links (defaults chips, "Stats" etc.) that jump to a tab.
+		document.addEventListener('click', function (e) {
+			var link = e.target.closest('a.lw-img-goto');
+			if (!link) {
+				return;
+			}
+			var tabId = (link.getAttribute('href') || '').substring(1);
+			var found = false;
+			tabLinks.forEach(function (navLink) {
+				if (navLink.getAttribute('href').substring(1) === tabId) {
+					found = true;
+				}
+			});
+			if (found) {
+				e.preventDefault();
+				activateTab(tabId);
+				history.replaceState(null, '', '#' + tabId);
+			}
+		});
 	}
 
 	// The run itself happens server-side via WP-Cron; this only keeps the
@@ -217,9 +237,26 @@
 		poll();
 	}
 
+	// Show/hide toggle next to the API key field on the General tab.
+	function initKeyToggle() {
+		var toggle = document.querySelector('.lw-img-key-toggle');
+		var input  = document.getElementById('api_key');
+
+		if (!toggle || !input) {
+			return;
+		}
+
+		toggle.addEventListener('click', function () {
+			var show = input.type === 'password';
+			input.type = show ? 'text' : 'password';
+			this.setAttribute('aria-pressed', show ? 'true' : 'false');
+		});
+	}
+
 	function init() {
 		initTabs();
 		initBulk();
+		initKeyToggle();
 	}
 
 	if (document.readyState === 'loading') {

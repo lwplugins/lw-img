@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.5.0
+Stable tag: 1.6.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,9 @@ Yes — use the Bulk tab (or `wp lw-img optimize --all`). The run happens in the
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.6.0 =
+* New: Redesigned General tab — connection status pill with the API key field and show/hide toggle, account tiles (balance shows Unlimited during the open beta, free-tier gauge, this site's optimization total), a "current defaults" strip linking to each setting's tab, and a three-step onboarding when no key is set
 
 = 1.5.0 =
 * New: Stats tab — total savings, backup folder size, and leftover backup folders from other optimizers (e.g. ShortPixel)

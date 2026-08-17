@@ -388,3 +388,28 @@
 .lw-img-health-pill--warning { background: #fdf2d0; color: #9a6700; }
 .lw-img-health-pill--critical { background: #fadbd8; color: #b03a2e; }
 .lw-img-health-pill--info { background: #eaecee; color: #566573; }
+
+/* General tab (v1.6.0 redesign) */
+.lw-img-gen-hero { border: 1px solid #dcdcde; border-radius: 6px; padding: 18px 20px 16px; margin: 4px 0 20px; }
+.lw-img-gen-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.lw-img-gen-head strong { font-size: 15px; }
+.lw-img-gen-lead { color: #646970; margin: 6px 0 14px; max-width: 70ch; }
+.lw-img-gen-keyrow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.lw-img-gen-keyrow input.regular-text { font-family: ui-monospace, Menlo, Consolas, monospace; max-width: 420px; }
+.lw-img-gen-hint { font-size: 12px; color: #646970; margin: 10px 0 0; }
+.lw-img-gen-heading { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #646970; margin: 24px 0 10px; }
+.lw-img-gen-badge { display: inline-block; background: #fcf9e8; color: #996800; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 3px; margin-left: 6px; vertical-align: 1px; text-transform: none; letter-spacing: 0; }
+.lw-img-gen-tiles .lw-img-tile-v small { font-size: 12px; font-weight: 500; color: #646970; }
+.lw-img-gen-tierbar { display: block; height: 6px; border-radius: 3px; background: #f0f0f1; overflow: hidden; margin: 8px 0 5px; }
+.lw-img-gen-tierbar span { display: block; height: 100%; background: #00a876; }
+.lw-img-gen-defaults { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 12px 14px; background: #f6f7f7; border-radius: 6px; }
+.lw-img-gen-defaults-label { font-weight: 600; margin-right: 2px; }
+.lw-img-gen-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 3px 10px; border-radius: 999px; background: #fff; border: 1px solid #dcdcde; color: #1d2327; text-decoration: none; }
+.lw-img-gen-chip:hover { border-color: #00a876; color: #00a876; }
+.lw-img-gen-chip span { color: #646970; font-size: 11px; }
+.lw-img-gen-steps { list-style: none; margin: 4px 0 12px; padding: 0; }
+.lw-img-gen-steps li { display: flex; gap: 14px; padding: 13px 0; border-top: 1px solid #f0f0f1; align-items: flex-start; }
+.lw-img-gen-steps li:first-child { border-top: 0; }
+.lw-img-gen-num { width: 26px; height: 26px; border-radius: 50%; background: #e6f6f0; color: #00a876; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.lw-img-gen-steps strong { display: block; margin-bottom: 2px; }
+.lw-img-gen-steps p { margin: 0; color: #646970; max-width: 62ch; }
