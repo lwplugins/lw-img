@@ -94,6 +94,7 @@ final class TabGeneral implements TabInterface {
 				'name'        => 'api_key',
 				'type'        => 'password',
 				'placeholder' => 'himg_...',
+				'aria_label'  => __( 'HelloImg API key', 'lw-img' ),
 			]
 		);
 		printf(

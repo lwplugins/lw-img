@@ -187,9 +187,10 @@ final class TabBackup implements TabInterface {
 		echo '<span class="lw-img-bk-custom">' . esc_html__( 'or', 'lw-img' ) . ' ';
 		$this->render_number_field(
 			[
-				'name' => 'backup_retention_days',
-				'min'  => '0',
-				'max'  => '3650',
+				'name'       => 'backup_retention_days',
+				'min'        => '0',
+				'max'        => '3650',
+				'aria_label' => __( 'Backup retention in days', 'lw-img' ),
 			]
 		);
 		echo ' ' . esc_html__( 'days', 'lw-img' ) . '</span>';

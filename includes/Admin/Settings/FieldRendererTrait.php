@@ -15,14 +15,28 @@ trait FieldRendererTrait {
 
 	protected function render_text_field( array $args ): void {
 		printf(
-			'<input type="%5$s" id="%1$s" name="%2$s[%1$s]" value="%3$s" placeholder="%4$s" class="regular-text" />',
+			'<input type="%5$s" id="%1$s" name="%2$s[%1$s]" value="%3$s" placeholder="%4$s" class="regular-text"%6$s />',
 			esc_attr( (string) $args['name'] ),
 			esc_attr( Options::OPTION_NAME ),
 			esc_attr( (string) Options::get( (string) $args['name'] ) ),
 			esc_attr( (string) ( $args['placeholder'] ?? '' ) ),
-			esc_attr( (string) ( $args['type'] ?? 'text' ) )
+			esc_attr( (string) ( $args['type'] ?? 'text' ) ),
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- returns an esc_attr()'d attribute string or empty.
+			$this->aria_label_attr( $args )
 		);
 		$this->render_description( (string) ( $args['description'] ?? '' ) );
+	}
+
+	/**
+	 * Build an aria-label attribute for fields with no visible <label for>.
+	 *
+	 * @param array<string, mixed> $args Field arguments.
+	 * @return string ' aria-label="..."' or ''.
+	 */
+	private function aria_label_attr( array $args ): string {
+		$label = (string) ( $args['aria_label'] ?? '' );
+
+		return '' === $label ? '' : ' aria-label="' . esc_attr( $label ) . '"';
 	}
 
 	protected function render_checkbox_field( array $args ): void {
@@ -57,13 +71,15 @@ trait FieldRendererTrait {
 
 	protected function render_number_field( array $args ): void {
 		printf(
-			'<input type="number" id="%1$s" name="%2$s[%1$s]" value="%3$s" min="%4$s" max="%5$s" step="%6$s" class="small-text" />',
+			'<input type="number" id="%1$s" name="%2$s[%1$s]" value="%3$s" min="%4$s" max="%5$s" step="%6$s" class="small-text"%7$s />',
 			esc_attr( (string) $args['name'] ),
 			esc_attr( Options::OPTION_NAME ),
 			esc_attr( (string) Options::get( (string) $args['name'] ) ),
 			esc_attr( (string) ( $args['min'] ?? '' ) ),
 			esc_attr( (string) ( $args['max'] ?? '' ) ),
-			esc_attr( (string) ( $args['step'] ?? '1' ) )
+			esc_attr( (string) ( $args['step'] ?? '1' ) ),
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- returns an esc_attr()'d attribute string or empty.
+			$this->aria_label_attr( $args )
 		);
 		$this->render_description( (string) ( $args['description'] ?? '' ) );
 	}
@@ -72,12 +88,14 @@ trait FieldRendererTrait {
 		$value = Options::get( (string) $args['name'] );
 		$text  = is_array( $value ) ? implode( "\n", array_map( 'strval', $value ) ) : (string) $value;
 		printf(
-			'<textarea id="%1$s" name="%2$s[%1$s]" rows="%4$s" class="large-text code" placeholder="%5$s">%3$s</textarea>',
+			'<textarea id="%1$s" name="%2$s[%1$s]" rows="%4$s" class="large-text code" placeholder="%5$s"%6$s>%3$s</textarea>',
 			esc_attr( (string) $args['name'] ),
 			esc_attr( Options::OPTION_NAME ),
 			esc_textarea( $text ),
 			esc_attr( (string) ( $args['rows'] ?? '4' ) ),
-			esc_attr( (string) ( $args['placeholder'] ?? '' ) )
+			esc_attr( (string) ( $args['placeholder'] ?? '' ) ),
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- returns an esc_attr()'d attribute string or empty.
+			$this->aria_label_attr( $args )
 		);
 		$this->render_description( (string) ( $args['description'] ?? '' ) );
 	}

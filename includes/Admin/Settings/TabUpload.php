@@ -150,17 +150,19 @@ final class TabUpload implements TabInterface {
 		echo '<span class="lw-img-up-dims">';
 		$this->render_number_field(
 			[
-				'name' => 'max_width',
-				'min'  => '0',
-				'max'  => '10000',
+				'name'       => 'max_width',
+				'min'        => '0',
+				'max'        => '10000',
+				'aria_label' => __( 'Maximum width in pixels', 'lw-img' ),
 			]
 		);
 		echo '<span class="lw-img-up-x">&times;</span>';
 		$this->render_number_field(
 			[
-				'name' => 'max_height',
-				'min'  => '0',
-				'max'  => '10000',
+				'name'       => 'max_height',
+				'min'        => '0',
+				'max'        => '10000',
+				'aria_label' => __( 'Maximum height in pixels', 'lw-img' ),
 			]
 		);
 		echo '<span class="lw-img-up-x">px</span></span>';
@@ -171,17 +173,19 @@ final class TabUpload implements TabInterface {
 		echo '<span class="lw-img-up-dims">';
 		$this->render_number_field(
 			[
-				'name' => 'min_filesize_kb',
-				'min'  => '0',
-				'max'  => '10240',
+				'name'       => 'min_filesize_kb',
+				'min'        => '0',
+				'max'        => '10240',
+				'aria_label' => __( 'Minimum file size in kilobytes', 'lw-img' ),
 			]
 		);
 		echo '<span class="lw-img-up-x">' . esc_html__( 'KB min', 'lw-img' ) . '</span><span class="lw-img-up-x">&mdash;</span>';
 		$this->render_number_field(
 			[
-				'name' => 'max_filesize_mb',
-				'min'  => '1',
-				'max'  => '10',
+				'name'       => 'max_filesize_mb',
+				'min'        => '1',
+				'max'        => '10',
+				'aria_label' => __( 'Maximum file size in megabytes', 'lw-img' ),
 			]
 		);
 		echo '<span class="lw-img-up-x">' . esc_html__( 'MB max', 'lw-img' ) . '</span></span>';
@@ -219,6 +223,7 @@ final class TabUpload implements TabInterface {
 			[
 				'name'        => 'exclusion_patterns',
 				'placeholder' => "*-original.jpg\n2026/08/*",
+				'aria_label'  => __( 'Exclusion patterns, one per line', 'lw-img' ),
 			]
 		);
 		echo '<span class="lw-img-up-hints">' . esc_html__( 'Examples:', 'lw-img' );

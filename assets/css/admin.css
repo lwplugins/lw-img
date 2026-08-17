@@ -48,10 +48,9 @@
 	background: #f0f0f1;
 }
 
-.lw-img-tabs a:focus,
-.lw-img-tabs a:focus-visible,
-.lw-img-tabs a:active {
-	outline: none;
+.lw-img-tabs a:focus-visible {
+	outline: 2px solid #00695c;
+	outline-offset: -2px;
 	box-shadow: none;
 }
 
