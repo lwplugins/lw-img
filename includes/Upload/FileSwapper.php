@@ -34,7 +34,7 @@ final class FileSwapper {
 		$bytes = $this->download( $result->image_url );
 
 		$new_path = $this->target_path( $original_path, $result->format );
-		$new_url  = $this->target_url( $original_url, $result->format );
+		$new_url  = $this->url_for( $original_url, $new_path );
 
 		$backup_enabled = (bool) Options::get( 'backup_enabled' );
 		$backup_rel     = $this->backup_original( $original_path, $new_path, $backup_enabled );
@@ -110,26 +110,47 @@ final class FileSwapper {
 		return $body;
 	}
 
+	/**
+	 * Absolute target path for the optimized file.
+	 *
+	 * The core uniqueness guarantee only covers the *uploaded* name, so
+	 * photo.jpg does not collide with an existing photo.webp. Without
+	 * wp_unique_filename() here, converting photo.jpg would overwrite an
+	 * unrelated attachment's photo.webp. An in-place conversion
+	 * (webp -> webp, same path) must stay in place and is exempt.
+	 *
+	 * @param string $original_path Absolute path of the uploaded file.
+	 * @param string $format        Optimized output format.
+	 * @return string
+	 */
 	private function target_path( string $original_path, string $format ): string {
-		$ext  = $this->extension_for_format( $format );
-		$dir  = dirname( $original_path );
-		$base = pathinfo( $original_path, PATHINFO_FILENAME );
+		$ext       = $this->extension_for_format( $format );
+		$dir       = dirname( $original_path );
+		$candidate = pathinfo( $original_path, PATHINFO_FILENAME ) . '.' . $ext;
 
-		return $dir . '/' . $base . '.' . $ext;
+		if ( $dir . '/' . $candidate !== $original_path ) {
+			$candidate = wp_unique_filename( $dir, $candidate );
+		}
+
+		return $dir . '/' . $candidate;
 	}
 
-	private function target_url( string $original_url, string $format ): string {
-		$ext  = $this->extension_for_format( $format );
+	/**
+	 * Rewrite the upload URL to the optimized file's final name, so the URL
+	 * always matches the (possibly de-duplicated) path.
+	 *
+	 * @param string $original_url Original upload URL.
+	 * @param string $new_path     Final absolute path of the optimized file.
+	 * @return string
+	 */
+	private function url_for( string $original_url, string $new_path ): string {
 		$path = wp_parse_url( $original_url, PHP_URL_PATH );
 
 		if ( ! is_string( $path ) ) {
 			return $original_url;
 		}
 
-		$dir  = dirname( $path );
-		$base = pathinfo( $path, PATHINFO_FILENAME );
-
-		$replaced = $dir . '/' . $base . '.' . $ext;
+		$replaced = dirname( $path ) . '/' . wp_basename( $new_path );
 
 		return str_replace( $path, $replaced, $original_url );
 	}
