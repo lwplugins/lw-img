@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace LightweightPlugins\Img\Bulk;
 
 /**
- * Returns the job record; never triggers processing and never counts —
- * progress comes from the job's own counters.
+ * Returns the job record; progress comes from the job's own counters, never
+ * from COUNT queries. One write path exists: when the run has stalled (no
+ * cron tick firing), the poll delegates a short processing burst to
+ * BackgroundWorker::assist() before responding.
  */
 final class StatusEndpoint {
 
@@ -39,6 +41,9 @@ final class StatusEndpoint {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'lw-img' ) ], 403 );
 		}
+
+		// Keep a stalled run moving while the tab is open (see assist()).
+		BackgroundWorker::assist();
 
 		$job        = BulkJob::get();
 		$started_at = (int) ( $job['started_at'] ?? 0 );

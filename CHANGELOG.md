@@ -11,6 +11,7 @@
 ### Fixed
 - On hosts with `DISABLE_WP_CRON` and a system-cron runner the background worker now uses a much larger per-tick budget under WP-CLI (4 minutes instead of 15 seconds), so runs no longer crawl in short bursts between cron passes
 - A lost bulk tick is automatically re-scheduled while a run is active (self-heal on init)
+- While the Bulk tab is open, the status poll itself processes a short burst when the run has stalled — runs keep moving even on hosts whose cron loopback request fails
 
 ## [1.4.0] - 2026-08-17
 

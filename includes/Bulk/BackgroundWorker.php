@@ -103,7 +103,42 @@ final class BackgroundWorker {
 			return;
 		}
 
-		$budget = self::budget();
+		if ( self::run_for( self::budget() ) ) {
+			return;
+		}
+
+		if ( BulkJob::is_running() ) {
+			self::kick( 1 );
+		}
+	}
+
+	/**
+	 * Short inline processing burst driven by the status poll.
+	 *
+	 * Keeps a run moving while the Bulk tab is open even on hosts whose
+	 * cron loopback request fails — without it, a dropped loopback would
+	 * stall the chain until an ordinary page view respawns cron.
+	 *
+	 * @return void
+	 */
+	public static function assist(): void {
+		$job     = BulkJob::get();
+		$stalled = time() - (int) ( $job['updated_at'] ?? 0 ) > 15;
+
+		if ( ! BulkJob::is_running() || ! $stalled || false !== get_transient( self::LOCK ) ) {
+			return;
+		}
+
+		self::run_for( 8 );
+	}
+
+	/**
+	 * Take the lock and process items until the budget runs out.
+	 *
+	 * @param int $budget Seconds to work for.
+	 * @return bool True when the run reached a terminal state (drained/finished).
+	 */
+	private static function run_for( int $budget ): bool {
 		set_transient( self::LOCK, 1, $budget + MINUTE_IN_SECONDS );
 
 		$deadline  = time() + $budget;
@@ -148,16 +183,14 @@ final class BackgroundWorker {
 				if ( $requeued > 0 ) {
 					BulkJob::mark_retried( $requeued );
 					self::kick( 5 );
-					return;
+					return true;
 				}
 			}
 
 			BulkJob::finish( BulkJob::STATE_DONE );
-			return;
+			return true;
 		}
 
-		if ( BulkJob::is_running() ) {
-			self::kick( 1 );
-		}
+		return false;
 	}
 }
