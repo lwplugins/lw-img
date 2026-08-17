@@ -10,6 +10,9 @@
 - Batched content URL rewrite during bulk runs: rewrite pairs of many images are applied in one pass, so a batch costs the same table scans as a single image did before (on large databases this was the dominant per-image cost)
 - Parallel-safe queue claiming (MySQL advisory lock + claim meta with expiry): several `wp lw-img optimize --all` workers, the cron worker, and poll assists can drain the same queue without double-processing — running multiple CLI workers in parallel is now the fastest path for huge libraries
 - CLI optimize progress is mirrored into an active background job, so the Bulk tab dashboard stays live while CLI workers run
+- Processing speed setting (gentle / normal / fast) on the Bulk tab and as `wp lw-img optimize --speed=...` — controls batch size, pause between images, and cron tick spacing
+- CPU load guard: long-running workers back off in 5-second steps while the server's 1-minute load average exceeds the profile's share of the CPU cores, so bulk runs cannot starve the site
+- Quota halt: when the API reports the balance is exhausted (402 / insufficient_balance), the run stops immediately instead of stamping every remaining image as failed — pending images stay queued and resume after a top-up
 
 ### Fixed
 - On hosts with `DISABLE_WP_CRON` and a system-cron runner the background worker now uses a much larger per-tick budget under WP-CLI (20 minutes instead of 15 seconds, with in-process cache hygiene to keep memory flat), so runs no longer crawl in short bursts between cron passes

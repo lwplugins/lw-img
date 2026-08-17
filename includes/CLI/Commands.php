@@ -15,6 +15,7 @@ use LightweightPlugins\Img\Bulk\AttachmentOptimizer;
 use LightweightPlugins\Img\Bulk\BackgroundWorker;
 use LightweightPlugins\Img\Bulk\BulkJob;
 use LightweightPlugins\Img\Bulk\StatusMeta;
+use LightweightPlugins\Img\Bulk\Throttle;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
 use LightweightPlugins\Img\Media\RewriteBuffer;
 use LightweightPlugins\Img\Stats\SiteStats;
@@ -133,10 +134,15 @@ final class Commands {
 	 * [--dry-run]
 	 * : Only list what would be optimized.
 	 *
+	 * [--speed=<speed>]
+	 * : Pacing profile: gentle, normal, or fast. Overrides the saved setting
+	 * for this process. All profiles back off while the server load is high.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp lw-img optimize 123 456
 	 *     wp lw-img optimize --all
+	 *     wp lw-img optimize --all --speed=gentle
 	 *     wp lw-img optimize --all --limit=50 --dry-run
 	 *
 	 * @param array<int, string>    $args       Positional arguments.
@@ -145,6 +151,10 @@ final class Commands {
 	public function optimize( array $args, array $assoc_args ): void {
 		if ( BulkJob::is_running() ) {
 			WP_CLI::log( 'A background bulk run is active — this process will cooperate with it (shared queue claims) and its progress shows up on the Bulk tab.' );
+		}
+
+		if ( isset( $assoc_args['speed'] ) ) {
+			Throttle::force( sanitize_key( (string) $assoc_args['speed'] ) );
 		}
 
 		if ( isset( $assoc_args['dry-run'] ) ) {
@@ -165,7 +175,9 @@ final class Commands {
 			$this->drain( $optimizer, $limit, $counts );
 		} else {
 			foreach ( array_map( 'absint', $args ) as $id ) {
-				$this->process_one( $optimizer, $id, $counts );
+				if ( $this->process_one( $optimizer, $id, $counts ) ) {
+					break;
+				}
 			}
 		}
 
@@ -215,18 +227,24 @@ final class Commands {
 		$processed = 0;
 
 		while ( $processed < $limit ) {
-			$ids = $query->claim( (int) min( 10, $limit - $processed ) );
+			Throttle::wait_for_headroom( time() + 600 );
+
+			$ids = $query->claim( (int) min( Throttle::batch_size(), $limit - $processed ) );
 			if ( [] === $ids ) {
 				break;
 			}
 
 			foreach ( $ids as $id ) {
-				$this->process_one( $optimizer, $id, $counts );
+				if ( $this->process_one( $optimizer, $id, $counts ) ) {
+					return;
+				}
 
 				++$processed;
 				if ( 0 === $processed % 50 ) {
 					BackgroundWorker::free_memory();
 				}
+
+				Throttle::pause();
 			}
 		}
 	}
@@ -238,9 +256,20 @@ final class Commands {
 	 * @param AttachmentOptimizer $optimizer Optimizer instance.
 	 * @param int                 $id        Attachment ID.
 	 * @param array<string, int>  $counts    Outcome counters (by reference).
+	 * @return bool True when the run must halt (API quota exhausted).
 	 */
-	private function process_one( AttachmentOptimizer $optimizer, int $id, array &$counts ): void {
+	private function process_one( AttachmentOptimizer $optimizer, int $id, array &$counts ): bool {
 		$outcome = $optimizer->optimize( $id );
+
+		if ( ! empty( $outcome['halt'] ) ) {
+			if ( BulkJob::is_running() ) {
+				BulkJob::finish( BulkJob::STATE_CANCELLED );
+				BackgroundWorker::unschedule();
+			}
+			WP_CLI::warning( sprintf( 'API quota exhausted (%s) — run halted; pending images stay queued for the next run.', $outcome['detail'] ) );
+			return true;
+		}
+
 		++$counts[ $outcome['result'] ];
 		WP_CLI::log( sprintf( '#%d: %s (%s)', $id, $outcome['result'], $outcome['detail'] ) );
 
@@ -253,6 +282,8 @@ final class Commands {
 				(string) $outcome['detail']
 			);
 		}
+
+		return false;
 	}
 
 	/**

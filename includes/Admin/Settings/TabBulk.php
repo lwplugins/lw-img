@@ -13,7 +13,9 @@ use LightweightPlugins\Img\Bulk\BulkJob;
 use LightweightPlugins\Img\Bulk\JobHandlers;
 use LightweightPlugins\Img\Bulk\StatusEndpoint;
 use LightweightPlugins\Img\Bulk\StatusMeta;
+use LightweightPlugins\Img\Bulk\Throttle;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
+use LightweightPlugins\Img\Options;
 
 /**
  * Bulk tab, three states: a progress dashboard while running (segmented
@@ -240,6 +242,39 @@ final class TabBulk implements TabInterface {
 			);
 		}
 
+		$this->render_speed_form();
+
 		echo '</div>';
+	}
+
+	/**
+	 * Processing-speed selector (gentle / normal / fast).
+	 *
+	 * @return void
+	 */
+	private function render_speed_form(): void {
+		$current = (string) Options::get( 'bulk_speed', 'normal' );
+		$labels  = [
+			'gentle' => __( 'Gentle — lightest server load', 'lw-img' ),
+			'normal' => __( 'Normal', 'lw-img' ),
+			'fast'   => __( 'Fast — highest server load', 'lw-img' ),
+		];
+
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="lw-img-speed-form">';
+		wp_nonce_field( JobHandlers::ACTION_SPEED );
+		echo '<input type="hidden" name="action" value="' . esc_attr( JobHandlers::ACTION_SPEED ) . '" />';
+		echo '<label for="lw-img-bulk-speed">' . esc_html__( 'Processing speed:', 'lw-img' ) . '</label> ';
+		echo '<select name="bulk_speed" id="lw-img-bulk-speed">';
+		foreach ( Throttle::SPEEDS as $speed ) {
+			printf(
+				'<option value="%s"%s>%s</option>',
+				esc_attr( $speed ),
+				selected( $current, $speed, false ),
+				esc_html( $labels[ $speed ] )
+			);
+		}
+		echo '</select> ';
+		echo '<button type="submit" class="button">' . esc_html__( 'Apply', 'lw-img' ) . '</button>';
+		echo '</form>';
 	}
 }

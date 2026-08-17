@@ -52,4 +52,17 @@ final class ApiException extends RuntimeException {
 
 		return in_array( $this->error_code, [ 'network_error', 'timeout', 'incomplete', 'rate_limited' ], true );
 	}
+
+	/**
+	 * Whether the failure means the account has no credit left.
+	 *
+	 * A quota failure must stop the whole run instead of stamping images
+	 * failed one by one — nothing will succeed until the balance is topped
+	 * up, and the images themselves are fine.
+	 *
+	 * @return bool
+	 */
+	public function is_quota(): bool {
+		return 402 === $this->getCode() || 'insufficient_balance' === $this->error_code;
+	}
 }

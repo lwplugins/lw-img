@@ -59,6 +59,11 @@ final class SettingsSanitizer {
 			return in_array( $value, [ 'webp', 'avif' ], true ) ? $value : (string) $fallback;
 		}
 
+		if ( 'bulk_speed' === $key ) {
+			$value = sanitize_text_field( (string) $value );
+			return in_array( $value, [ 'gentle', 'normal', 'fast' ], true ) ? $value : (string) $fallback;
+		}
+
 		return null === $value ? (string) $fallback : sanitize_text_field( (string) $value );
 	}
 

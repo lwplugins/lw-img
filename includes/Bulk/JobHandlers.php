@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Bulk;
 
+use LightweightPlugins\Img\Options;
+
 /**
  * Start / cancel the background run and re-queue skipped or failed items.
  * All actions are nonce- and capability-checked and redirect back to the
@@ -20,6 +22,7 @@ final class JobHandlers {
 	public const ACTION_CANCEL = 'lw_img_bulk_cancel';
 	public const ACTION_RETRY  = 'lw_img_bulk_retry';
 	public const ACTION_RESCAN = 'lw_img_bulk_rescan';
+	public const ACTION_SPEED  = 'lw_img_bulk_speed';
 
 	/**
 	 * Hook the admin-post actions.
@@ -31,6 +34,7 @@ final class JobHandlers {
 		add_action( 'admin_post_' . self::ACTION_CANCEL, [ self::class, 'cancel' ] );
 		add_action( 'admin_post_' . self::ACTION_RETRY, [ self::class, 'retry_failed' ] );
 		add_action( 'admin_post_' . self::ACTION_RESCAN, [ self::class, 'rescan_skipped' ] );
+		add_action( 'admin_post_' . self::ACTION_SPEED, [ self::class, 'set_speed' ] );
 	}
 
 	/**
@@ -97,6 +101,23 @@ final class JobHandlers {
 	public static function rescan_skipped(): void {
 		self::authorize( self::ACTION_RESCAN );
 		StatusMeta::requeue_by_status( StatusMeta::SKIPPED );
+		self::back();
+	}
+
+	/**
+	 * Save the bulk processing speed.
+	 *
+	 * @return void
+	 */
+	public static function set_speed(): void {
+		self::authorize( self::ACTION_SPEED );
+
+		$speed = isset( $_POST['bulk_speed'] ) ? sanitize_key( wp_unslash( $_POST['bulk_speed'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- authorize() above runs check_admin_referer for this action.
+
+		if ( in_array( $speed, Throttle::SPEEDS, true ) ) {
+			Options::set( 'bulk_speed', $speed );
+		}
+
 		self::back();
 	}
 

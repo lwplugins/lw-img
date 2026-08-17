@@ -90,7 +90,7 @@ final class AttachmentOptimizer {
 	 * removes it from the pending queue until it is explicitly re-queued.
 	 *
 	 * @param int $attachment_id Attachment post ID.
-	 * @return array{result: string, detail: string, bytes_in?: int, bytes_saved?: int} Outcome, detail, and size info for optimized items.
+	 * @return array{result: string, detail: string, bytes_in?: int, bytes_saved?: int, halt?: bool} Outcome and detail; halt=true means the run must stop (API quota exhausted).
 	 */
 	public function optimize( int $attachment_id ): array {
 		if ( get_post_meta( $attachment_id, '_lw_img_optimized', true ) ) {
@@ -117,6 +117,17 @@ final class AttachmentOptimizer {
 			return $this->convert( $attachment_id, $file, $mime );
 		} catch ( ApiException $e ) {
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
+
+			if ( $e->is_quota() ) {
+				// Out of credit: leave the image unstamped (it is fine and
+				// stays pending) and tell the caller to halt the whole run.
+				return [
+					'result' => self::RESULT_FAILED,
+					'detail' => $e->getMessage(),
+					'halt'   => true,
+				];
+			}
+
 			return $this->finish( $attachment_id, self::RESULT_FAILED, $e->getMessage(), $e->is_transient() );
 		} catch ( Throwable $e ) {
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );

@@ -27,6 +27,27 @@ final class ApiExceptionTest extends MonkeyTestCase {
 	}
 
 	/**
+	 * @dataProvider provide_quota_cases
+	 */
+	public function test_quota_classification( string $code, int $status, bool $expected ): void {
+		$exception = new ApiException( 'msg', $code, $status );
+
+		$this->assertSame( $expected, $exception->is_quota() );
+	}
+
+	/**
+	 * @return array<string, array{string, int, bool}>
+	 */
+	public static function provide_quota_cases(): array {
+		return [
+			'payment required (402)'  => [ 'unknown', 402, true ],
+			'insufficient balance'    => [ 'insufficient_balance', 200, true ],
+			'rate limit is not quota' => [ 'rate_limited', 429, false ],
+			'server error not quota'  => [ 'http_500', 500, false ],
+		];
+	}
+
+	/**
 	 * Failure cases based on the documented HelloImg error codes.
 	 *
 	 * @return array<string, array{string, int, bool}>

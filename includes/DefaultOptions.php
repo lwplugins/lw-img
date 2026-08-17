@@ -59,6 +59,7 @@ final class DefaultOptions {
 			'backup_retention_days'   => 30,
 			'redirect_missing_images' => true,
 			'request_timeout'         => 30,
+			'bulk_speed'              => 'normal',
 			'debug_mode'              => false,
 			'enable_log'              => true,
 		];

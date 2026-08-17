@@ -124,7 +124,7 @@ final class BackgroundWorker {
 		}
 
 		if ( BulkJob::is_running() ) {
-			self::kick( 1 );
+			self::kick( Throttle::tick_gap() );
 		}
 	}
 
@@ -162,42 +162,41 @@ final class BackgroundWorker {
 		$buffer    = new RewriteBuffer();
 		$optimizer = new AttachmentOptimizer( null, null, null, null, $buffer );
 		$drained   = false;
+		$halted    = false;
 		$processed = 0;
 
-		while ( time() < $deadline ) {
-			if ( ! BulkJob::is_running() ) {
+		while ( time() < $deadline && BulkJob::is_running() ) {
+			Throttle::wait_for_headroom( $deadline );
+			if ( time() >= $deadline ) {
 				break;
 			}
 
-			$ids = $query->claim( 3 );
+			$ids = $query->claim( Throttle::batch_size() );
 			if ( [] === $ids ) {
 				$drained = true;
 				break;
 			}
 
-			foreach ( $ids as $attachment_id ) {
-				$outcome = $optimizer->optimize( $attachment_id );
-				BulkJob::record(
-					$outcome['result'],
-					(string) get_the_title( $attachment_id ),
-					(int) ( $outcome['bytes_in'] ?? 0 ),
-					(int) ( $outcome['bytes_saved'] ?? 0 ),
-					(string) $outcome['detail']
-				);
-
-				++$processed;
-				if ( 0 === $processed % 50 ) {
-					self::free_memory();
-				}
-
-				if ( time() >= $deadline || ! BulkJob::is_running() ) {
-					break;
-				}
+			$state = self::process_batch( $ids, $optimizer, $deadline, $processed );
+			if ( 'halt' === $state ) {
+				$halted = true;
+				break;
+			}
+			if ( 'stop' === $state ) {
+				break;
 			}
 		}
 
 		$buffer->flush();
 		delete_transient( self::LOCK );
+
+		if ( $halted ) {
+			// API quota exhausted: stop the whole run — nothing else will
+			// succeed and the images themselves stay pending.
+			BulkJob::finish( BulkJob::STATE_CANCELLED );
+			self::unschedule();
+			return true;
+		}
 
 		if ( $drained ) {
 			// One automatic second pass for transient failures (timeouts,
@@ -216,5 +215,45 @@ final class BackgroundWorker {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Process one claimed batch with per-image pacing.
+	 *
+	 * @param array<int, int>     $ids       Claimed attachment IDs.
+	 * @param AttachmentOptimizer $optimizer Optimizer wired to the rewrite buffer.
+	 * @param int                 $deadline  Unix timestamp ending the budget.
+	 * @param int                 $processed Running item counter (by reference).
+	 * @return string 'ok' (batch done), 'stop' (budget/cancel), or 'halt' (quota).
+	 */
+	private static function process_batch( array $ids, AttachmentOptimizer $optimizer, int $deadline, int &$processed ): string {
+		foreach ( $ids as $attachment_id ) {
+			$outcome = $optimizer->optimize( $attachment_id );
+
+			if ( ! empty( $outcome['halt'] ) ) {
+				return 'halt';
+			}
+
+			BulkJob::record(
+				$outcome['result'],
+				(string) get_the_title( $attachment_id ),
+				(int) ( $outcome['bytes_in'] ?? 0 ),
+				(int) ( $outcome['bytes_saved'] ?? 0 ),
+				(string) $outcome['detail']
+			);
+
+			++$processed;
+			if ( 0 === $processed % 50 ) {
+				self::free_memory();
+			}
+
+			if ( time() >= $deadline || ! BulkJob::is_running() ) {
+				return 'stop';
+			}
+
+			Throttle::pause();
+		}
+
+		return 'ok';
 	}
 }
