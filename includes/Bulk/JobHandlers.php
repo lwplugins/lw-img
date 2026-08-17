@@ -24,6 +24,8 @@ final class JobHandlers {
 	public const ACTION_RESCAN = 'lw_img_bulk_rescan';
 	public const ACTION_SPEED  = 'lw_img_bulk_speed';
 
+	public const SPEED_FORM_ID = 'lw-img-speed-form';
+
 	/**
 	 * Hook the admin-post actions.
 	 *
@@ -35,6 +37,25 @@ final class JobHandlers {
 		add_action( 'admin_post_' . self::ACTION_RETRY, [ self::class, 'retry_failed' ] );
 		add_action( 'admin_post_' . self::ACTION_RESCAN, [ self::class, 'rescan_skipped' ] );
 		add_action( 'admin_post_' . self::ACTION_SPEED, [ self::class, 'set_speed' ] );
+		add_action( 'lw_img_admin_auxiliary_forms', [ self::class, 'render_speed_form' ] );
+	}
+
+	/**
+	 * Hidden speed form, rendered OUTSIDE the main settings form.
+	 *
+	 * The Bulk tab's speed controls reference it via the HTML5 form=""
+	 * attribute — a form nested inside the options.php settings form would
+	 * be dropped by the browser and the submit would hit options.php.
+	 *
+	 * @return void
+	 */
+	public static function render_speed_form(): void {
+		?>
+		<form id="<?php echo esc_attr( self::SPEED_FORM_ID ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:none;">
+			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION_SPEED ); ?>">
+			<?php wp_nonce_field( self::ACTION_SPEED ); ?>
+		</form>
+		<?php
 	}
 
 	/**

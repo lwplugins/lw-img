@@ -250,6 +250,10 @@ final class TabBulk implements TabInterface {
 	/**
 	 * Processing-speed selector (gentle / normal / fast).
 	 *
+	 * The controls belong to the hidden auxiliary form (HTML5 form=""
+	 * attribute) rendered by JobHandlers outside the settings form — a
+	 * nested form would be dropped and the submit would hit options.php.
+	 *
 	 * @return void
 	 */
 	private function render_speed_form(): void {
@@ -260,11 +264,9 @@ final class TabBulk implements TabInterface {
 			'fast'   => __( 'Fast — highest server load', 'lw-img' ),
 		];
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="lw-img-speed-form">';
-		wp_nonce_field( JobHandlers::ACTION_SPEED );
-		echo '<input type="hidden" name="action" value="' . esc_attr( JobHandlers::ACTION_SPEED ) . '" />';
+		echo '<span class="lw-img-speed">';
 		echo '<label for="lw-img-bulk-speed">' . esc_html__( 'Processing speed:', 'lw-img' ) . '</label> ';
-		echo '<select name="bulk_speed" id="lw-img-bulk-speed">';
+		echo '<select name="bulk_speed" id="lw-img-bulk-speed" form="' . esc_attr( JobHandlers::SPEED_FORM_ID ) . '">';
 		foreach ( Throttle::SPEEDS as $speed ) {
 			printf(
 				'<option value="%s"%s>%s</option>',
@@ -274,7 +276,7 @@ final class TabBulk implements TabInterface {
 			);
 		}
 		echo '</select> ';
-		echo '<button type="submit" class="button">' . esc_html__( 'Apply', 'lw-img' ) . '</button>';
-		echo '</form>';
+		echo '<button type="submit" class="button" form="' . esc_attr( JobHandlers::SPEED_FORM_ID ) . '">' . esc_html__( 'Apply', 'lw-img' ) . '</button>';
+		echo '</span>';
 	}
 }
