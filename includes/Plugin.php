@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Admin\SettingsPage;
 use LightweightPlugins\Img\Backup\AttachmentDeleteCleanup;
 use LightweightPlugins\Img\Backup\RestoreHandler;

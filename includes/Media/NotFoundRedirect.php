@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Media;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Backup\BackupStore;
 use LightweightPlugins\Img\Options;
 
@@ -157,6 +159,13 @@ final class NotFoundRedirect {
 
 		if ( $id > 0 ) {
 			return $id;
+		}
+
+		// The fallback below searches postmeta by value, which no index
+		// covers. This runs on an unauthenticated 404, so it is rate-limited
+		// rather than offered to anyone who asks for missing image paths.
+		if ( ! LookupBudget::consume() ) {
+			return 0;
 		}
 
 		// Fallback: a converted sibling of the requested name.

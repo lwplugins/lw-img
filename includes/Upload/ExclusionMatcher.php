@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Upload;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Wildcard matcher: `*` matches any characters, `?` a single character.
  * Patterns without a slash are matched against the filename (full match);

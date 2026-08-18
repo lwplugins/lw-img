@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Media;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Shared by restore (webp -> original) and bulk optimize (original -> webp):
  * deletes the current sub-size files, optionally the current main file,

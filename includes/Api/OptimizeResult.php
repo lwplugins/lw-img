@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Api;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Value object holding a parsed /v1/optimize response.
  */

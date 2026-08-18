@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Health;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Background bulk runs ride on WP-Cron; when the server cannot reach its
  * own site (broken loopback), runs only progress while the Bulk tab is

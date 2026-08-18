@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Compat;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Meta keys were verified against each plugin's source. Plugins without
  * meta keys listed are only used for the "another optimizer is active"

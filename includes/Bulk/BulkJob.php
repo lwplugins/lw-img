@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Bulk;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * One option row holds the run state and counters. The background worker
  * increments counters as it goes, so progress never needs a COUNT query.

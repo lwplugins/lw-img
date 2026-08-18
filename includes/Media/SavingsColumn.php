@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Media;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Compat\CompetitorRegistry;
 use LightweightPlugins\Img\Db\ImageRepository;
 

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Api;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Logger;
 use LightweightPlugins\Img\Options;
 
@@ -223,10 +225,31 @@ final class Client {
 		throw new ApiException( 'Optimization still processing after extended wait', 'timeout', 408 );
 	}
 
+	/**
+	 * A file name that is safe to put inside a Content-Disposition header.
+	 *
+	 * Files that arrived through wp_handle_upload have already been through
+	 * sanitize_file_name(), which strips quotes and control characters. Files
+	 * we optimize from the Media Library have not: their path comes from
+	 * _wp_attached_file, which an importer, an FTP drop, or a direct meta
+	 * write can put a quote or a newline into. Such a name would close the
+	 * quoted string and let the rest of it be read as further header lines
+	 * and multipart parts, so it is stripped here rather than trusted.
+	 *
+	 * @param string $file_path Absolute path of the file being sent.
+	 * @return string Header-safe file name (never empty).
+	 */
+	public static function header_filename( string $file_path ): string {
+		$name = preg_replace( '/[\x00-\x1F\x7F"\\\\]/', '', basename( $file_path ) );
+		$name = trim( (string) $name );
+
+		return '' === $name ? 'image' : $name;
+	}
+
 	private function build_multipart_body( OptimizeRequest $request, string $boundary ): string {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading the just-uploaded local file, not a remote URL.
 		$file_contents = (string) file_get_contents( $request->file_path );
-		$filename      = basename( $request->file_path );
+		$filename      = self::header_filename( $request->file_path );
 		$mime          = (string) mime_content_type( $request->file_path );
 		$data_json     = (string) wp_json_encode( $request->to_data_payload() );
 

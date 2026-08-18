@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Backup;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Maps upload paths into the backup directory and moves files in and out.
  *

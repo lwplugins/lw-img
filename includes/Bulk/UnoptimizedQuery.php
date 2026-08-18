@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Bulk;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Db\ImageRepository;
 use LightweightPlugins\Img\Db\Schema;
 use LightweightPlugins\Img\Options;

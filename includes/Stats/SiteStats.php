@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Stats;
 
+defined( 'ABSPATH' ) || exit;
+
 use FilesystemIterator;
 use LightweightPlugins\Img\Backup\BackupStore;
 use LightweightPlugins\Img\Db\ImageRepository;

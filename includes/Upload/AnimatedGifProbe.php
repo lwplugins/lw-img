@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Upload;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Byte-scans for multiple GIF frame markers without decoding the image.
  */

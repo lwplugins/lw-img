@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Provides the plugin's default option values.
  */

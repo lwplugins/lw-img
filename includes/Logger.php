@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Writes debug/error lines to the PHP error log when WP_DEBUG_LOG is enabled.
  */

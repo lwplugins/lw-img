@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Db;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * One row per processed attachment, replacing the eleven postmeta rows the
  * plugin used to write per image.

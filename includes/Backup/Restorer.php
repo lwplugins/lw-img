@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Backup;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Bulk\StatusMeta;
 use LightweightPlugins\Img\Media\AttachmentRebuilder;
 use LightweightPlugins\Img\Media\UrlPairs;

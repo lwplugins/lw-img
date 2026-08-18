@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Media;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Sub-size URLs are matched by size name; a size that no longer exists
  * after regeneration falls back to the new main URL so no reference is

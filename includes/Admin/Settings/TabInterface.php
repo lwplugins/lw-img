@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Admin\Settings;
 
+defined( 'ABSPATH' ) || exit;
+
 interface TabInterface {
 
 	public function get_slug(): string;

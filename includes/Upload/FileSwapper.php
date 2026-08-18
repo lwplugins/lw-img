@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Upload;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Api\OptimizeResult;
 use LightweightPlugins\Img\Backup\BackupStore;
 use LightweightPlugins\Img\Logger;
@@ -18,6 +20,11 @@ use LightweightPlugins\Img\Options;
  * Downloads the optimized image and replaces the uploaded file on disk.
  */
 final class FileSwapper {
+
+	/**
+	 * Hard ceiling on the optimized file we are willing to read into memory.
+	 */
+	private const MAX_DOWNLOAD_BYTES = 67108864;
 
 	/**
 	 * Stores originals before they are replaced.
@@ -90,8 +97,31 @@ final class FileSwapper {
 		return $backup_rel;
 	}
 
+	/**
+	 * Fetch the optimized file.
+	 *
+	 * The response is bounded and its bytes are checked before anything is
+	 * written: this download replaces a file inside the uploads directory
+	 * under an extension we pick, so a response that is not an image must
+	 * never reach the disk. Throwing here leaves the original untouched —
+	 * nothing has been backed up, deleted, or overwritten yet.
+	 *
+	 * @param string $url Optimized file URL from the API response.
+	 * @return string Raw image bytes.
+	 * @throws \RuntimeException On a transport error, a non-200, an empty
+	 *                           body, or bytes that are not an image.
+	 */
 	private function download( string $url ): string {
-		$response = wp_safe_remote_get( $url, [ 'timeout' => 30 ] );
+		$response = wp_safe_remote_get(
+			$url,
+			[
+				'timeout'             => 30,
+				// A sanity bound, not a business rule: uploads are already
+				// capped by max_filesize_mb (1-10 MB) and the optimized file
+				// is meant to be smaller than its input.
+				'limit_response_size' => self::MAX_DOWNLOAD_BYTES,
+			]
+		);
 
 		if ( is_wp_error( $response ) ) {
 			throw new \RuntimeException( esc_html( 'Download failed: ' . $response->get_error_message() ) );
@@ -105,6 +135,10 @@ final class FileSwapper {
 		$body = (string) wp_remote_retrieve_body( $response );
 		if ( '' === $body ) {
 			throw new \RuntimeException( 'Empty response body from CDN' );
+		}
+
+		if ( ! ImageBytes::is_image( $body ) ) {
+			throw new \RuntimeException( 'Optimized download is not an image — original kept' );
 		}
 
 		return $body;

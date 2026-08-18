@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Health;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Flags MyISAM/Aria core tables: with table-level locking a bulk run's
  * scans and the site's own queries block each other, which can make the

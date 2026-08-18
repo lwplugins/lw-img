@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Health;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Api\Client;
 use LightweightPlugins\Img\Compat\CompetitorRegistry;
 use LightweightPlugins\Img\Options;

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Backup;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Db\ImageRepository;
 
 /**

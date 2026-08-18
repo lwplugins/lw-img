@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Reads and writes the plugin's options with an in-request cache.
  */

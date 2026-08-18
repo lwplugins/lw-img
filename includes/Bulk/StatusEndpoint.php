@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Bulk;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Returns the job record; progress comes from the job's own counters, never
  * from COUNT queries. One write path exists: when the run has stalled (no

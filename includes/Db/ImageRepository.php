@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Db;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The single place that touches the image table. Every question the plugin
  * used to ask postmeta — is this optimized, what is pending, how much was
@@ -20,6 +22,30 @@ final class ImageRepository {
 	public const STATUS_OPTIMIZED = 'optimized';
 	public const STATUS_SKIPPED   = 'skipped';
 	public const STATUS_FAILED    = 'failed';
+
+	/**
+	 * Every column save() is allowed to write.
+	 *
+	 * The save() method builds its column list from the caller's array keys and
+	 * interpolates it into the statement, so the list has to be a fact rather
+	 * than a convention: anything not named here is dropped before it can
+	 * reach the SQL.
+	 *
+	 * @var array<int, string>
+	 */
+	private const COLUMNS = [
+		'attachment_id',
+		'status',
+		'detail',
+		'is_transient',
+		'orig_size',
+		'new_size',
+		'level',
+		'job_id',
+		'keep_exif',
+		'claimed_at',
+		'optimized_at',
+	];
 
 	/**
 	 * Per-request row cache, keyed by attachment ID.
@@ -74,7 +100,10 @@ final class ImageRepository {
 		global $wpdb;
 
 		$table = Schema::table();
-		$data  = array_merge( [ 'attachment_id' => $attachment_id ], $fields );
+		$data  = array_intersect_key(
+			array_merge( [ 'attachment_id' => $attachment_id ], $fields ),
+			array_flip( self::COLUMNS )
+		);
 
 		$columns      = array_keys( $data );
 		$placeholders = implode( ', ', array_fill( 0, count( $data ), '%s' ) );

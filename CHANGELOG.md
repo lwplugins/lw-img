@@ -2,6 +2,13 @@
 
 ## [1.7.0] - 2026-08-18
 
+### Security
+- Rate-limit the 404 image redirect's fallback lookup. That query searches postmeta by value, which no index covers — on a 95k-image library it examined ~216,000 rows and cost ~0.11s, and any anonymous request for a missing image path under the uploads directory reached it. A rolling 60-second budget in a single transient now caps how often it can run; the cheap indexed backup-path lookup is untouched, so images we actually converted still redirect. Deliberately one counter rather than a per-path negative cache, which would have written two options rows per probe on sites without an external object cache
+- Strip quotes and control characters from the file name embedded in the API request's `Content-Disposition` header. Uploads were already safe (`sanitize_file_name()` removes those), but images optimized from the Media Library take their name from `_wp_attached_file`, which an importer, an FTP drop, or a direct meta write can put a quote or a newline into — enough to close the quoted value and have the rest read as further header lines
+- Verify the optimized download is really an image before it replaces anything. The response now has a size ceiling and its leading bytes are checked against the formats the API can return (JPEG, PNG, GIF, WebP, AVIF); anything else aborts the swap with the original still in place. Magic bytes rather than `getimagesizefromstring()`, whose AVIF support depends on the PHP build
+- Add a direct-access guard to every PHP file (only the main plugin file had one), so a request straight to a class file cannot produce a path-disclosing fatal
+- Enforce `ImageRepository::save()`'s column list instead of asserting it in a comment: the method interpolates the caller's array keys into the statement, so anything outside the schema is now dropped before it can reach SQL
+
 ### Changed
 - Per-image records now live in the plugin's own `{prefix}lw_img_images` table instead of eleven postmeta rows per image. The bulk queue's "what is still pending" question was an anti-join across the site-wide, EAV-shaped postmeta table; it is now a single join against a table of our own size, with an index built for exactly that question. The savings totals were a self-join over the same table and are now one indexed scan
 - `Bulk\StatusMeta` keeps its role as the queue's vocabulary but delegates every read and write to `Db\ImageRepository`, which is the only class that touches the table

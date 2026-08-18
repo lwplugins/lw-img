@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Health;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The report includes live probes (API, cron loopback), so it is cached
  * for ten minutes; the Tester tab's re-run button clears the cache.

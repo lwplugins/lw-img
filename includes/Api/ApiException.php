@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Api;
 
+defined( 'ABSPATH' ) || exit;
+
 use RuntimeException;
 
 /**

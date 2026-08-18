@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Upload;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Api\OptimizeResult;
 use LightweightPlugins\Img\Backup\BackupStore;
 use LightweightPlugins\Img\Db\ImageRepository;

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Admin\Settings\TabBackup;
 use LightweightPlugins\Img\Admin\Settings\TabBulk;
 use LightweightPlugins\Img\Admin\Settings\TabGeneral;

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Media;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Rewriting content per image costs a full scan of every content table.
  * During bulk runs the pairs of many images are collected here and applied

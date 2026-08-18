@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Compat;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Warning only — nothing is blocked or deactivated. Shown on the LW Image
  * settings page, the Media Library, and the Plugins screen; dismissible,

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Renders the tabbed settings page HTML.
  */

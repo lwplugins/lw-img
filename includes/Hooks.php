@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Reference holder for the plugin's public hooks (documented in the file header).
  */

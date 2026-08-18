@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Media;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Applies URL pairs to post_content (plain text replace), to every meta
  * table (post/comment/term/user), and to options — all serialization-aware:

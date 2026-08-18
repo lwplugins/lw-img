@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Handles the LW Plugins parent menu page.
  */

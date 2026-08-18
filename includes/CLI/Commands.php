@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\CLI;
 
+defined( 'ABSPATH' ) || exit;
+
 use LightweightPlugins\Img\Backup\BackupStore;
 use LightweightPlugins\Img\Backup\Restorer;
 use LightweightPlugins\Img\Bulk\AttachmentOptimizer;

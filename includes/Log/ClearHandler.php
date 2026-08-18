@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Log;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Handles the admin-post action that clears the event log.
  */

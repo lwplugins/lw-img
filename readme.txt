@@ -74,6 +74,8 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 == Changelog ==
 
 = 1.7.0 =
+* Security: the redirect for missing images could be made to run an expensive, unindexed database lookup by anyone requesting a non-existent image URL — it is now rate-limited
+* Security: file names are stripped of characters that could break out of the API request's headers, the optimized download is verified to be an image before it replaces anything, and every plugin file now refuses to run when loaded directly
 * Change: per-image records moved from postmeta into the plugin's own table — one row per image instead of eleven, so the bulk queue and the Stats totals no longer search the site-wide meta table
 * Fix: the Media Library left skipped images blank, so you could not tell whether anything had happened. Images we skipped because the optimized file was no smaller now show a green 0% and "already as small as it gets"; other skips and failures show their reason, and the action reads "Try again" once there is a result
 * Note: the plugin is still pre-release and there is no upgrade path from the old layout — images recorded by an earlier version re-enter the queue
