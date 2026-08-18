@@ -31,9 +31,15 @@ final class SiteStats {
 
 	/**
 	 * Bounds for the uploads-wide leftover scan (see suffix_stats()).
+	 *
+	 * Measured on a 1.29M-file uploads tree: the walk runs at roughly a
+	 * million entries per second with a warm dentry cache, so these bounds
+	 * let a normal library finish while still capping a pathological one.
+	 * The wall-clock budget is the real safety net (cold cache, slow or
+	 * network storage); the entry cap just keeps the loop finite.
 	 */
-	private const SCAN_MAX_ENTRIES = 250000;
-	private const SCAN_MAX_SECONDS = 5;
+	private const SCAN_MAX_ENTRIES = 2000000;
+	private const SCAN_MAX_SECONDS = 10;
 
 	/**
 	 * Hook the refresh action.
@@ -179,7 +185,9 @@ final class SiteStats {
 		foreach ( $iterator as $file ) {
 			++$entries;
 
-			if ( $entries > self::SCAN_MAX_ENTRIES || time() > $deadline ) {
+			// The clock is only consulted periodically: at a million entries
+			// per second a per-entry time() call is pure overhead.
+			if ( $entries > self::SCAN_MAX_ENTRIES || ( 0 === $entries % 5000 && time() > $deadline ) ) {
 				$partial = true;
 				break;
 			}
