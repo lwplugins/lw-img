@@ -49,7 +49,7 @@ final class InfoMetabox {
 		$record = ImageRepository::find( $post->ID );
 
 		if ( null === $record || ImageRepository::STATUS_OPTIMIZED !== $record['status'] ) {
-			self::render_unoptimized( $post );
+			self::render_unoptimized( $post, $record );
 			return;
 		}
 
@@ -65,7 +65,7 @@ final class InfoMetabox {
 		$original_label = size_format( $original );
 		$new_label      = size_format( $new_size );
 
-		echo '<p><strong style="font-size:1.3em;color:#00a32a;">&minus;' . esc_html( number_format_i18n( $percent, 1 ) ) . '%</strong>';
+		echo '<p><strong style="font-size:1.3em;color:' . esc_attr( SavingsColumn::GREEN ) . ';">&minus;' . esc_html( number_format_i18n( $percent, 1 ) ) . '%</strong>';
 		if ( '' !== $level ) {
 			echo ' <span class="description">(' . esc_html( $level ) . ')</span>';
 		}
@@ -104,12 +104,13 @@ final class InfoMetabox {
 	}
 
 	/**
-	 * Render the box for an unoptimized attachment.
+	 * Render the box for an attachment we did not replace.
 	 *
-	 * @param WP_Post $post Attachment post.
+	 * @param WP_Post                    $post   Attachment post.
+	 * @param array<string, string>|null $record Stored record, if we have looked at this image.
 	 * @return void
 	 */
-	private static function render_unoptimized( WP_Post $post ): void {
+	private static function render_unoptimized( WP_Post $post, ?array $record = null ): void {
 		$owner = CompetitorRegistry::managed_by( $post->ID );
 		if ( null !== $owner ) {
 			printf(
@@ -127,7 +128,55 @@ final class InfoMetabox {
 			return;
 		}
 
-		echo '<p class="description">' . esc_html__( 'Not optimized yet.', 'lw-img' ) . '</p>';
-		echo '<p><a class="button button-primary" href="' . esc_url( OptimizeHandler::url( $post->ID ) ) . '">' . esc_html__( 'Optimize now', 'lw-img' ) . '</a></p>';
+		$decided = null !== $record && ImageRepository::STATUS_PENDING !== $record['status'];
+
+		if ( $decided ) {
+			self::render_outcome( $record );
+		} else {
+			echo '<p class="description">' . esc_html__( 'Not optimized yet.', 'lw-img' ) . '</p>';
+		}
+
+		printf(
+			'<p><a class="button %1$s" href="%2$s">%3$s</a></p>',
+			$decided ? 'button-secondary' : 'button-primary',
+			esc_url( OptimizeHandler::url( $post->ID ) ),
+			$decided ? esc_html__( 'Try again', 'lw-img' ) : esc_html__( 'Optimize now', 'lw-img' )
+		);
+	}
+
+	/**
+	 * Say what happened, so a finished image does not read as an untouched one.
+	 *
+	 * @param array<string, string> $record Stored record.
+	 * @return void
+	 */
+	private static function render_outcome( array $record ): void {
+		$detail = (string) $record['detail'];
+
+		if ( ImageRepository::STATUS_FAILED === $record['status'] ) {
+			echo '<p><strong style="color:#b32d2e;">' . esc_html__( 'Optimization failed', 'lw-img' ) . '</strong></p>';
+			if ( '' !== $detail ) {
+				echo '<p class="description">' . esc_html( $detail ) . '</p>';
+			}
+			return;
+		}
+
+		// "No smaller" is a finished result, not a gap: the image is already
+		// as small as the API can make it. Saying so — with the same green a
+		// real saving gets — stops people re-running it over and over.
+		if ( 'result not smaller' === $detail ) {
+			echo '<p><strong style="font-size:1.3em;color:' . esc_attr( SavingsColumn::GREEN ) . ';">0%</strong></p>';
+			echo '<p class="description">' . esc_html__( 'Skipped — the optimized version came back no smaller, so the original was kept. This image is already as small as it gets.', 'lw-img' ) . '</p>';
+			return;
+		}
+
+		echo '<p class="description">';
+		if ( '' !== $detail ) {
+			/* translators: %s: reason the image was skipped, e.g. "file missing". */
+			printf( esc_html__( 'Skipped — %s', 'lw-img' ), esc_html( $detail ) );
+		} else {
+			esc_html_e( 'Skipped', 'lw-img' );
+		}
+		echo '</p>';
 	}
 }

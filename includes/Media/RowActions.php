@@ -53,10 +53,15 @@ final class RowActions {
 		}
 
 		if ( in_array( (string) $post->post_mime_type, (array) Options::get( 'mime_types' ), true ) ) {
+			// An image we already decided on (skipped, failed) keeps the link,
+			// but says it is a retry — the column next to it shows the outcome.
+			$record  = ImageRepository::find( $post->ID );
+			$decided = null !== $record && ImageRepository::STATUS_PENDING !== $record['status'];
+
 			$actions['lw_img_optimize'] = sprintf(
 				'<a href="%s">%s</a>',
 				esc_url( OptimizeHandler::url( $post->ID ) ),
-				esc_html__( 'Optimize now', 'lw-img' )
+				$decided ? esc_html__( 'Try again', 'lw-img' ) : esc_html__( 'Optimize now', 'lw-img' )
 			);
 		}
 

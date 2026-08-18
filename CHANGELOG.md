@@ -7,6 +7,10 @@
 - `Bulk\StatusMeta` keeps its role as the queue's vocabulary but delegates every read and write to `Db\ImageRepository`, which is the only class that touches the table
 - The plugin is still pre-release, so there is no upgrade path from the old meta layout: images recorded by an earlier version are seen as unprocessed and re-enter the queue
 
+### Fixed
+- The Media Library column and the attachment box left a skipped image blank, which read as "nothing happened here" and invited people to run it again and again. Both now say what happened: an image skipped because the optimized file came back no smaller shows a green **0%** with "Skipped — already as small as it gets", other skips show their reason, and failures show theirs in red. The row action and the button read "Try again" instead of "Optimize now" once we have a result for that image
+- The green used for savings figures now clears 4.5:1 against the admin background (the WordPress success green does not)
+
 ### Added
 - `Db\Schema` creates the table on activation and whenever the schema version moves
 
