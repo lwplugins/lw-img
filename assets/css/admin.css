@@ -162,17 +162,82 @@
 
 /* Buttons accent (Clear log + others) */
 
-.lw-img-tab-panel .button-primary {
-	background: #00a876;
-	border-color: #00a876;
-	box-shadow: 0 1px 0 #008a60;
+/*
+ * One accent for every control in the settings card, replacing the WP blue.
+ * #00695c is the text/fill green: it clears 4.5:1 both as text on white and
+ * as a background under white text, which the brighter #00a876 does not.
+ * #00a876 stays for large fills, icons and bars, where 3:1 is enough.
+ */
+.lw-img-settings .button-primary,
+.lw-img-settings .button-primary:visited {
+	background: #00695c;
+	border-color: #00695c;
+	box-shadow: none;
 	text-shadow: none;
+	color: #fff;
 }
 
-.lw-img-tab-panel .button-primary:hover,
-.lw-img-tab-panel .button-primary:focus {
-	background: #008a60;
-	border-color: #008a60;
+.lw-img-settings .button-primary:hover,
+.lw-img-settings .button-primary:active {
+	background: #00544a;
+	border-color: #00544a;
+	color: #fff;
+}
+
+.lw-img-settings .button-primary:focus { box-shadow: none; }
+
+.lw-img-settings .button-primary:focus-visible {
+	outline: 2px solid #00544a;
+	outline-offset: 1px;
+}
+
+/* Secondary buttons: neutral until touched, then the accent. */
+.lw-img-settings .button:not(.button-primary),
+.lw-img-settings .button:not(.button-primary):visited {
+	border-color: #dcdcde;
+	color: #1d2327;
+	background: #fff;
+}
+
+.lw-img-settings .button:not(.button-primary):hover,
+.lw-img-settings .button:not(.button-primary):active {
+	border-color: #00695c;
+	color: #00695c;
+	background: #f6fbfa;
+}
+
+.lw-img-settings .button:not(.button-primary):focus { box-shadow: none; outline: none; }
+
+.lw-img-settings .button:not(.button-primary):focus-visible {
+	outline: 2px solid #00695c;
+	outline-offset: 1px;
+	color: #00695c;
+}
+
+/* Links inside the panels (the tab rail keeps its own styling). */
+.lw-img-tab-content a:not(.button):not(.button-primary):not(.lw-img-action) {
+	color: #00695c;
+}
+
+.lw-img-tab-content a:not(.button):not(.button-primary):not(.lw-img-action):hover {
+	color: #00544a;
+}
+
+/* Fields: green focus ring instead of the core blue one. */
+.lw-img-settings input[type="text"]:focus,
+.lw-img-settings input[type="password"]:focus,
+.lw-img-settings input[type="number"]:focus,
+.lw-img-settings input[type="search"]:focus,
+.lw-img-settings select:focus,
+.lw-img-settings textarea:focus {
+	border-color: #00695c;
+	box-shadow: 0 0 0 1px #00695c;
+	outline: 2px solid transparent;
+}
+
+.lw-img-settings input[type="checkbox"],
+.lw-img-settings input[type="radio"] {
+	accent-color: #00695c;
 }
 
 .lw-img-bulk-bar {
