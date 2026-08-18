@@ -43,8 +43,11 @@ final class TabStats implements TabInterface {
 			$this->render_hero( $stats );
 			$this->render_tiles( $stats );
 			$this->render_wins( (array) $stats['wins'] );
-			$this->render_leftovers( (array) $stats['leftovers'] );
 		}
+
+		// Always shown: a site that has optimized nothing yet is exactly the
+		// site most likely to be carrying a previous optimizer's backups.
+		$this->render_leftovers( (array) $stats['leftovers'], (int) ( $stats['scanned_at'] ?? 0 ) );
 
 		$this->render_refresh( (int) $stats['generated_at'] );
 	}
@@ -153,61 +156,142 @@ final class TabStats implements TabInterface {
 	}
 
 	/**
-	 * Warning card about other optimizers' leftover originals.
+	 * Leftover originals from other optimizers.
 	 *
-	 * @param array<string, array{bytes: int, files: int, path?: string, partial?: bool}> $leftovers Leftovers by plugin name.
+	 * Leads with the reclaimable total, then one row per source: the two
+	 * shapes (a backup folder vs. originals dropped beside each image) are
+	 * tagged, because they are cleaned up in completely different ways.
+	 *
+	 * @param array<string, array{bytes: int, files: int, path?: string, type?: string, partial?: bool}> $leftovers Leftovers by source.
+	 * @param int                                                                                        $scanned_at Timestamp of the last scan.
 	 * @return void
 	 */
-	private function render_leftovers( array $leftovers ): void {
+	private function render_leftovers( array $leftovers, int $scanned_at ): void {
+		echo '<h3 class="lw-img-gen-heading">' . esc_html__( 'Leftovers from other optimizers', 'lw-img' ) . '</h3>';
+
 		if ( [] === $leftovers ) {
+			$this->render_leftovers_clean();
+			$this->render_leftovers_foot( $scanned_at, false );
 			return;
 		}
 
 		$total   = 0;
 		$partial = false;
-		foreach ( $leftovers as $dir ) {
-			$total += (int) $dir['bytes'];
-			if ( ! empty( $dir['partial'] ) ) {
+		foreach ( $leftovers as $source ) {
+			$total += (int) $source['bytes'];
+			if ( ! empty( $source['partial'] ) ) {
 				$partial = true;
 			}
 		}
 
-		echo '<h3 class="lw-img-gen-heading">' . esc_html__( 'Leftovers from other optimizers', 'lw-img' ) . '</h3>';
-		echo '<div class="lw-img-leftover">';
-		echo '<span class="dashicons dashicons-warning" aria-hidden="true"></span>';
-		echo '<div>';
-		echo '<strong>' . esc_html(
-			sprintf(
-				$partial
-					/* translators: %s: human-readable size. */
-					? __( 'at least %s of old originals found', 'lw-img' )
-					/* translators: %s: human-readable size. */
-					: __( '%s of old originals found', 'lw-img' ),
-				$this->format_bytes( $total )
-			)
-		) . '</strong>';
-		echo '<p>' . esc_html__( 'A previously installed optimizer left its originals behind — some keep a backup folder, others (e.g. Swift Performance) save the original next to each file. They stay on disk even after that plugin is uninstalled. LW Image does not manage or delete them; remove them manually if you no longer need them.', 'lw-img' ) . '</p>';
-		foreach ( $leftovers as $name => $dir ) {
+		printf(
+			'<div class="lw-img-lo-band"><span class="dashicons dashicons-archive" aria-hidden="true"></span><span class="lw-img-lo-total">%s</span><span class="lw-img-lo-lede">%s <strong>%s</strong> %s</span></div>',
+			esc_html( ( $partial ? __( 'at least', 'lw-img' ) . ' ' : '' ) . $this->format_bytes( $total ) ),
+			esc_html__( 'of originals from optimizers you no longer use —', 'lw-img' ),
+			esc_html__( 'safe to delete', 'lw-img' ),
+			esc_html__( 'once you are sure you will not restore them.', 'lw-img' )
+		);
+
+		$this->render_leftover_sources( $leftovers, $total );
+
+		if ( $partial ) {
 			printf(
-				'<span class="lw-img-leftover-row"><strong>%1$s</strong> <code>%2$s</code> %3$s · %4$s</span>',
+				'<div class="lw-img-lo-partial"><span class="dashicons dashicons-info" aria-hidden="true"></span><span>%s</span></div>',
+				esc_html__( 'The scan stopped early on this very large uploads folder, so the real total is higher than shown.', 'lw-img' )
+			);
+		}
+
+		$this->render_leftovers_foot( $scanned_at, true );
+
+		echo '<p class="lw-img-lo-note">' . esc_html__( 'LW Image never touches these files: it only measures them. To reclaim the space, delete the folder or the files with your file manager, over SFTP, or from that plugin\'s own settings if it is still installed.', 'lw-img' ) . '</p>';
+	}
+
+	/**
+	 * One row per leftover source, with its share of the total.
+	 *
+	 * @param array<string, array<string, mixed>> $leftovers Leftovers by source.
+	 * @param int                                 $total     Total bytes across sources.
+	 * @return void
+	 */
+	private function render_leftover_sources( array $leftovers, int $total ): void {
+		$tags = [
+			'folder' => __( 'backup folder', 'lw-img' ),
+			'beside' => __( 'beside each image', 'lw-img' ),
+		];
+
+		echo '<ul class="lw-img-lo-sources">';
+		foreach ( $leftovers as $name => $source ) {
+			$bytes = (int) $source['bytes'];
+			$share = $total > 0 ? 100 * $bytes / $total : 0;
+			$type  = (string) ( $source['type'] ?? 'folder' );
+
+			printf(
+				'<li><div class="lw-img-lo-row"><span class="lw-img-lo-name">%1$s</span><span class="lw-img-lo-tag">%2$s</span><code>%3$s</code></div>'
+					. '<div class="lw-img-lo-size"><span class="lw-img-lo-b">%4$s</span><span class="lw-img-lo-f">%5$s</span></div>'
+					. '<div class="lw-img-lo-bar"><span style="width:%6$s%%"></span></div></li>',
 				esc_html( (string) $name ),
-				esc_html( (string) ( $dir['path'] ?? '' ) ),
-				esc_html( $this->format_bytes( (int) $dir['bytes'] ) ),
+				esc_html( $tags[ $type ] ?? $type ),
+				esc_html( (string) ( $source['path'] ?? '' ) ),
+				esc_html( $this->format_bytes( $bytes ) ),
 				esc_html(
 					sprintf(
 						/* translators: %s: number of files. */
 						__( '%s files', 'lw-img' ),
-						number_format_i18n( (int) $dir['files'] )
+						number_format_i18n( (int) $source['files'] )
 					)
-				)
+				),
+				esc_attr( number_format( $share, 1, '.', '' ) )
 			);
 		}
+		echo '</ul>';
+	}
 
-		if ( $partial ) {
-			echo '<p class="description">' . esc_html__( 'The scan of the uploads folder stopped early on this large library, so the real total is higher.', 'lw-img' ) . '</p>';
+	/**
+	 * "Nothing found" panel, naming what was checked.
+	 *
+	 * @return void
+	 */
+	private function render_leftovers_clean(): void {
+		echo '<div class="lw-img-lo-clean"><span class="dashicons dashicons-yes-alt" aria-hidden="true"></span><div>';
+		echo '<strong>' . esc_html__( 'No leftovers found', 'lw-img' ) . '</strong>';
+		echo '<p>' . esc_html(
+			sprintf(
+				/* translators: %s: list of optimizer names. */
+				__( 'Checked %s — nothing of theirs is taking up space.', 'lw-img' ),
+				implode( ', ', SiteStats::KNOWN_SOURCES )
+			)
+		) . '</p>';
+		echo '</div></div>';
+	}
+
+	/**
+	 * Scan button and the last-scan time.
+	 *
+	 * @param int  $scanned_at Timestamp of the last scan.
+	 * @param bool $found      Whether anything was found (changes the hint).
+	 * @return void
+	 */
+	private function render_leftovers_foot( int $scanned_at, bool $found ): void {
+		$url = wp_nonce_url(
+			add_query_arg( 'action', SiteStats::REFRESH_ACTION, admin_url( 'admin-post.php' ) ),
+			SiteStats::REFRESH_ACTION
+		);
+
+		$when = $scanned_at > 0
+			/* translators: %s: human-readable time difference. */
+			? sprintf( __( 'Last scanned %s ago.', 'lw-img' ), human_time_diff( $scanned_at ) )
+			: __( 'Not scanned yet.', 'lw-img' );
+
+		if ( $found ) {
+			$when .= ' ' . __( 'This does not run on its own.', 'lw-img' );
 		}
 
-		echo '</div></div>';
+		printf(
+			'<p class="lw-img-lo-foot"><a href="%1$s" class="button"><span class="dashicons dashicons-update" aria-hidden="true"></span> %2$s</a> <span class="description">%3$s</span></p>',
+			esc_url( $url ),
+			esc_html__( 'Scan again', 'lw-img' ),
+			esc_html( $when )
+		);
 	}
 
 	/**

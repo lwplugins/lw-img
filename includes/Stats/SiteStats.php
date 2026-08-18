@@ -39,6 +39,14 @@ final class SiteStats {
 	public const LEFTOVERS_OPTION = 'lw_img_leftovers';
 
 	/**
+	 * Optimizers whose leftovers we know how to find, in report order. Named
+	 * here so the UI can say what was checked when it finds nothing.
+	 *
+	 * @var array<int, string>
+	 */
+	public const KNOWN_SOURCES = [ 'ShortPixel', 'Imagify', 'EWWW', 'Swift Performance', 'Smush' ];
+
+	/**
 	 * Bounds for the uploads-wide leftover scan (see suffix_stats()).
 	 *
 	 * Measured on a 1.29M-file uploads tree: the walk runs at roughly a
@@ -280,7 +288,7 @@ final class SiteStats {
 	 * each plugin's own source.
 	 *
 	 * @param string $uploads Absolute uploads basedir.
-	 * @return array<string, array{bytes: int, files: int, path: string, partial: bool}>
+	 * @return array<string, array{bytes: int, files: int, path: string, type: string, partial: bool}>
 	 */
 	private static function leftovers( string $uploads ): array {
 		$leftovers = [];
@@ -301,6 +309,7 @@ final class SiteStats {
 					$stats,
 					[
 						'path'    => $label,
+						'type'    => 'folder',
 						'partial' => false,
 					]
 				);
@@ -314,6 +323,7 @@ final class SiteStats {
 				$imagify_root,
 				[
 					'path'    => 'imagify-backup',
+					'type'    => 'folder',
 					'partial' => false,
 				]
 			);
@@ -333,6 +343,7 @@ final class SiteStats {
 				$stats,
 				[
 					'path'    => $patterns[ $name ] ?? 'uploads',
+					'type'    => 'beside',
 					'partial' => (bool) $stray['partial'],
 				]
 			);
