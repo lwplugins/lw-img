@@ -5,6 +5,7 @@
 ### Added
 - Stats tab now reports leftover originals from every optimizer we know, in both shapes they take. Backup folders: ShortPixel (`uploads/ShortpixelBackups`), Imagify (`uploads/backup` and the site-root `imagify-backup`), EWWW (`wp-content/image-backup` — outside uploads). Originals dropped beside each image: Swift Performance (`<name>.swift-original`) and Smush (`<name>.bak.<ext>`). Every path and pattern was verified against that plugin's own source. Each row shows its location, size and file count, on the Stats tab and in `wp lw-img status`
 - The uploads tree is walked exactly once for all beside-the-file patterns, bounded by an entry count and a wall-clock budget; when it stops early the card says "at least X" and explains that the real total is higher
+- `wp lw-img leftovers` reports the same findings on the command line, with `--rescan` to walk the tree again and `--format=json|csv|yaml` for scripting (machine formats print no prose). `wp lw-img status` now reads the stored scan instead of forcing a fresh walk on every call
 - Smush-optimized images are now recognized and skipped (postmeta `wp-smpro-smush-data`), and EWWW-optimized ones too — EWWW keeps no postmeta, so its own `{prefix}ewwwio_images` table is consulted (indexed lookup; the table-exists probe runs once per request, so sites without EWWW pay nothing)
 
 ## [1.6.1] - 2026-08-17

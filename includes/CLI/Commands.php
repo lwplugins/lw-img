@@ -29,6 +29,9 @@ final class Commands {
 	/**
 	 * Show optimization status counts.
 	 *
+	 * Leftover figures come from the stored scan; use `wp lw-img leftovers
+	 * --rescan` to walk the uploads tree again.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp lw-img status
@@ -36,7 +39,7 @@ final class Commands {
 	public function status(): void {
 		$counts = StatusMeta::counts();
 		$query  = new UnoptimizedQuery();
-		$stats  = SiteStats::get( true );
+		$stats  = SiteStats::get();
 
 		$items = [
 			[
@@ -82,6 +85,89 @@ final class Commands {
 		}
 
 		WP_CLI\Utils\format_items( 'table', $items, [ 'metric', 'value' ] );
+	}
+
+	/**
+	 * Report originals other image optimizers left on disk.
+	 *
+	 * Covers both shapes: dedicated backup folders (ShortPixel, Imagify,
+	 * EWWW) and originals kept beside each image (Swift Performance's
+	 * .swift-original, Smush's .bak.<ext>). LW Image only measures these —
+	 * it never deletes them.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--rescan]
+	 * : Walk the uploads tree again instead of using the stored scan.
+	 *
+	 * [--format=<format>]
+	 * : Output format: table (default), csv, json, yaml, or count.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp lw-img leftovers
+	 *     wp lw-img leftovers --rescan
+	 *     wp lw-img leftovers --format=json
+	 *
+	 * @param array<int, string>    $args       Positional arguments (unused).
+	 * @param array<string, string> $assoc_args Named arguments.
+	 */
+	public function leftovers( array $args, array $assoc_args ): void {
+		$rescan = (bool) WP_CLI\Utils\get_flag_value( $assoc_args, 'rescan', false );
+		$format = (string) WP_CLI\Utils\get_flag_value( $assoc_args, 'format', 'table' );
+
+		if ( $rescan ) {
+			WP_CLI::log( 'Scanning the uploads folder…' );
+		}
+
+		$scan    = SiteStats::stored_leftovers( $rescan );
+		$sources = (array) $scan['sources'];
+
+		if ( [] === $sources ) {
+			WP_CLI::success( 'No leftovers found. Checked: ' . implode( ', ', SiteStats::KNOWN_SOURCES ) . '.' );
+			return;
+		}
+
+		$total   = 0;
+		$partial = false;
+		$items   = [];
+
+		foreach ( $sources as $name => $source ) {
+			$total  += (int) $source['bytes'];
+			$partial = $partial || ! empty( $source['partial'] );
+
+			$items[] = [
+				'source'   => (string) $name,
+				'kind'     => 'beside' === ( $source['type'] ?? '' ) ? 'beside each image' : 'backup folder',
+				'location' => (string) ( $source['path'] ?? '' ),
+				'size'     => (string) size_format( (int) $source['bytes'], 1 ),
+				'files'    => (int) $source['files'],
+			];
+		}
+
+		WP_CLI\Utils\format_items( $format, $items, [ 'source', 'kind', 'location', 'size', 'files' ] );
+
+		// Machine-readable formats stay machine-readable: the prose below
+		// would otherwise be appended to the JSON/CSV a script is parsing.
+		if ( 'table' !== $format ) {
+			return;
+		}
+
+		WP_CLI::log(
+			sprintf(
+				'%s%s reclaimable. LW Image never deletes these — remove them yourself if you no longer need them.',
+				$partial ? 'At least ' : '',
+				size_format( $total, 1 )
+			)
+		);
+
+		if ( $partial ) {
+			WP_CLI::warning( 'The scan stopped early on this very large uploads folder, so the real total is higher.' );
+		}
+
+		if ( ! $rescan ) {
+			WP_CLI::log( 'From the stored scan' . ( $scan['scanned_at'] > 0 ? ' (' . human_time_diff( (int) $scan['scanned_at'] ) . ' ago)' : '' ) . '. Pass --rescan to walk the tree again.' );
+		}
 	}
 
 	/**
