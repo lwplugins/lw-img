@@ -171,7 +171,7 @@ final class TabStats implements TabInterface {
 
 		if ( [] === $leftovers ) {
 			$this->render_leftovers_clean();
-			$this->render_leftovers_foot( $scanned_at, false );
+			$this->render_leftovers_foot( $scanned_at );
 			return;
 		}
 
@@ -201,7 +201,7 @@ final class TabStats implements TabInterface {
 			);
 		}
 
-		$this->render_leftovers_foot( $scanned_at, true );
+		$this->render_leftovers_foot( $scanned_at );
 
 		echo '<p class="lw-img-lo-note">' . esc_html__( 'LW Image never touches these files: it only measures them. To reclaim the space, delete the folder or the files with your file manager, over SFTP, or from that plugin\'s own settings if it is still installed.', 'lw-img' ) . '</p>';
 	}
@@ -267,27 +267,22 @@ final class TabStats implements TabInterface {
 	/**
 	 * Scan button and the last-scan time.
 	 *
-	 * @param int  $scanned_at Timestamp of the last scan.
-	 * @param bool $found      Whether anything was found (changes the hint).
+	 * @param int $scanned_at Timestamp of the last scan.
 	 * @return void
 	 */
-	private function render_leftovers_foot( int $scanned_at, bool $found ): void {
+	private function render_leftovers_foot( int $scanned_at ): void {
 		$url = wp_nonce_url(
-			add_query_arg( 'action', SiteStats::REFRESH_ACTION, admin_url( 'admin-post.php' ) ),
-			SiteStats::REFRESH_ACTION
+			add_query_arg( 'action', SiteStats::RESCAN_ACTION, admin_url( 'admin-post.php' ) ),
+			SiteStats::RESCAN_ACTION
 		);
 
 		$when = $scanned_at > 0
 			/* translators: %s: human-readable time difference. */
-			? sprintf( __( 'Last scanned %s ago.', 'lw-img' ), human_time_diff( $scanned_at ) )
+			? sprintf( __( 'Scanned %s ago — never runs on its own.', 'lw-img' ), human_time_diff( $scanned_at ) )
 			: __( 'Not scanned yet.', 'lw-img' );
 
-		if ( $found ) {
-			$when .= ' ' . __( 'This does not run on its own.', 'lw-img' );
-		}
-
 		printf(
-			'<p class="lw-img-lo-foot"><a href="%1$s" class="button"><span class="dashicons dashicons-update" aria-hidden="true"></span> %2$s</a> <span class="description">%3$s</span></p>',
+			'<p class="lw-img-lo-foot"><a href="%1$s" class="lw-img-action"><span class="dashicons dashicons-search" aria-hidden="true"></span>%2$s</a><span class="lw-img-action-hint">%3$s</span></p>',
 			esc_url( $url ),
 			esc_html__( 'Scan again', 'lw-img' ),
 			esc_html( $when )
@@ -320,16 +315,18 @@ final class TabStats implements TabInterface {
 			SiteStats::REFRESH_ACTION
 		);
 
-		echo '<p class="lw-img-stats-refresh">';
-		echo '<a class="button" href="' . esc_url( $refresh_url ) . '">' . esc_html__( 'Refresh stats', 'lw-img' ) . '</a> ';
-		echo '<span class="description">' . esc_html(
-			sprintf(
-				/* translators: %s: human-readable time difference. */
-				__( 'Cached — last updated %s ago. Directory sizes are cached for an hour.', 'lw-img' ),
-				human_time_diff( $generated_at )
+		printf(
+			'<p class="lw-img-stats-refresh"><a class="lw-img-action" href="%1$s"><span class="dashicons dashicons-update" aria-hidden="true"></span>%2$s</a><span class="lw-img-action-hint">%3$s</span></p>',
+			esc_url( $refresh_url ),
+			esc_html__( 'Refresh figures', 'lw-img' ),
+			esc_html(
+				sprintf(
+					/* translators: %s: human-readable time difference. */
+					__( 'Updated %s ago, refreshes hourly on its own.', 'lw-img' ),
+					human_time_diff( $generated_at )
+				)
 			)
-		) . '</span>';
-		echo '</p>';
+		);
 	}
 
 	/**

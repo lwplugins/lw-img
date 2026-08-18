@@ -601,9 +601,35 @@
 .lw-img-lo-partial { display: flex; gap: 10px; padding: 10px 14px; background: #f6f7f7; border-radius: 4px; color: #646970; font-size: 12px; margin-top: 10px; }
 .lw-img-lo-partial .dashicons { flex-shrink: 0; font-size: 16px; width: 16px; height: 16px; }
 .lw-img-lo-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 12px 0 0; }
-.lw-img-lo-foot .dashicons { vertical-align: text-bottom; }
 .lw-img-lo-note { padding: 11px 14px; background: #f6f7f7; border-radius: 4px; color: #646970; margin-top: 14px; max-width: 78ch; }
 .lw-img-lo-clean { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #dcdcde; border-radius: 6px; }
 .lw-img-lo-clean .dashicons { color: #00a876; flex-shrink: 0; }
 .lw-img-lo-clean strong { display: block; }
 .lw-img-lo-clean p { margin: 0; color: #646970; font-size: 12px; }
+
+/* Quiet action buttons — the plugin's own accent instead of the WP blue */
+.lw-img-action {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 14px;
+	border: 1px solid #dcdcde;
+	border-radius: 3px;
+	background: #fff;
+	color: #1d2327;
+	text-decoration: none;
+	font-weight: 500;
+	line-height: 1.6;
+}
+.lw-img-action:hover,
+.lw-img-action:active {
+	border-color: #00695c;
+	color: #00695c;
+	background: #f6fbfa;
+}
+.lw-img-action:focus { outline: none; box-shadow: none; color: #1d2327; }
+.lw-img-action:focus-visible { outline: 2px solid #00695c; outline-offset: 1px; color: #00695c; }
+.lw-img-action .dashicons { font-size: 16px; width: 16px; height: 16px; color: #646970; }
+.lw-img-action:hover .dashicons { color: #00695c; }
+.lw-img-action-hint { color: #646970; font-size: 12px; }
+.lw-img-stats-refresh { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
