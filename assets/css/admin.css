@@ -48,6 +48,16 @@
 	background: #f0f0f1;
 }
 
+/*
+ * A mouse click should not leave a ring behind — but keyboard focus must
+ * stay visible (WCAG 2.4.7). Suppressing plain :focus and painting our own
+ * ring on :focus-visible gives exactly that split.
+ */
+.lw-img-tabs a:focus {
+	outline: none;
+	box-shadow: none;
+}
+
 .lw-img-tabs a:focus-visible {
 	outline: 2px solid #00695c;
 	outline-offset: -2px;
