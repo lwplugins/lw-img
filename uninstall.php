@@ -16,6 +16,7 @@ delete_option( 'lw_img_version' );
 delete_option( 'lw_img_log' );
 delete_option( 'lw_img_bulk_job' );
 delete_option( 'lw_img_competitor_notice_dismissed' );
+delete_option( 'lw_img_leftovers' );
 delete_transient( 'lw_img_stats' );
 
 wp_clear_scheduled_hook( 'lw_img_backup_cleanup' );

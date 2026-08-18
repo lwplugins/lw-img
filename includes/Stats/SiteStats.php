@@ -18,16 +18,25 @@ use RecursiveIteratorIterator;
  * Aggregates saved bytes from the attachment meta and measures backup
  * storage on disk — including originals left behind by other optimizers,
  * so users learn about forgotten files even when that plugin is gone.
- * Two shapes are covered: a backup folder (ShortPixel's
- * <uploads>/ShortpixelBackups) and originals kept beside each file
- * (Swift Performance's "<name>.swift-original"). Results are cached for
- * an hour; the Stats tab offers a refresh.
+ * Two shapes are covered: backup folders (ShortPixel, Imagify, EWWW) and
+ * originals kept beside each file (Swift Performance, Smush).
+ *
+ * The savings figures are cached for an hour. The leftover scan is not on
+ * that clock: it walks the whole uploads tree, and its result only changes
+ * when someone deletes those files, so it runs once and then only when the
+ * user explicitly refreshes.
  */
 final class SiteStats {
 
 	public const REFRESH_ACTION = 'lw_img_refresh_stats';
 
 	private const CACHE_KEY = 'lw_img_stats';
+
+	/**
+	 * Where the last leftover scan is kept (an option, not a transient: it
+	 * is only redone on request).
+	 */
+	public const LEFTOVERS_OPTION = 'lw_img_leftovers';
 
 	/**
 	 * Bounds for the uploads-wide leftover scan (see suffix_stats()).
@@ -57,17 +66,56 @@ final class SiteStats {
 	 * @return array<string, mixed>
 	 */
 	public static function get( bool $fresh = false ): array {
+		$scan = self::stored_leftovers( $fresh );
+
 		if ( ! $fresh ) {
 			$cached = get_transient( self::CACHE_KEY );
 			if ( is_array( $cached ) ) {
+				$cached['leftovers']  = $scan['sources'];
+				$cached['scanned_at'] = $scan['scanned_at'];
 				return $cached;
 			}
 		}
 
-		$stats = self::collect();
+		$stats               = self::collect();
+		$stats['leftovers']  = $scan['sources'];
+		$stats['scanned_at'] = $scan['scanned_at'];
+
 		set_transient( self::CACHE_KEY, $stats, HOUR_IN_SECONDS );
 
 		return $stats;
+	}
+
+	/**
+	 * The last leftover scan's result, scanning once if none was stored.
+	 *
+	 * Leftovers only change when someone deletes those files, so re-walking
+	 * the uploads tree on a timer would be pure waste — and that walk is by
+	 * far the most expensive thing on this tab. The scan therefore runs once
+	 * and is then kept until the user explicitly asks for a new one, which
+	 * is also why it lives in an option instead of an expiring transient.
+	 *
+	 * @param bool $fresh Force a new scan.
+	 * @return array{sources: array<string, array<string, mixed>>, scanned_at: int}
+	 */
+	public static function stored_leftovers( bool $fresh = false ): array {
+		$stored = get_option( self::LEFTOVERS_OPTION );
+
+		if ( ! $fresh && is_array( $stored ) && isset( $stored['sources'] ) ) {
+			return [
+				'sources'    => (array) $stored['sources'],
+				'scanned_at' => (int) ( $stored['scanned_at'] ?? 0 ),
+			];
+		}
+
+		$scan = [
+			'sources'    => self::leftovers( (string) wp_get_upload_dir()['basedir'] ),
+			'scanned_at' => time(),
+		];
+
+		update_option( self::LEFTOVERS_OPTION, $scan, false );
+
+		return $scan;
 	}
 
 	/**
@@ -83,6 +131,10 @@ final class SiteStats {
 		check_admin_referer( self::REFRESH_ACTION );
 
 		delete_transient( self::CACHE_KEY );
+
+		// An explicit refresh is the one time re-walking the uploads tree is
+		// wanted: the numbers only move when someone deletes those files.
+		self::stored_leftovers( true );
 
 		wp_safe_redirect( admin_url( 'admin.php?page=lw-img#stats' ) );
 		exit;
@@ -353,10 +405,10 @@ final class SiteStats {
 
 		$original  = (int) ( $row->orig_sum ?? 0 );
 		$optimized = (int) ( $row->new_sum ?? 0 );
-		$uploads   = (string) wp_get_upload_dir()['basedir'];
 
-		$leftovers = self::leftovers( $uploads );
-
+		// Leftovers are deliberately not collected here — they come from the
+		// stored scan (see stored_leftovers()) so this hourly refresh never
+		// re-walks the uploads tree.
 		return [
 			'count'         => (int) ( $row->cnt ?? 0 ),
 			'original'      => $original,
@@ -364,7 +416,7 @@ final class SiteStats {
 			'saved'         => max( 0, $original - $optimized ),
 			'percent'       => self::savings_percent( $original, $optimized ),
 			'backup'        => self::dir_stats( ( new BackupStore() )->root() ),
-			'leftovers'     => $leftovers,
+			'leftovers'     => [],
 			'library_total' => self::library_total(),
 			'wins'          => self::biggest_wins(),
 			'generated_at'  => time(),
