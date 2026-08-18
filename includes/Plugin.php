@@ -20,6 +20,7 @@ use LightweightPlugins\Img\Bulk\ReoptimizeHandler;
 use LightweightPlugins\Img\Bulk\StatusEndpoint;
 use LightweightPlugins\Img\CLI\Commands as CLICommands;
 use LightweightPlugins\Img\Compat\CompetitorNotice;
+use LightweightPlugins\Img\Db\Schema;
 use LightweightPlugins\Img\Health\HealthReport;
 use LightweightPlugins\Img\Log\ClearHandler;
 use LightweightPlugins\Img\Log\EventLog;
@@ -46,6 +47,8 @@ final class Plugin {
 	}
 
 	private function init_components(): void {
+		Schema::maybe_install();
+
 		EventLog::register();
 		RetentionCleaner::register();
 		AttachmentDeleteCleanup::register();

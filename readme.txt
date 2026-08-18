@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.6.2
+Stable tag: 1.7.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,11 @@ Yes — use the Bulk tab (or `wp lw-img optimize --all`). The run happens in the
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.7.0 =
+* Change: per-image records moved from postmeta into the plugin's own table — one row per image instead of eleven, so the bulk queue and the Stats totals no longer search the site-wide meta table
+* Note: the plugin is still pre-release and there is no upgrade path from the old layout — images recorded by an earlier version re-enter the queue
+* Note: backup paths stay in postmeta, and uninstall now drops the plugin's table
 
 = 1.6.2 =
 * New: Stats tab finds leftover originals from ShortPixel, Imagify, EWWW, Swift Performance and Smush — both backup folders and the originals some of them save next to each image (.swift-original, .bak.jpg) — so you can reclaim that disk space

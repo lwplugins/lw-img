@@ -11,6 +11,7 @@ namespace LightweightPlugins\Img\Upload;
 
 use LightweightPlugins\Img\Api\OptimizeResult;
 use LightweightPlugins\Img\Backup\BackupStore;
+use LightweightPlugins\Img\Db\ImageRepository;
 
 /**
  * Stashes optimization stats and writes them to attachment meta.
@@ -80,14 +81,21 @@ final class AttachmentMetaWriter {
 	 * @return void
 	 */
 	public static function write_meta( int $attachment_id, int $original_size, int $new_size, float $percent, string $job_id, string $backup_rel = '', string $level = '', bool $keep_exif = false ): void {
-		update_post_meta( $attachment_id, '_lw_img_optimized', 1 );
-		update_post_meta( $attachment_id, '_lw_img_original_size', $original_size );
-		update_post_meta( $attachment_id, '_lw_img_new_size', $new_size );
-		update_post_meta( $attachment_id, '_lw_img_savings_pct', $percent );
-		update_post_meta( $attachment_id, '_lw_img_job_id', $job_id );
-		update_post_meta( $attachment_id, '_lw_img_level', $level );
-		update_post_meta( $attachment_id, '_lw_img_keep_exif', $keep_exif ? 1 : 0 );
-		update_post_meta( $attachment_id, '_lw_img_optimized_at', time() );
+		ImageRepository::save(
+			$attachment_id,
+			[
+				'status'       => ImageRepository::STATUS_OPTIMIZED,
+				'detail'       => sprintf( '-%.1f%%', $percent ),
+				'is_transient' => 0,
+				'orig_size'    => $original_size,
+				'new_size'     => $new_size,
+				'level'        => $level,
+				'job_id'       => $job_id,
+				'keep_exif'    => $keep_exif ? 1 : 0,
+				'optimized_at' => time(),
+				'claimed_at'   => 0,
+			]
+		);
 
 		if ( '' !== $backup_rel ) {
 			update_post_meta( $attachment_id, BackupStore::META_KEY, $backup_rel );

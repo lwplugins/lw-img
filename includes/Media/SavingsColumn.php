@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Media;
 
+use LightweightPlugins\Img\Db\ImageRepository;
+
 /**
  * Shows the savings for optimized images and a dash for the rest.
  */
@@ -48,7 +50,9 @@ final class SavingsColumn {
 			return;
 		}
 
-		if ( ! get_post_meta( $post_id, '_lw_img_optimized', true ) ) {
+		$record = ImageRepository::find( $post_id );
+
+		if ( null === $record || ImageRepository::STATUS_OPTIMIZED !== $record['status'] ) {
 			$owner = \LightweightPlugins\Img\Compat\CompetitorRegistry::managed_by( $post_id );
 			if ( null !== $owner ) {
 				echo '<span class="description">' . esc_html( $owner ) . '</span>';
@@ -58,9 +62,9 @@ final class SavingsColumn {
 			return;
 		}
 
-		$original = (int) get_post_meta( $post_id, '_lw_img_original_size', true );
-		$new_size = (int) get_post_meta( $post_id, '_lw_img_new_size', true );
-		$percent  = (float) get_post_meta( $post_id, '_lw_img_savings_pct', true );
+		$original = (int) $record['orig_size'];
+		$new_size = (int) $record['new_size'];
+		$percent  = $original > 0 ? ( 1 - $new_size / $original ) * 100 : 0.0;
 
 		$original_label = size_format( $original );
 		$new_label      = size_format( $new_size );

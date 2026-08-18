@@ -9,10 +9,16 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Bulk;
 
+use LightweightPlugins\Img\Db\ImageRepository;
+use LightweightPlugins\Img\Db\Schema;
 use LightweightPlugins\Img\Options;
 
 /**
- * Queries attachments in the allowed mime list without the optimized meta.
+ * Queries attachments in the allowed mime list that have no record yet.
+ *
+ * The pending set is "attachments minus what our own table already knows",
+ * so it costs one join against a table of our own size instead of three
+ * anti-joins across the site's shared postmeta table.
  */
 final class UnoptimizedQuery {
 
@@ -67,7 +73,13 @@ final class UnoptimizedQuery {
 		}
 
 		foreach ( $ids as $attachment_id ) {
-			update_post_meta( $attachment_id, StatusMeta::META_CLAIM, time() );
+			ImageRepository::save(
+				$attachment_id,
+				[
+					'status'     => ImageRepository::STATUS_PENDING,
+					'claimed_at' => time(),
+				]
+			);
 		}
 
 		update_option( self::CURSOR_OPTION, [] === $ids ? 0 : max( $ids ), false );
@@ -144,12 +156,7 @@ final class UnoptimizedQuery {
 	 * @return int
 	 */
 	public function optimized_count(): int {
-		global $wpdb;
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- indexed single-key count; shown on demand only.
-		return (int) $wpdb->get_var(
-			$wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s", '_lw_img_optimized' )
-		);
+		return ImageRepository::count_by_status( ImageRepository::STATUS_OPTIMIZED );
 	}
 
 	/**
@@ -170,21 +177,20 @@ final class UnoptimizedQuery {
 		}
 
 		$placeholders = implode( ',', array_fill( 0, count( $mimes ), '%s' ) );
+		$table        = Schema::table();
 
+		// Pending means: no record of its own yet, or a claim whose worker
+		// died and whose TTL has expired.
 		$sql = "FROM {$wpdb->posts} p
-			 LEFT JOIN {$wpdb->postmeta} s ON p.ID = s.post_id AND s.meta_key = %s
-			 LEFT JOIN {$wpdb->postmeta} o ON p.ID = o.post_id AND o.meta_key = %s
-			 LEFT JOIN {$wpdb->postmeta} c ON p.ID = c.post_id AND c.meta_key = %s
+			 LEFT JOIN {$table} q ON p.ID = q.attachment_id
 			 WHERE p.post_type = 'attachment' AND p.post_status = 'inherit'
 			   AND p.post_mime_type IN ($placeholders)
 			   AND p.ID > %d
-			   AND s.post_id IS NULL AND o.post_id IS NULL
-			   AND ( c.post_id IS NULL OR c.meta_value + 0 < %d )";
+			   AND ( q.attachment_id IS NULL OR ( q.status = %s AND q.claimed_at < %d ) )";
 
 		$params = array_merge(
-			[ StatusMeta::META_STATUS, '_lw_img_optimized', StatusMeta::META_CLAIM ],
 			array_map( 'strval', $mimes ),
-			[ $after_id, time() - self::CLAIM_TTL ]
+			[ $after_id, ImageRepository::STATUS_PENDING, time() - self::CLAIM_TTL ]
 		);
 
 		return [ $sql, $params ];

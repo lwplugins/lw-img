@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.7.0] - 2026-08-18
+
+### Changed
+- Per-image records now live in the plugin's own `{prefix}lw_img_images` table instead of eleven postmeta rows per image. The bulk queue's "what is still pending" question was an anti-join across the site-wide, EAV-shaped postmeta table; it is now a single join against a table of our own size, with an index built for exactly that question. The savings totals were a self-join over the same table and are now one indexed scan
+- `Bulk\StatusMeta` keeps its role as the queue's vocabulary but delegates every read and write to `Db\ImageRepository`, which is the only class that touches the table
+
+### Added
+- `Db\Schema` creates the table on activation and whenever the schema version moves
+
+### Removed
+- The `_lw_img_status`, `_lw_img_status_detail`, `_lw_img_status_transient`, `_lw_img_claimed`, `_lw_img_optimized`, `_lw_img_original_size`, `_lw_img_new_size`, `_lw_img_savings_pct`, `_lw_img_job_id`, `_lw_img_level`, `_lw_img_keep_exif` and `_lw_img_optimized_at` meta keys. `_lw_img_backup_path` stays in postmeta: it points at files that survive uninstall
+- Uninstall drops the plugin's table and clears the new options
+
+### Note
+- The plugin is still pre-release, so there is no upgrade path from the old meta layout: images recorded by an earlier version are simply seen as unprocessed and re-enter the queue.
+
 ## [1.6.2] - 2026-08-18
 
 ### Added

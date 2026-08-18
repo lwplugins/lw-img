@@ -89,23 +89,10 @@ final class Restorer {
 	 * @return void
 	 */
 	private function clear_meta( int $attachment_id ): void {
-		$keys = [
-			'_lw_img_optimized',
-			'_lw_img_original_size',
-			'_lw_img_new_size',
-			'_lw_img_savings_pct',
-			'_lw_img_job_id',
-			'_lw_img_level',
-			'_lw_img_keep_exif',
-			'_lw_img_optimized_at',
-			BackupStore::META_KEY,
-		];
+		delete_post_meta( $attachment_id, BackupStore::META_KEY );
 
-		foreach ( $keys as $key ) {
-			delete_post_meta( $attachment_id, $key );
-		}
-
-		// The attachment becomes pending again — it can be re-optimized.
+		// Dropping the record makes the attachment pending again, so it can
+		// be re-optimized.
 		StatusMeta::clear( $attachment_id );
 	}
 }

@@ -15,6 +15,7 @@ namespace LightweightPlugins\Img;
 final class Activator {
 
 	public static function activate(): void {
+		\LightweightPlugins\Img\Db\Schema::install();
 		self::set_defaults();
 		self::ensure_log_option();
 		\LightweightPlugins\Img\Backup\RetentionCleaner::schedule();

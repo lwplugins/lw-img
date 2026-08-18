@@ -11,6 +11,7 @@ namespace LightweightPlugins\Img\Stats;
 
 use FilesystemIterator;
 use LightweightPlugins\Img\Backup\BackupStore;
+use LightweightPlugins\Img\Db\ImageRepository;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -425,28 +426,18 @@ final class SiteStats {
 	 * @return array<string, mixed>
 	 */
 	private static function collect(): array {
-		global $wpdb;
+		// One aggregate over the plugin's own table; this used to be a
+		// self-join across the site's postmeta table.
+		$totals = ImageRepository::savings();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- aggregate SUM over meta values; no meta-API equivalent, result is transient-cached by the caller.
-		$row = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT COUNT(*) AS cnt, SUM(CAST(o.meta_value AS UNSIGNED)) AS orig_sum, SUM(CAST(n.meta_value AS UNSIGNED)) AS new_sum
-				 FROM {$wpdb->postmeta} o
-				 INNER JOIN {$wpdb->postmeta} n ON n.post_id = o.post_id AND n.meta_key = %s
-				 WHERE o.meta_key = %s",
-				'_lw_img_new_size',
-				'_lw_img_original_size'
-			)
-		);
-
-		$original  = (int) ( $row->orig_sum ?? 0 );
-		$optimized = (int) ( $row->new_sum ?? 0 );
+		$original  = $totals['original'];
+		$optimized = $totals['optimized'];
 
 		// Leftovers are deliberately not collected here — they come from the
 		// stored scan (see stored_leftovers()) so this hourly refresh never
 		// re-walks the uploads tree.
 		return [
-			'count'         => (int) ( $row->cnt ?? 0 ),
+			'count'         => $totals['count'],
 			'original'      => $original,
 			'optimized'     => $optimized,
 			'saved'         => max( 0, $original - $optimized ),
@@ -480,30 +471,14 @@ final class SiteStats {
 	 * @return array<int, array{file: string, original: int, new: int}>
 	 */
 	private static function biggest_wins( int $limit = 5 ): array {
-		global $wpdb;
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- top-N over the plugin's own meta; result is transient-cached by the caller.
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT o.post_id, CAST(o.meta_value AS UNSIGNED) AS orig, CAST(n.meta_value AS UNSIGNED) AS new_size
-				 FROM {$wpdb->postmeta} o
-				 INNER JOIN {$wpdb->postmeta} n ON n.post_id = o.post_id AND n.meta_key = %s
-				 WHERE o.meta_key = %s
-				 ORDER BY CAST(o.meta_value AS UNSIGNED) - CAST(n.meta_value AS UNSIGNED) DESC
-				 LIMIT %d",
-				'_lw_img_new_size',
-				'_lw_img_original_size',
-				$limit
-			)
-		);
-
 		$wins = [];
-		foreach ( $rows as $win ) {
-			$file   = (string) get_post_meta( (int) $win->post_id, '_wp_attached_file', true );
+
+		foreach ( ImageRepository::biggest_wins( $limit ) as $win ) {
+			$file   = (string) get_post_meta( $win['attachment_id'], '_wp_attached_file', true );
 			$wins[] = [
-				'file'     => '' !== $file ? basename( $file ) : '#' . (int) $win->post_id,
-				'original' => (int) $win->orig,
-				'new'      => (int) $win->new_size,
+				'file'     => '' !== $file ? basename( $file ) : '#' . $win['attachment_id'],
+				'original' => $win['orig_size'],
+				'new'      => $win['new_size'],
 			];
 		}
 

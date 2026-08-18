@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Backup;
 
+use LightweightPlugins\Img\Db\ImageRepository;
+
 /**
  * Prevents orphaned backups from accumulating after attachments are deleted.
  */
@@ -35,5 +37,9 @@ final class AttachmentDeleteCleanup {
 		if ( '' !== $relative ) {
 			( new BackupStore() )->delete( $relative );
 		}
+
+		// Our record lives in its own table now, so unlike postmeta it is not
+		// cleaned up by WordPress when the attachment goes away.
+		ImageRepository::forget( $attachment_id );
 	}
 }

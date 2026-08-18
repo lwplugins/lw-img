@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Media;
 
+use LightweightPlugins\Img\Db\ImageRepository;
+
 use LightweightPlugins\Img\Backup\BackupStore;
 use LightweightPlugins\Img\Backup\RestoreHandler;
 use LightweightPlugins\Img\Bulk\OptimizeHandler;
@@ -42,7 +44,7 @@ final class RowActions {
 			return $actions;
 		}
 
-		if ( get_post_meta( $post->ID, '_lw_img_optimized', true ) ) {
+		if ( ImageRepository::is_optimized( $post->ID ) ) {
 			return self::add_restore_action( $actions, $post->ID );
 		}
 

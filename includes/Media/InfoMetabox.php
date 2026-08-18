@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Media;
 
+use LightweightPlugins\Img\Db\ImageRepository;
+
 use LightweightPlugins\Img\Backup\BackupStore;
 use LightweightPlugins\Img\Backup\RestoreHandler;
 use LightweightPlugins\Img\Bulk\OptimizeHandler;
@@ -44,17 +46,19 @@ final class InfoMetabox {
 	 * @return void
 	 */
 	public static function render( WP_Post $post ): void {
-		if ( ! get_post_meta( $post->ID, '_lw_img_optimized', true ) ) {
+		$record = ImageRepository::find( $post->ID );
+
+		if ( null === $record || ImageRepository::STATUS_OPTIMIZED !== $record['status'] ) {
 			self::render_unoptimized( $post );
 			return;
 		}
 
-		$percent   = (float) get_post_meta( $post->ID, '_lw_img_savings_pct', true );
-		$original  = (int) get_post_meta( $post->ID, '_lw_img_original_size', true );
-		$new_size  = (int) get_post_meta( $post->ID, '_lw_img_new_size', true );
-		$level     = (string) get_post_meta( $post->ID, '_lw_img_level', true );
-		$keep_exif = (bool) get_post_meta( $post->ID, '_lw_img_keep_exif', true );
-		$done_at   = (int) get_post_meta( $post->ID, '_lw_img_optimized_at', true );
+		$original  = (int) $record['orig_size'];
+		$new_size  = (int) $record['new_size'];
+		$percent   = $original > 0 ? ( 1 - $new_size / $original ) * 100 : 0.0;
+		$level     = (string) $record['level'];
+		$keep_exif = (bool) $record['keep_exif'];
+		$done_at   = (int) $record['optimized_at'];
 		$metadata  = wp_get_attachment_metadata( $post->ID );
 		$sizes     = is_array( $metadata ) && ! empty( $metadata['sizes'] ) ? count( (array) $metadata['sizes'] ) : 0;
 

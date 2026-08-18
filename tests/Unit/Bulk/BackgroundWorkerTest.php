@@ -90,6 +90,7 @@ final class BackgroundWorkerTest extends MonkeyTestCase {
 			 */
 			public string $posts    = 'wp_posts';
 			public string $postmeta = 'wp_postmeta'; // phpcs:ignore Squiz.Commenting.VariableComment.Missing -- same role as $posts above.
+			public string $prefix   = 'wp_'; // phpcs:ignore Squiz.Commenting.VariableComment.Missing -- same role as $posts above.
 
 			/**
 			 * @param string $sql  Query with placeholders.

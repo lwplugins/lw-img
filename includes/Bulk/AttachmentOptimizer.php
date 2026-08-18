@@ -13,6 +13,7 @@ use LightweightPlugins\Img\Api\ApiException;
 use LightweightPlugins\Img\Api\Client;
 use LightweightPlugins\Img\Api\OptimizeRequest;
 use LightweightPlugins\Img\Compat\CompetitorRegistry;
+use LightweightPlugins\Img\Db\ImageRepository;
 use LightweightPlugins\Img\Media\AttachmentRebuilder;
 use LightweightPlugins\Img\Media\RewriteBuffer;
 use LightweightPlugins\Img\Media\UrlPairs;
@@ -93,7 +94,7 @@ final class AttachmentOptimizer {
 	 * @return array{result: string, detail: string, bytes_in?: int, bytes_saved?: int, halt?: bool} Outcome and detail; halt=true means the run must stop (API quota exhausted).
 	 */
 	public function optimize( int $attachment_id ): array {
-		if ( get_post_meta( $attachment_id, '_lw_img_optimized', true ) ) {
+		if ( ImageRepository::is_optimized( $attachment_id ) ) {
 			return $this->finish( $attachment_id, self::RESULT_SKIPPED, 'already optimized' );
 		}
 
