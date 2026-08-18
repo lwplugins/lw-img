@@ -42,6 +42,7 @@ final class CompetitorRegistryTest extends MonkeyTestCase {
 			'tinypng legacy'     => [ 'tiny_compress_images', 'TinyPNG (Tinify)' ],
 			'imagify data'       => [ '_imagify_data', 'Imagify' ],
 			'imagify status'     => [ '_imagify_status', 'Imagify' ],
+			'smush'              => [ 'wp-smpro-smush-data', 'Smush' ],
 		];
 	}
 

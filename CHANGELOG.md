@@ -3,8 +3,9 @@
 ## [1.6.2] - 2026-08-18
 
 ### Added
-- Stats tab now also reports leftovers that live *beside* the optimized files, not just in a backup folder: Swift Performance kept the pre-optimization original as `<name>.swift-original`, and those files stay on disk long after that plugin is gone. The leftovers card lists each source with its location (`uploads/ShortpixelBackups`, `uploads/**/*.swift-original`), size and file count, and `wp lw-img status` reports them too
-- The uploads-wide scan is bounded (entry count + wall-clock budget) so it stays cheap on very large libraries; when it stops early the card says "at least X" and explains that the real total is higher
+- Stats tab now reports leftover originals from every optimizer we know, in both shapes they take. Backup folders: ShortPixel (`uploads/ShortpixelBackups`), Imagify (`uploads/backup` and the site-root `imagify-backup`), EWWW (`wp-content/image-backup` — outside uploads). Originals dropped beside each image: Swift Performance (`<name>.swift-original`) and Smush (`<name>.bak.<ext>`). Every path and pattern was verified against that plugin's own source. Each row shows its location, size and file count, on the Stats tab and in `wp lw-img status`
+- The uploads tree is walked exactly once for all beside-the-file patterns, bounded by an entry count and a wall-clock budget; when it stops early the card says "at least X" and explains that the real total is higher
+- Smush-optimized images are now recognized and skipped (postmeta `wp-smpro-smush-data`), and EWWW-optimized ones too — EWWW keeps no postmeta, so its own `{prefix}ewwwio_images` table is consulted (indexed lookup; the table-exists probe runs once per request, so sites without EWWW pay nothing)
 
 ## [1.6.1] - 2026-08-17
 

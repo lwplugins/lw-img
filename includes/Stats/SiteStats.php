@@ -135,30 +135,29 @@ final class SiteStats {
 	}
 
 	/**
-	 * Size and count of files ending in a given suffix, anywhere under a root.
+	 * Find originals other optimizers left *beside* the optimized file.
 	 *
-	 * Unlike a leftover backup *folder*, some optimizers keep the original
-	 * next to the optimized file (Swift Performance wrote "<file>.swift-original"),
-	 * so finding those means walking the whole uploads tree. That is expensive
-	 * on large libraries, so the walk is bounded by an entry count and a wall
-	 * clock budget; when it stops early the result is flagged partial and the
-	 * UI says so rather than reporting a wrong total as fact.
+	 * Some optimizers keep no backup folder: Swift Performance saved
+	 * "<file>.swift-original" and Smush saves "<name>.bak.<ext>" right next
+	 * to the image (both verified against their source). Finding those means
+	 * walking the whole uploads tree, so the tree is walked exactly once and
+	 * every matcher is tested per entry. The walk is bounded by an entry
+	 * count and a wall-clock budget; when it stops early the result is
+	 * flagged partial and the UI says so rather than reporting a truncated
+	 * total as fact.
 	 *
 	 * @param string $root     Absolute directory to walk.
-	 * @param string $suffix   Case-insensitive filename suffix (e.g. '.swift-original').
 	 * @param string $skip_dir Absolute directory to skip (our own backups).
-	 * @return array{bytes: int, files: int, partial: bool}
+	 * @return array{sources: array<string, array{bytes: int, files: int}>, partial: bool}
 	 */
-	public static function suffix_stats( string $root, string $suffix, string $skip_dir = '' ): array {
-		$bytes   = 0;
-		$files   = 0;
+	public static function stray_stats( string $root, string $skip_dir = '' ): array {
+		$sources = [];
 		$entries = 0;
 		$partial = false;
 
 		if ( ! is_dir( $root ) ) {
 			return [
-				'bytes'   => 0,
-				'files'   => 0,
+				'sources' => [],
 				'partial' => false,
 			];
 		}
@@ -198,19 +197,121 @@ final class SiteStats {
 				continue;
 			}
 
-			if ( ! self::has_suffix( $path, $suffix ) || ! $file->isFile() ) {
+			$source = self::classify_stray( $path );
+
+			if ( null === $source || ! $file->isFile() ) {
 				continue;
 			}
 
-			$bytes += (int) $file->getSize();
-			++$files;
+			if ( ! isset( $sources[ $source ] ) ) {
+				$sources[ $source ] = [
+					'bytes' => 0,
+					'files' => 0,
+				];
+			}
+
+			$sources[ $source ]['bytes'] += (int) $file->getSize();
+			++$sources[ $source ]['files'];
 		}
 
 		return [
-			'bytes'   => $bytes,
-			'files'   => $files,
+			'sources' => $sources,
 			'partial' => $partial,
 		];
+	}
+
+	/**
+	 * Originals other optimizers left on disk, by source.
+	 *
+	 * Two shapes exist and both are covered: dedicated backup folders, and
+	 * originals dropped beside each image. All paths were verified against
+	 * each plugin's own source.
+	 *
+	 * @param string $uploads Absolute uploads basedir.
+	 * @return array<string, array{bytes: int, files: int, path: string, partial: bool}>
+	 */
+	private static function leftovers( string $uploads ): array {
+		$leftovers = [];
+
+		$folders = [
+			// ShortPixel: <uploads>/ShortpixelBackups.
+			'ShortPixel' => [ $uploads . '/ShortpixelBackups', 'uploads/ShortpixelBackups' ],
+			// Imagify media library: <uploads>/backup (inc/functions/attachments.php).
+			'Imagify'    => [ $uploads . '/backup', 'uploads/backup' ],
+			// EWWW local backups live in wp-content, not uploads (classes/class-backup.php).
+			'EWWW'       => [ WP_CONTENT_DIR . '/image-backup', 'wp-content/image-backup' ],
+		];
+
+		foreach ( $folders as $name => [ $absolute, $label ] ) {
+			$stats = self::dir_stats( $absolute );
+			if ( $stats['files'] > 0 ) {
+				$leftovers[ $name ] = array_merge(
+					$stats,
+					[
+						'path'    => $label,
+						'partial' => false,
+					]
+				);
+			}
+		}
+
+		// Imagify's custom-folders backup sits at the site root, outside uploads.
+		$imagify_root = self::dir_stats( trailingslashit( ABSPATH ) . 'imagify-backup' );
+		if ( $imagify_root['files'] > 0 ) {
+			$leftovers['Imagify (custom folders)'] = array_merge(
+				$imagify_root,
+				[
+					'path'    => 'imagify-backup',
+					'partial' => false,
+				]
+			);
+		}
+
+		// Optimizers that drop the original beside the file need one walk of
+		// the uploads tree; every matcher is tested during that single pass.
+		$stray = self::stray_stats( $uploads, ( new BackupStore() )->root() );
+
+		$patterns = [
+			'Swift Performance' => 'uploads/**/*.swift-original',
+			'Smush'             => 'uploads/**/*.bak.<ext>',
+		];
+
+		foreach ( (array) $stray['sources'] as $name => $stats ) {
+			$leftovers[ $name ] = array_merge(
+				$stats,
+				[
+					'path'    => $patterns[ $name ] ?? 'uploads',
+					'partial' => (bool) $stray['partial'],
+				]
+			);
+		}
+
+		return $leftovers;
+	}
+
+	/**
+	 * Which optimizer left this file behind, if any.
+	 *
+	 * Patterns verified against each plugin's source:
+	 * - Swift Performance: "<file>.swift-original"
+	 * - Smush: "<name>.bak.<ext>" (core/backups/class-backups.php), restricted
+	 *   to image extensions so an unrelated "notes.bak.txt" is not counted.
+	 *
+	 * @param string $path Absolute file path.
+	 * @return string|null Source label, or null when the file is not a leftover.
+	 */
+	public static function classify_stray( string $path ): ?string {
+		if ( self::has_suffix( $path, '.swift-original' ) ) {
+			return 'Swift Performance';
+		}
+
+		foreach ( [ '.bak.jpg', '.bak.jpeg', '.bak.png', '.bak.gif', '.bak.webp' ] as $bak ) {
+			if ( self::has_suffix( $path, $bak ) ) {
+				return 'Smush';
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -254,29 +355,7 @@ final class SiteStats {
 		$optimized = (int) ( $row->new_sum ?? 0 );
 		$uploads   = (string) wp_get_upload_dir()['basedir'];
 
-		$leftovers = [];
-
-		// Path verified against the ShortPixel source: <uploads>/ShortpixelBackups.
-		$shortpixel = self::dir_stats( $uploads . '/ShortpixelBackups' );
-		if ( $shortpixel['files'] > 0 ) {
-			$leftovers['ShortPixel'] = array_merge(
-				$shortpixel,
-				[
-					'path'    => 'uploads/ShortpixelBackups',
-					'partial' => false,
-				]
-			);
-		}
-
-		// Swift Performance kept the pre-optimization original beside the file
-		// as "<name>.swift-original" instead of in a folder of its own.
-		$swift = self::suffix_stats( $uploads, '.swift-original', ( new BackupStore() )->root() );
-		if ( $swift['files'] > 0 ) {
-			$leftovers['Swift Performance'] = array_merge(
-				$swift,
-				[ 'path' => 'uploads/**/*.swift-original' ]
-			);
-		}
+		$leftovers = self::leftovers( $uploads );
 
 		return [
 			'count'         => (int) ( $row->cnt ?? 0 ),

@@ -36,11 +36,15 @@ final class CompetitorRegistry {
 		'smush'      => [
 			'name'      => 'Smush',
 			'plugin'    => 'wp-smushit/wp-smush.php',
-			'meta_keys' => [],
+			// core/modules/class-smush.php: $smushed_meta_key, also the key
+			// its own uninstall.php deletes.
+			'meta_keys' => [ 'wp-smpro-smush-data' ],
 		],
 		'ewww'       => [
 			'name'      => 'EWWW Image Optimizer',
 			'plugin'    => 'ewww-image-optimizer/ewww-image-optimizer.php',
+			// EWWW keeps no postmeta: optimization records live in its own
+			// {prefix}ewwwio_images table, queried separately below.
 			'meta_keys' => [],
 		],
 	];
@@ -70,7 +74,53 @@ final class CompetitorRegistry {
 			}
 		}
 
+		if ( self::ewww_manages( $attachment_id ) ) {
+			return 'EWWW Image Optimizer';
+		}
+
 		return null;
+	}
+
+	/**
+	 * Whether EWWW already optimized this attachment.
+	 *
+	 * EWWW records optimizations in its own {prefix}ewwwio_images table
+	 * rather than in postmeta, so it needs a lookup of its own. The query
+	 * uses the plugin's own (gallery, attachment_id) index, and the
+	 * table-exists probe is resolved once per request — on sites without
+	 * EWWW this costs a single SHOW TABLES for the whole bulk run.
+	 *
+	 * @param int $attachment_id Attachment post ID.
+	 * @return bool
+	 */
+	private static function ewww_manages( int $attachment_id ): bool {
+		global $wpdb;
+
+		if ( ! is_object( $wpdb ) ) {
+			return false;
+		}
+
+		static $table = null;
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- third-party table probed once per request and named from $wpdb->prefix; values are placeholders. The per-image lookup must stay uncached to reflect EWWW's live state.
+		if ( null === $table ) {
+			$candidate = $wpdb->prefix . 'ewwwio_images';
+			$table     = ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $candidate ) ) === $candidate ) ? $candidate : '';
+		}
+
+		if ( '' === $table ) {
+			return false;
+		}
+
+		$found = (bool) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT id FROM {$table} WHERE attachment_id = %d AND gallery = 'media' AND pending = 0 AND image_size > 0 LIMIT 1",
+				$attachment_id
+			)
+		);
+		// phpcs:enable
+
+		return $found;
 	}
 
 	/**

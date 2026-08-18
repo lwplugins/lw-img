@@ -35,7 +35,7 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 * Tabbed admin: General, Stats, Upload, Bulk, Backup, Tester, and Log
 * Tester tab: environment checks (database table engines, WebP thumbnail support, cron loopback, disk space, API reachability) that catch hosting problems before a bulk run
 * Stats tab: total savings, biggest wins, backup folder size, and originals left behind by other optimizers (ShortPixel backup folders and Swift Performance .swift-original files)
-* Recognizes images already optimized by ShortPixel, TinyPNG, or Imagify and leaves them untouched
+* Recognizes images already optimized by ShortPixel, TinyPNG, Imagify, Smush, or EWWW and leaves them untouched
 * Media Library savings column, "Optimize now" / "Restore original" row actions, attachment info box, Compare, Re-optimize
 * Exclusion patterns (wildcard filename/path rules) and min/max file size limits
 * WP-CLI: wp lw-img status / optimize / restore / requeue
@@ -74,7 +74,8 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 == Changelog ==
 
 = 1.6.2 =
-* New: Stats tab also finds Swift Performance leftovers — the ".swift-original" files that plugin saved next to each optimized image, so you can reclaim that disk space
+* New: Stats tab finds leftover originals from ShortPixel, Imagify, EWWW, Swift Performance and Smush — both backup folders and the originals some of them save next to each image (.swift-original, .bak.jpg) — so you can reclaim that disk space
+* New: images already optimized by Smush or EWWW are recognized and left untouched (previously only ShortPixel, TinyPNG and Imagify were)
 * Note: the uploads scan is bounded on very large libraries; when it stops early the total is shown as "at least"
 
 = 1.6.1 =

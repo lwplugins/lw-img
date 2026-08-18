@@ -76,26 +76,48 @@ final class SiteStatsTest extends MonkeyTestCase {
 		];
 	}
 
-	public function test_suffix_stats_finds_leftover_originals_in_fixtures(): void {
-		$stats = SiteStats::suffix_stats( __DIR__ . '/../../Fixtures', '.swift-original' );
+	/**
+	 * @dataProvider provide_stray_files
+	 */
+	public function test_classify_stray( string $path, ?string $expected ): void {
+		$this->assertSame( $expected, SiteStats::classify_stray( $path ) );
+	}
 
-		$this->assertSame( 1, $stats['files'] );
-		$this->assertGreaterThan( 0, $stats['bytes'] );
+	/**
+	 * @return array<string, array{string, string|null}>
+	 */
+	public static function provide_stray_files(): array {
+		return [
+			'swift original'      => [ '/up/2020/05/photo.jpg.swift-original', 'Swift Performance' ],
+			'smush bak jpg'       => [ '/up/2020/05/photo.bak.jpg', 'Smush' ],
+			'smush bak png upper' => [ '/up/PHOTO.BAK.PNG', 'Smush' ],
+			'smush numbered bak'  => [ '/up/photo-1.bak.webp', 'Smush' ],
+			'plain image'         => [ '/up/2020/05/photo.jpg', null ],
+			'non-image bak'       => [ '/up/notes.bak.txt', null ],
+			'bak in the middle'   => [ '/up/photo.bak.jpg.webp', null ],
+		];
+	}
+
+	public function test_stray_stats_groups_leftovers_by_source(): void {
+		$stats = SiteStats::stray_stats( __DIR__ . '/../../Fixtures' );
+
+		$this->assertSame( 1, $stats['sources']['Swift Performance']['files'] );
+		$this->assertGreaterThan( 0, $stats['sources']['Swift Performance']['bytes'] );
 		$this->assertFalse( $stats['partial'] );
 	}
 
-	public function test_suffix_stats_skips_the_excluded_directory(): void {
+	public function test_stray_stats_skips_the_excluded_directory(): void {
 		$fixtures = __DIR__ . '/../../Fixtures';
 
-		$stats = SiteStats::suffix_stats( $fixtures, '.swift-original', $fixtures );
+		$stats = SiteStats::stray_stats( $fixtures, $fixtures );
 
-		$this->assertSame( 0, $stats['files'] );
+		$this->assertSame( [], $stats['sources'] );
 	}
 
-	public function test_suffix_stats_of_missing_directory_is_empty(): void {
-		$stats = SiteStats::suffix_stats( __DIR__ . '/nope', '.swift-original' );
+	public function test_stray_stats_of_missing_directory_is_empty(): void {
+		$stats = SiteStats::stray_stats( __DIR__ . '/nope' );
 
-		$this->assertSame( 0, $stats['files'] );
+		$this->assertSame( [], $stats['sources'] );
 		$this->assertFalse( $stats['partial'] );
 	}
 }
