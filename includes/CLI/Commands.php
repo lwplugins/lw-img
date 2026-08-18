@@ -67,8 +67,10 @@ final class Commands {
 
 		foreach ( (array) $stats['leftovers'] as $name => $dir ) {
 			$items[] = [
-				'metric' => $name . ' leftover backups',
-				'value'  => size_format( (int) $dir['bytes'] ) . ' / ' . $dir['files'] . ' files',
+				'metric' => $name . ' leftovers',
+				'value'  => ( empty( $dir['partial'] ) ? '' : 'at least ' )
+					. size_format( (int) $dir['bytes'] ) . ' / ' . $dir['files'] . ' files'
+					. ( isset( $dir['path'] ) ? ' (' . $dir['path'] . ')' : '' ),
 			];
 		}
 

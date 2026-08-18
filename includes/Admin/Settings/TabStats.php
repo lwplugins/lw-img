@@ -14,7 +14,8 @@ use LightweightPlugins\Img\Stats\SiteStats;
 
 /**
  * Savings hero with a before/after bar, stat tiles, the biggest wins,
- * a leftover-backup warning, and an empty state pointing to Bulk.
+ * a leftover-originals warning (backup folders and .swift-original files
+ * from other optimizers), and an empty state pointing to Bulk.
  */
 final class TabStats implements TabInterface {
 
@@ -152,9 +153,9 @@ final class TabStats implements TabInterface {
 	}
 
 	/**
-	 * Warning card about other optimizers' leftover backup folders.
+	 * Warning card about other optimizers' leftover originals.
 	 *
-	 * @param array<string, array{bytes: int, files: int}> $leftovers Leftover folders by plugin name.
+	 * @param array<string, array{bytes: int, files: int, path?: string, partial?: bool}> $leftovers Leftovers by plugin name.
 	 * @return void
 	 */
 	private function render_leftovers( array $leftovers ): void {
@@ -162,9 +163,13 @@ final class TabStats implements TabInterface {
 			return;
 		}
 
-		$total = 0;
+		$total   = 0;
+		$partial = false;
 		foreach ( $leftovers as $dir ) {
 			$total += (int) $dir['bytes'];
+			if ( ! empty( $dir['partial'] ) ) {
+				$partial = true;
+			}
 		}
 
 		echo '<h3 class="lw-img-gen-heading">' . esc_html__( 'Leftovers from other optimizers', 'lw-img' ) . '</h3>';
@@ -173,16 +178,20 @@ final class TabStats implements TabInterface {
 		echo '<div>';
 		echo '<strong>' . esc_html(
 			sprintf(
-				/* translators: %s: human-readable size. */
-				__( '%s of old backups found', 'lw-img' ),
+				$partial
+					/* translators: %s: human-readable size. */
+					? __( 'at least %s of old originals found', 'lw-img' )
+					/* translators: %s: human-readable size. */
+					: __( '%s of old originals found', 'lw-img' ),
 				$this->format_bytes( $total )
 			)
 		) . '</strong>';
-		echo '<p>' . esc_html__( 'A previously installed optimizer left its backup folder behind — these files stay on disk even after the plugin is uninstalled. LW Image does not manage or delete them; remove the folder manually if you no longer need those backups.', 'lw-img' ) . '</p>';
+		echo '<p>' . esc_html__( 'A previously installed optimizer left its originals behind — some keep a backup folder, others (e.g. Swift Performance) save the original next to each file. They stay on disk even after that plugin is uninstalled. LW Image does not manage or delete them; remove them manually if you no longer need them.', 'lw-img' ) . '</p>';
 		foreach ( $leftovers as $name => $dir ) {
 			printf(
-				'<span class="lw-img-leftover-row"><code>%1$s</code> %2$s · %3$s</span>',
+				'<span class="lw-img-leftover-row"><strong>%1$s</strong> <code>%2$s</code> %3$s · %4$s</span>',
 				esc_html( (string) $name ),
+				esc_html( (string) ( $dir['path'] ?? '' ) ),
 				esc_html( $this->format_bytes( (int) $dir['bytes'] ) ),
 				esc_html(
 					sprintf(
@@ -193,6 +202,11 @@ final class TabStats implements TabInterface {
 				)
 			);
 		}
+
+		if ( $partial ) {
+			echo '<p class="description">' . esc_html__( 'The scan of the uploads folder stopped early on this large library, so the real total is higher.', 'lw-img' ) . '</p>';
+		}
+
 		echo '</div></div>';
 	}
 

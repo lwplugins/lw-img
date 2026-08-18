@@ -16,16 +16,24 @@ use RecursiveIteratorIterator;
 
 /**
  * Aggregates saved bytes from the attachment meta and measures backup
- * directories on disk — including leftover folders from other optimizers
- * (currently ShortPixel, whose path is verified against its source), so
- * users learn about forgotten backups even when that plugin is gone.
- * Results are cached for an hour; the Stats tab offers a refresh.
+ * storage on disk — including originals left behind by other optimizers,
+ * so users learn about forgotten files even when that plugin is gone.
+ * Two shapes are covered: a backup folder (ShortPixel's
+ * <uploads>/ShortpixelBackups) and originals kept beside each file
+ * (Swift Performance's "<name>.swift-original"). Results are cached for
+ * an hour; the Stats tab offers a refresh.
  */
 final class SiteStats {
 
 	public const REFRESH_ACTION = 'lw_img_refresh_stats';
 
 	private const CACHE_KEY = 'lw_img_stats';
+
+	/**
+	 * Bounds for the uploads-wide leftover scan (see suffix_stats()).
+	 */
+	private const SCAN_MAX_ENTRIES = 250000;
+	private const SCAN_MAX_SECONDS = 5;
 
 	/**
 	 * Hook the refresh action.
@@ -101,7 +109,9 @@ final class SiteStats {
 
 		if ( is_dir( $path ) ) {
 			$iterator = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator( $path, FilesystemIterator::SKIP_DOTS )
+				new RecursiveDirectoryIterator( $path, FilesystemIterator::SKIP_DOTS ),
+				RecursiveIteratorIterator::LEAVES_ONLY,
+				RecursiveIteratorIterator::CATCH_GET_CHILD
 			);
 
 			foreach ( $iterator as $file ) {
@@ -116,6 +126,100 @@ final class SiteStats {
 			'bytes' => $bytes,
 			'files' => $files,
 		];
+	}
+
+	/**
+	 * Size and count of files ending in a given suffix, anywhere under a root.
+	 *
+	 * Unlike a leftover backup *folder*, some optimizers keep the original
+	 * next to the optimized file (Swift Performance wrote "<file>.swift-original"),
+	 * so finding those means walking the whole uploads tree. That is expensive
+	 * on large libraries, so the walk is bounded by an entry count and a wall
+	 * clock budget; when it stops early the result is flagged partial and the
+	 * UI says so rather than reporting a wrong total as fact.
+	 *
+	 * @param string $root     Absolute directory to walk.
+	 * @param string $suffix   Case-insensitive filename suffix (e.g. '.swift-original').
+	 * @param string $skip_dir Absolute directory to skip (our own backups).
+	 * @return array{bytes: int, files: int, partial: bool}
+	 */
+	public static function suffix_stats( string $root, string $suffix, string $skip_dir = '' ): array {
+		$bytes   = 0;
+		$files   = 0;
+		$entries = 0;
+		$partial = false;
+
+		if ( ! is_dir( $root ) ) {
+			return [
+				'bytes'   => 0,
+				'files'   => 0,
+				'partial' => false,
+			];
+		}
+
+		// Resolve both sides once so the per-file prefix test below is exact
+		// (the iterator yields paths built from $root, unresolved), instead of
+		// paying a realpath() syscall per entry.
+		$real_root = realpath( $root );
+		$root      = false === $real_root ? $root : $real_root;
+
+		if ( '' !== $skip_dir ) {
+			$real_skip = realpath( $skip_dir );
+			$skip_dir  = false === $real_skip ? $skip_dir : $real_skip;
+		}
+
+		$deadline = time() + self::SCAN_MAX_SECONDS;
+
+		$iterator = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator( $root, FilesystemIterator::SKIP_DOTS ),
+			RecursiveIteratorIterator::LEAVES_ONLY,
+			RecursiveIteratorIterator::CATCH_GET_CHILD
+		);
+
+		foreach ( $iterator as $file ) {
+			++$entries;
+
+			if ( $entries > self::SCAN_MAX_ENTRIES || time() > $deadline ) {
+				$partial = true;
+				break;
+			}
+
+			$path = (string) $file->getPathname();
+
+			if ( '' !== $skip_dir && str_starts_with( $path, $skip_dir ) ) {
+				continue;
+			}
+
+			if ( ! self::has_suffix( $path, $suffix ) || ! $file->isFile() ) {
+				continue;
+			}
+
+			$bytes += (int) $file->getSize();
+			++$files;
+		}
+
+		return [
+			'bytes'   => $bytes,
+			'files'   => $files,
+			'partial' => $partial,
+		];
+	}
+
+	/**
+	 * Case-insensitive "filename ends with this suffix" test.
+	 *
+	 * @param string $path   Path or filename.
+	 * @param string $suffix Suffix to match (e.g. '.swift-original').
+	 * @return bool
+	 */
+	public static function has_suffix( string $path, string $suffix ): bool {
+		$length = strlen( $suffix );
+
+		if ( 0 === $length || strlen( $path ) <= $length ) {
+			return false;
+		}
+
+		return 0 === substr_compare( $path, $suffix, -$length, $length, true );
 	}
 
 	/**
@@ -143,10 +247,27 @@ final class SiteStats {
 		$uploads   = (string) wp_get_upload_dir()['basedir'];
 
 		$leftovers = [];
+
 		// Path verified against the ShortPixel source: <uploads>/ShortpixelBackups.
 		$shortpixel = self::dir_stats( $uploads . '/ShortpixelBackups' );
 		if ( $shortpixel['files'] > 0 ) {
-			$leftovers['ShortPixel'] = $shortpixel;
+			$leftovers['ShortPixel'] = array_merge(
+				$shortpixel,
+				[
+					'path'    => 'uploads/ShortpixelBackups',
+					'partial' => false,
+				]
+			);
+		}
+
+		// Swift Performance kept the pre-optimization original beside the file
+		// as "<name>.swift-original" instead of in a folder of its own.
+		$swift = self::suffix_stats( $uploads, '.swift-original', ( new BackupStore() )->root() );
+		if ( $swift['files'] > 0 ) {
+			$leftovers['Swift Performance'] = array_merge(
+				$swift,
+				[ 'path' => 'uploads/**/*.swift-original' ]
+			);
 		}
 
 		return [

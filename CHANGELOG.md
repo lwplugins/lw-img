@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.2] - 2026-08-18
+
+### Added
+- Stats tab now also reports leftovers that live *beside* the optimized files, not just in a backup folder: Swift Performance kept the pre-optimization original as `<name>.swift-original`, and those files stay on disk long after that plugin is gone. The leftovers card lists each source with its location (`uploads/ShortpixelBackups`, `uploads/**/*.swift-original`), size and file count, and `wp lw-img status` reports them too
+- The uploads-wide scan is bounded (entry count + wall-clock budget) so it stays cheap on very large libraries; when it stops early the card says "at least X" and explains that the real total is higher
+
 ## [1.6.1] - 2026-08-17
 
 ### Security

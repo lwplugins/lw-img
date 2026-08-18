@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,7 +34,7 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 * Content URL rewrite on bulk convert/restore (post content + page-builder data, serialization-aware) plus a 301 redirect from old image URLs
 * Tabbed admin: General, Stats, Upload, Bulk, Backup, Tester, and Log
 * Tester tab: environment checks (database table engines, WebP thumbnail support, cron loopback, disk space, API reachability) that catch hosting problems before a bulk run
-* Stats tab: total savings, biggest wins, backup folder size, and leftover backup folders from other optimizers
+* Stats tab: total savings, biggest wins, backup folder size, and originals left behind by other optimizers (ShortPixel backup folders and Swift Performance .swift-original files)
 * Recognizes images already optimized by ShortPixel, TinyPNG, or Imagify and leaves them untouched
 * Media Library savings column, "Optimize now" / "Restore original" row actions, attachment info box, Compare, Re-optimize
 * Exclusion patterns (wildcard filename/path rules) and min/max file size limits
@@ -72,6 +72,10 @@ Yes — use the Bulk tab (or `wp lw-img optimize --all`). The run happens in the
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.6.2 =
+* New: Stats tab also finds Swift Performance leftovers — the ".swift-original" files that plugin saved next to each optimized image, so you can reclaim that disk space
+* Note: the uploads scan is bounded on very large libraries; when it stops early the total is shown as "at least"
 
 = 1.6.1 =
 * Security: prevent cross-extension overwrite — a converted upload can no longer overwrite an unrelated attachment's file (wp_unique_filename on the target)
