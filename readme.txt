@@ -2,9 +2,9 @@
 Contributors: lwplugins
 Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,9 @@ Yes — use the Bulk tab (or `wp lw-img optimize --all`). The run happens in the
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.7.1 =
+* Update: Tested up to WordPress 7.1.
 
 = 1.7.0 =
 * Security: the redirect for missing images could be made to run an expensive, unindexed database lookup by anyone requesting a non-existent image URL — it is now rate-limited
