@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.8.1] - 2026-08-22
+## [1.8.1] - 2026-08-23
 
 ### Fixed
 - WordPress 7.1's client-side uploads no longer spend one API call per thumbnail. The browser generates every sub-size itself; each one used to pass through the conversion pipeline individually — measured at 3 calls for a 2-size upload and ~11 on a typical store. The per-thumbnail sideload requests are now recognised and skipped, and an `image_editor_output_format` mapping — active only on WordPress 7.1 with a configured API key — tells the browser to produce the thumbnails in the plugin's output format locally, so a browser upload is back to exactly one API call with format-matched thumbnails. URL-sideloaded primary images (importers) still convert
