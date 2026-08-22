@@ -41,6 +41,7 @@ final class CropSchedulerTest extends MonkeyTestCase {
 			static fn ( $args, $defaults ) => array_merge( (array) $defaults, (array) $args )
 		);
 		Functions\when( 'get_attached_file' )->justReturn( '/uploads/2026/08/photo.webp' );
+		Functions\when( 'get_post_meta' )->justReturn( '' );
 	}
 
 	protected function tearDown(): void {
@@ -56,8 +57,59 @@ final class CropSchedulerTest extends MonkeyTestCase {
 			->once()
 			->with( \Mockery::type( 'int' ), CropScheduler::HOOK, [ 42 ] );
 
-		$metadata = [ 'sizes' => [] ];
+		$metadata = [ 'sizes' => [ 'thumbnail' => [ 'file' => 'a-150x150.webp' ] ] ];
 		$this->assertSame( $metadata, CropScheduler::maybe_schedule( $metadata, 42 ) );
+	}
+
+	public function test_create_pass_with_empty_sizes_writes_the_marker_instead_of_scheduling(): void {
+		CropScheduler::record( '/uploads/2026/08/photo.webp' );
+		Functions\expect( 'wp_schedule_single_event' )->never();
+		Functions\expect( 'update_post_meta' )
+			->once()
+			->with( 42, CropScheduler::PENDING_META, 1 );
+
+		$metadata = [ 'sizes' => [] ];
+		$this->assertSame( $metadata, CropScheduler::maybe_schedule( $metadata, 42, 'create' ) );
+	}
+
+	public function test_update_pass_with_marker_schedules_and_clears_it(): void {
+		Functions\when( 'get_post_meta' )->justReturn( 1 );
+		Functions\expect( 'wp_schedule_single_event' )
+			->once()
+			->with( \Mockery::type( 'int' ), CropScheduler::HOOK, [ 42 ] );
+		Functions\expect( 'delete_post_meta' )
+			->once()
+			->with( 42, CropScheduler::PENDING_META );
+
+		$metadata = [ 'sizes' => [ 'thumbnail' => [ 'file' => 'a-150x150.webp' ] ] ];
+		$this->assertSame( $metadata, CropScheduler::maybe_schedule( $metadata, 42, 'update' ) );
+	}
+
+	public function test_update_pass_without_marker_does_nothing(): void {
+		Functions\when( 'get_post_meta' )->justReturn( '' );
+		Functions\expect( 'wp_schedule_single_event' )->never();
+
+		CropScheduler::maybe_schedule( [ 'sizes' => [] ], 42, 'update' );
+	}
+
+	public function test_update_pass_respects_the_disabled_toggle(): void {
+		\LightweightPlugins\Img\Options::clear_cache();
+		Functions\when( 'get_option' )->alias(
+			static function ( string $name, $fallback = false ) {
+				if ( 'lw_img_options' === $name ) {
+					return [
+						'auto_convert'      => true,
+						'smartcrop_enabled' => false,
+						'smartcrop_sizes'   => [ 'thumbnail' ],
+					];
+				}
+				return $fallback;
+			}
+		);
+		Functions\when( 'get_post_meta' )->justReturn( 1 );
+		Functions\expect( 'wp_schedule_single_event' )->never();
+
+		CropScheduler::maybe_schedule( [ 'sizes' => [] ], 42, 'update' );
 	}
 
 	public function test_an_empty_registry_schedules_nothing(): void {
@@ -131,7 +183,7 @@ final class CropSchedulerTest extends MonkeyTestCase {
 			->with( \Mockery::type( 'int' ), CropScheduler::HOOK, [ 42 ] );
 
 		$metadata = [
-			'sizes'          => [],
+			'sizes'          => [ 'thumbnail' => [ 'file' => 'a-150x150.webp' ] ],
 			'original_image' => 'photo.webp',
 		];
 		$this->assertSame( $metadata, CropScheduler::maybe_schedule( $metadata, 42 ) );
