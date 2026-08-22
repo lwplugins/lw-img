@@ -3,7 +3,7 @@
  * Plugin Name:       LW Image
  * Plugin URI:        https://github.com/lwplugins/lw-img
  * Description:       Lightweight image optimization — auto-convert WordPress uploads to WebP via the HelloImg API. No bloat, no upsell.
- * Version:           1.7.1
+ * Version:           1.7.2
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            LW Plugins
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LW_IMG_VERSION', '1.7.1' );
+define( 'LW_IMG_VERSION', '1.7.2' );
 define( 'LW_IMG_FILE', __FILE__ );
 define( 'LW_IMG_PATH', plugin_dir_path( __FILE__ ) );
 define( 'LW_IMG_URL', plugin_dir_url( __FILE__ ) );

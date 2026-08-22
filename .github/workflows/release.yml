@@ -74,9 +74,7 @@ jobs:
           tag_name: v${{ steps.get_version.outputs.version }}
           name: v${{ steps.get_version.outputs.version }}
           body: |
-            ## LW Img v${{ steps.get_version.outputs.version }}
-
-            > ⚠️ **Under active development** — not yet recommended for production sites.
+            ## LW Image v${{ steps.get_version.outputs.version }}
 
             See [readme.txt](https://github.com/lwplugins/lw-img/blob/main/readme.txt) for changelog.
           files: |

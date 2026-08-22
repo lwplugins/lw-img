@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.2] - 2026-08-22
+
+### Changed
+- LW Image is out of pre-release. The "under active development, not yet recommended for production sites" notice is removed from `README.md`, `readme.txt` and the release-notes template, and the release title uses the display name the plugin has carried since 1.6.0 (LW Image, not LW Img)
+- Earlier changelog entries keep their original wording: what they say about the plugin's state was true when they were written, and rewriting them would make the record wrong
+
 ## [1.7.1] - 2026-08-20
 
 ### Changed

@@ -1,7 +1,5 @@
 # LW Image
 
-**Note:** LW Image is under active development and not yet recommended for use on production sites.
-
 Lightweight image optimization for WordPress — auto-convert uploads to WebP via the [HelloImg](https://helloimg.io) API. No bloat, no upsell, no tracking.
 
 ## What it does
