@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.8.0
+Stable tag: 1.8.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,12 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.8.1 =
+* Fix: WordPress 7.1's client-side uploads no longer spend one API call per thumbnail. The browser generates every sub-size itself; each one used to pass through the conversion pipeline individually — measured at 3 calls for a 2-size upload and ~11 on a typical store. The per-thumbnail sideload requests are now recognised and skipped, and an image_editor_output_format mapping tells the browser to produce the thumbnails in the plugin's output format locally, so a browser upload is back to exactly one API call with format-matched thumbnails. URL-sideloaded primary images (importers) still convert
+* Fix: Smart crops now run reliably on client-side uploads: scheduling used to race the browser's thumbnail sideloads (the metadata pass fires before the sizes exist); a marker now carries the job to the finalize pass, where every size is present. If finalize never fires (core treats it as best-effort), wp lw-img smartcrop re-crops on demand
+* Change: The open-beta wording is gone; dashboard links now point at app.helloimg.io and go through the new lw_img_dashboard_url filter, so integrators can white-label the destination
+* Change: sub-size file names are sanitized before filesystem operations (hardening)
 
 = 1.8.0 =
 * New: smart crop — opt-in subject-aware re-cropping of the hard-cropped thumbnail sizes you select, on new uploads. Runs in the background, never blocks an upload, and shows its per-upload API cost before you enable it
