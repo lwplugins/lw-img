@@ -79,7 +79,10 @@ final class CropScheduler {
 	 *
 	 * Runs on wp_generate_attachment_metadata, which also fires on restore,
 	 * re-optimize and thumbnail regeneration — the registry check is what
-	 * limits this to genuine new uploads (see the class docblock).
+	 * limits this to genuine new uploads (see the class docblock). Also
+	 * falls back to the metadata's original_image sibling, because core
+	 * rewrites the attached file for scaled, rotated or format-converted
+	 * images between the wp_handle_upload and this filter.
 	 *
 	 * @param mixed $metadata      Generated attachment metadata (passed through).
 	 * @param int   $attachment_id Attachment post ID.
@@ -98,7 +101,14 @@ final class CropScheduler {
 			return $metadata;
 		}
 
-		if ( ! self::is_recorded( (string) get_attached_file( $attachment_id ) ) ) {
+		$attached = (string) get_attached_file( $attachment_id );
+		$recorded = self::is_recorded( $attached );
+
+		if ( ! $recorded && ! empty( $metadata['original_image'] ) ) {
+			$recorded = self::is_recorded( dirname( $attached ) . '/' . (string) $metadata['original_image'] );
+		}
+
+		if ( ! $recorded ) {
 			return $metadata;
 		}
 

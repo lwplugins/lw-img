@@ -116,4 +116,45 @@ final class CropSchedulerTest extends MonkeyTestCase {
 
 		$this->assertFalse( CropScheduler::maybe_schedule( false, 42 ) );
 	}
+
+	public function test_falls_back_to_original_image_sibling_when_core_rewrote_attached_file(): void {
+		// Core rewrites _wp_attached_file between wp_handle_upload and this
+		// filter for -scaled/-rotated/converted images; get_attached_file()
+		// now returns a sibling path the registry never saw. The metadata's
+		// original_image carries the pre-rewrite basename, which IS what was
+		// recorded.
+		Functions\when( 'get_attached_file' )->justReturn( '/uploads/2026/08/photo-scaled.webp' );
+		CropScheduler::record( '/uploads/2026/08/photo.webp' );
+
+		Functions\expect( 'wp_schedule_single_event' )
+			->once()
+			->with( \Mockery::type( 'int' ), CropScheduler::HOOK, [ 42 ] );
+
+		$metadata = [
+			'sizes'          => [],
+			'original_image' => 'photo.webp',
+		];
+		$this->assertSame( $metadata, CropScheduler::maybe_schedule( $metadata, 42 ) );
+	}
+
+	public function test_auto_convert_disabled_schedules_nothing(): void {
+		\LightweightPlugins\Img\Options::clear_cache();
+		Functions\when( 'get_option' )->alias(
+			static function ( string $name, $fallback = false ) {
+				if ( 'lw_img_options' === $name ) {
+					return [
+						'auto_convert'      => false,
+						'smartcrop_enabled' => true,
+						'smartcrop_sizes'   => [ 'thumbnail' ],
+					];
+				}
+				return $fallback;
+			}
+		);
+		CropScheduler::record( '/uploads/2026/08/photo.webp' );
+		Functions\expect( 'wp_schedule_single_event' )->never();
+
+		$metadata = [ 'sizes' => [] ];
+		$this->assertSame( $metadata, CropScheduler::maybe_schedule( $metadata, 42 ) );
+	}
 }

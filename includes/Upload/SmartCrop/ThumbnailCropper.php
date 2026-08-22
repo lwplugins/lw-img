@@ -178,7 +178,10 @@ final class ThumbnailCropper {
 		$tmp = $path . '.lwtmp';
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- writing inside the uploads dir; WP_Filesystem adds nothing here.
-		if ( false === file_put_contents( $tmp, $bytes ) ) {
+		$written = file_put_contents( $tmp, $bytes );
+
+		if ( false === $written || strlen( $bytes ) !== $written ) {
+			wp_delete_file( $tmp );
 			throw new \RuntimeException( 'could not write the cropped file' );
 		}
 

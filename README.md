@@ -14,6 +14,7 @@ When a non-WebP image is uploaded to WordPress, LW Image sends it to the HelloIm
 - API failure → original kept (nothing ever fails because of LW Image)
 - Original backups (`uploads/lw-img-backups/`, on by default), restorable from the Media Library — thumbnails are regenerated on restore
 - Backup retention: daily cleanup after the configured days (default 30, `0` = keep forever)
+- Smart crop (opt-in): re-crop selected hard-cropped thumbnail sizes around the subject instead of the centre — you pick the sizes and see the per-upload API cost before enabling
 
 ## Bulk & scale
 
