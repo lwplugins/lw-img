@@ -85,7 +85,8 @@ final class ThumbnailCropper {
 		foreach ( $jobs as $job ) {
 			try {
 				$bytes = $this->cropped_bytes( $main, $job, $convert, $level, $keep_exif );
-				$this->swap_file( $directory . '/' . $job['file'], $bytes );
+				// Guard: metadata file values are basenames, but enforce at filesystem use.
+				$this->swap_file( $directory . '/' . wp_basename( $job['file'] ), $bytes );
 
 				if ( isset( $metadata['sizes'][ $job['name'] ]['filesize'] ) ) {
 					$metadata['sizes'][ $job['name'] ]['filesize'] = strlen( $bytes );
