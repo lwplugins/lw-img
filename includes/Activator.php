@@ -27,6 +27,7 @@ final class Activator {
 	public static function deactivate(): void {
 		\LightweightPlugins\Img\Backup\RetentionCleaner::unschedule();
 		\LightweightPlugins\Img\Bulk\BackgroundWorker::unschedule();
+		wp_unschedule_hook( \LightweightPlugins\Img\Upload\SmartCrop\CropScheduler::HOOK );
 		if ( \LightweightPlugins\Img\Bulk\BulkJob::is_running() ) {
 			\LightweightPlugins\Img\Bulk\BulkJob::finish( \LightweightPlugins\Img\Bulk\BulkJob::STATE_CANCELLED );
 		}

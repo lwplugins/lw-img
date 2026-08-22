@@ -24,6 +24,7 @@ delete_transient( 'lw_img_pending_count' );
 
 wp_clear_scheduled_hook( 'lw_img_backup_cleanup' );
 wp_clear_scheduled_hook( 'lw_img_bulk_tick' );
+wp_unschedule_hook( 'lw_img_smart_crop' );
 
 global $wpdb;
 

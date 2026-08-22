@@ -32,6 +32,7 @@ use LightweightPlugins\Img\Media\NotFoundRedirect;
 use LightweightPlugins\Img\Media\RowActions;
 use LightweightPlugins\Img\Media\SavingsColumn;
 use LightweightPlugins\Img\Stats\SiteStats;
+use LightweightPlugins\Img\Upload\SmartCrop\CropScheduler;
 use LightweightPlugins\Img\Upload\UploadInterceptor;
 
 /**
@@ -55,6 +56,7 @@ final class Plugin {
 		RetentionCleaner::register();
 		AttachmentDeleteCleanup::register();
 		BackgroundWorker::register();
+		CropScheduler::register();
 		NotFoundRedirect::register();
 		new UploadInterceptor();
 
