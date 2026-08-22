@@ -79,26 +79,7 @@ final class ConvertibleDetector {
 			return false;
 		}
 
-		$patterns = (array) Options::get( 'exclusion_patterns' );
-		if ( [] !== $patterns && $this->exclusions->matches( $file_path, $patterns ) ) {
-			return false;
-		}
-
-		if ( ! is_readable( $file_path ) ) {
-			return false;
-		}
-
-		$max_bytes = ( (int) Options::get( 'max_filesize_mb' ) ) * 1024 * 1024;
-		if ( $max_bytes > 0 && filesize( $file_path ) > $max_bytes ) {
-			return false;
-		}
-
-		$min_bytes = ( (int) Options::get( 'min_filesize_kb' ) ) * 1024;
-		if ( $min_bytes > 0 && filesize( $file_path ) < $min_bytes ) {
-			return false;
-		}
-
-		return true;
+		return null === $this->file_rules_reason( $file_path );
 	}
 
 	private function passes_common_rules( string $file_path, string $mime_type ): bool {
@@ -119,23 +100,9 @@ final class ConvertibleDetector {
 			return $this->skip( $file_path, 'mime not in allowed list' );
 		}
 
-		$patterns = (array) Options::get( 'exclusion_patterns' );
-		if ( [] !== $patterns && $this->exclusions->matches( $file_path, $patterns ) ) {
-			return $this->skip( $file_path, 'excluded by pattern' );
-		}
-
-		if ( ! is_readable( $file_path ) ) {
-			return $this->skip( $file_path, 'file not readable' );
-		}
-
-		$max_bytes = ( (int) Options::get( 'max_filesize_mb' ) ) * 1024 * 1024;
-		if ( $max_bytes > 0 && filesize( $file_path ) > $max_bytes ) {
-			return $this->skip( $file_path, 'exceeds max_filesize_mb' );
-		}
-
-		$min_bytes = ( (int) Options::get( 'min_filesize_kb' ) ) * 1024;
-		if ( $min_bytes > 0 && filesize( $file_path ) < $min_bytes ) {
-			return $this->skip( $file_path, 'below min_filesize_kb' );
+		$reason = $this->file_rules_reason( $file_path );
+		if ( null !== $reason ) {
+			return $this->skip( $file_path, $reason );
 		}
 
 		if ( Options::get( 'skip_animated_gif' ) && 'image/gif' === $mime_type && AnimatedGifProbe::is_animated( $file_path ) ) {
@@ -143,6 +110,39 @@ final class ConvertibleDetector {
 		}
 
 		return (bool) apply_filters( 'lw_img_should_convert', true, $file_path, $mime_type );
+	}
+
+	/**
+	 * The file-level rules shared by should_convert()/should_convert_on_demand()
+	 * (via passes_common_rules()) and smart_crop_eligible(): exclusion patterns,
+	 * readability, and the min/max size window. Mime-scope checks stay in each
+	 * caller — they legitimately differ (smart_crop_eligible ORs in
+	 * SKIP_TYPES; passes_common_rules excludes them).
+	 *
+	 * @param string $file_path Absolute file path.
+	 * @return string|null Skip reason, or null when the file passes all rules.
+	 */
+	private function file_rules_reason( string $file_path ): ?string {
+		$patterns = (array) Options::get( 'exclusion_patterns' );
+		if ( [] !== $patterns && $this->exclusions->matches( $file_path, $patterns ) ) {
+			return 'excluded by pattern';
+		}
+
+		if ( ! is_readable( $file_path ) ) {
+			return 'file not readable';
+		}
+
+		$max_bytes = ( (int) Options::get( 'max_filesize_mb' ) ) * 1024 * 1024;
+		if ( $max_bytes > 0 && filesize( $file_path ) > $max_bytes ) {
+			return 'exceeds max_filesize_mb';
+		}
+
+		$min_bytes = ( (int) Options::get( 'min_filesize_kb' ) ) * 1024;
+		if ( $min_bytes > 0 && filesize( $file_path ) < $min_bytes ) {
+			return 'below min_filesize_kb';
+		}
+
+		return null;
 	}
 
 	private function skip( string $file_path, string $reason ): bool {
