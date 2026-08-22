@@ -6,6 +6,7 @@
 - Smart crop: opt-in, subject-aware re-cropping of hard-cropped thumbnail sizes on new uploads. WordPress cuts every such thumbnail out of the geometric centre; with smart crop enabled, the selected sizes are re-derived from the full original around the subject instead. The user picks which registered crop sizes take part, and the Upload tab shows the resulting cost ("1 + 2 = 3 API calls per upload") before anything is spent
 - The crops run in the background right after the upload finishes, never block or fail the upload, and overwrite the thumbnail file in place — same name, same dimensions — so nothing else (URLs, redirects, backups) is affected. Restoring an original still brings back plain WordPress thumbnails
 - Per-size failures keep the WordPress thumbnail and are logged; a quota error stops the remaining sizes instead of burning attempts
+- `wp lw-img smartcrop <id>...` / `--all` re-crops existing images — the way to redo crops a restore or a thumbnail regeneration removed. Supports `--sizes` to override the saved selection for the run, `--dry-run` to list the planned jobs and total API calls without spending anything, and `--yes` to skip the confirmation prompt with `--all`; a quota error halts the whole run instead of failing one image at a time
 
 ## [1.7.2] - 2026-08-22
 

@@ -46,23 +46,29 @@ final class ThumbnailCropper {
 	 * ago; nothing here can affect it.
 	 *
 	 * @param int $attachment_id Attachment post ID.
-	 * @return void
+	 * @return array{cropped: int, failed: int, halted: bool} Outcome summary.
 	 */
-	public function crop( int $attachment_id ): void {
+	public function crop( int $attachment_id ): array {
+		$summary = [
+			'cropped' => 0,
+			'failed'  => 0,
+			'halted'  => false,
+		];
+
 		$main = (string) get_attached_file( $attachment_id );
 		if ( '' === $main || ! file_exists( $main ) || '' === (string) Options::get( 'api_key' ) ) {
-			return;
+			return $summary;
 		}
 
 		$convert = self::convert_target_for( $main );
 		if ( null === $convert ) {
 			Logger::debug( 'smart crop: unsupported main format', [ 'file' => $main ] );
-			return;
+			return $summary;
 		}
 
 		$metadata = wp_get_attachment_metadata( $attachment_id );
 		if ( ! is_array( $metadata ) ) {
-			return;
+			return $summary;
 		}
 
 		$jobs = SizeCatalog::jobs(
@@ -85,13 +91,17 @@ final class ThumbnailCropper {
 					$metadata['sizes'][ $job['name'] ]['filesize'] = strlen( $bytes );
 				}
 				$updated = true;
+				++$summary['cropped'];
 			} catch ( ApiException $e ) {
 				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: ' . $e->getMessage() );
+				++$summary['failed'];
 				if ( $e->is_quota() ) {
+					$summary['halted'] = true;
 					break;
 				}
 			} catch ( Throwable $e ) {
 				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: ' . $e->getMessage() );
+				++$summary['failed'];
 			}
 		}
 
@@ -99,6 +109,8 @@ final class ThumbnailCropper {
 			wp_update_attachment_metadata( $attachment_id, $metadata );
 			Logger::debug( 'smart crop done', [ 'attachment' => $attachment_id ] );
 		}
+
+		return $summary;
 	}
 
 	/**

@@ -21,6 +21,7 @@ use LightweightPlugins\Img\Bulk\OptimizeHandler;
 use LightweightPlugins\Img\Bulk\ReoptimizeHandler;
 use LightweightPlugins\Img\Bulk\StatusEndpoint;
 use LightweightPlugins\Img\CLI\Commands as CLICommands;
+use LightweightPlugins\Img\CLI\SmartCropCommand;
 use LightweightPlugins\Img\Compat\CompetitorNotice;
 use LightweightPlugins\Img\Db\Schema;
 use LightweightPlugins\Img\Health\HealthReport;
@@ -79,6 +80,7 @@ final class Plugin {
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			\WP_CLI::add_command( 'lw-img', CLICommands::class );
+			\WP_CLI::add_command( 'lw-img smartcrop', SmartCropCommand::class );
 		}
 	}
 

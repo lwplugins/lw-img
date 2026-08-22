@@ -37,7 +37,7 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 * Recognizes images already optimized by ShortPixel, TinyPNG, Imagify, Smush, or EWWW and leaves them untouched
 * Media Library savings column, "Optimize now" / "Restore original" row actions, attachment info box, Compare, Re-optimize
 * Exclusion patterns (wildcard filename/path rules) and min/max file size limits
-* WP-CLI: wp lw-img status / optimize / restore / requeue / leftovers
+* WP-CLI: wp lw-img status / optimize / restore / requeue / leftovers / smartcrop
 
 **Roadmap:**
 
@@ -67,7 +67,7 @@ Yes — use the Bulk tab (or `wp lw-img optimize --all`). The run happens in the
 
 = What does smart crop cost? =
 
-One extra API call per selected size per upload — the Upload tab shows the exact multiplier as you pick sizes. Sizes that keep the aspect ratio never appear in the list: nothing is cut off them, so a plain resize gives the same result. If a crop fails, the normal WordPress thumbnail simply stays in place.
+One extra API call per selected size per upload — the Upload tab shows the exact multiplier as you pick sizes. Sizes that keep the aspect ratio never appear in the list: nothing is cut off them, so a plain resize gives the same result. If a crop fails, the normal WordPress thumbnail simply stays in place. Crops removed by a restore or a thumbnail regeneration can be redone with `wp lw-img smartcrop <id>` (or `--all`).
 
 = Is there a free tier? =
 
@@ -78,6 +78,7 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 = 1.8.0 =
 * New: smart crop — opt-in subject-aware re-cropping of the hard-cropped thumbnail sizes you select, on new uploads. Runs in the background, never blocks an upload, and shows its per-upload API cost before you enable it
 * New: per-size failures keep the WordPress thumbnail; a quota error stops the remaining sizes
+* New: wp lw-img smartcrop — re-crop existing images by ID or --all, with --sizes override and --dry-run
 
 = 1.7.2 =
 * Change: LW Image is out of pre-release. The "under active development" notice is gone from the readme, the README and every future release note
