@@ -33,6 +33,7 @@ use LightweightPlugins\Img\Media\NotFoundRedirect;
 use LightweightPlugins\Img\Media\RowActions;
 use LightweightPlugins\Img\Media\SavingsColumn;
 use LightweightPlugins\Img\Stats\SiteStats;
+use LightweightPlugins\Img\Upload\OutputFormatMap;
 use LightweightPlugins\Img\Upload\SmartCrop\CropScheduler;
 use LightweightPlugins\Img\Upload\UploadInterceptor;
 
@@ -59,6 +60,7 @@ final class Plugin {
 		BackgroundWorker::register();
 		CropScheduler::register();
 		NotFoundRedirect::register();
+		OutputFormatMap::register();
 		new UploadInterceptor();
 
 		if ( is_admin() ) {
