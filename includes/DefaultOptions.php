@@ -64,6 +64,8 @@ final class DefaultOptions {
 			'bulk_speed'              => 'normal',
 			'debug_mode'              => false,
 			'enable_log'              => true,
+			'smartcrop_enabled'       => false,
+			'smartcrop_sizes'         => [],
 		];
 	}
 }

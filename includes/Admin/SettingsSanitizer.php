@@ -58,6 +58,10 @@ final class SettingsSanitizer {
 			return self::sanitize_patterns( $value );
 		}
 
+		if ( 'smartcrop_sizes' === $key ) {
+			return self::sanitize_size_names( $value );
+		}
+
 		if ( is_bool( $default ) ) {
 			return ! empty( $value );
 		}
@@ -118,5 +122,30 @@ final class SettingsSanitizer {
 		);
 
 		return array_values( array_filter( $patterns, static fn ( string $pattern ): bool => '' !== $pattern ) );
+	}
+
+	/**
+	 * Normalize the smart-crop size selection into a clean list of size names.
+	 *
+	 * The checkbox group posts a hidden empty string when nothing is checked,
+	 * so '' deliberately means "none selected" rather than "keep the old
+	 * value". Names are sanitize_key'd only — they are NOT validated against
+	 * the live size registry, because themes change: a stale name simply
+	 * never matches at crop time.
+	 *
+	 * @param mixed $value Submitted value: array of names, or '' for none.
+	 * @return array<int, string>
+	 */
+	private static function sanitize_size_names( mixed $value ): array {
+		if ( ! is_array( $value ) ) {
+			return [];
+		}
+
+		$names = array_map(
+			static fn ( $name ): string => sanitize_key( (string) $name ),
+			$value
+		);
+
+		return array_values( array_filter( $names, static fn ( string $name ): bool => '' !== $name ) );
 	}
 }

@@ -30,6 +30,9 @@ final class SettingsSanitizerTest extends MonkeyTestCase {
 		Functions\when( 'sanitize_text_field' )->alias(
 			static fn ( $value ): string => trim( (string) $value )
 		);
+		Functions\when( 'sanitize_key' )->alias(
+			static fn ( $key ): string => preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $key ) )
+		);
 	}
 
 	protected function tearDown(): void {
@@ -110,5 +113,38 @@ final class SettingsSanitizerTest extends MonkeyTestCase {
 		$sanitized = SettingsSanitizer::sanitize( [] );
 
 		$this->assertSame( [], $sanitized['exclusion_patterns'] );
+	}
+
+	public function test_smartcrop_sizes_keeps_valid_size_names(): void {
+		$result = SettingsSanitizer::sanitize(
+			[ 'smartcrop_sizes' => [ 'woocommerce_thumbnail', 'shop_catalog' ] ]
+		);
+
+		$this->assertSame( [ 'woocommerce_thumbnail', 'shop_catalog' ], $result['smartcrop_sizes'] );
+	}
+
+	public function test_smartcrop_sizes_sanitizes_hostile_names(): void {
+		$result = SettingsSanitizer::sanitize(
+			[ 'smartcrop_sizes' => [ '<script>alert(1)</script>', 'Thumb Nail!', '' ] ]
+		);
+
+		// sanitize_key lowercases and strips everything outside [a-z0-9_-];
+		// empties drop out entirely.
+		$this->assertSame( [ 'scriptalert1script', 'thumbnail' ], $result['smartcrop_sizes'] );
+	}
+
+	public function test_smartcrop_sizes_empty_string_means_none_selected(): void {
+		// The checkbox group posts a hidden '' when every box is unchecked.
+		// Without this, unchecking everything would silently restore the old
+		// selection from the fallback.
+		$result = SettingsSanitizer::sanitize( [ 'smartcrop_sizes' => '' ] );
+
+		$this->assertSame( [], $result['smartcrop_sizes'] );
+	}
+
+	public function test_smartcrop_enabled_defaults_off_and_absent_means_off(): void {
+		$result = SettingsSanitizer::sanitize( [] );
+
+		$this->assertFalse( $result['smartcrop_enabled'] );
 	}
 }
