@@ -201,6 +201,14 @@ final class SmartCropCommand {
 	/**
 	 * Crop every attachment, stopping the whole run on quota exhaustion.
 	 *
+	 * The override/restore pair is wrapped in try/finally so the filter is
+	 * ALWAYS removed — including if something inside the loop throws —
+	 * instead of relying on every call site remembering to clean up. The
+	 * halt message is only raised (via WP_CLI::error(), which exits by
+	 * default and does not run pending finally blocks) after the finally
+	 * has already restored the saved sizes, so a halted run can never
+	 * leave the override attached.
+	 *
 	 * @param array<int, int>    $ids   Attachment IDs.
 	 * @param array<int, string> $sizes Resolved size names.
 	 * @return void
@@ -215,35 +223,41 @@ final class SmartCropCommand {
 			2
 		);
 
-		$override  = $this->override_sizes( $sizes );
-		$cropper   = new ThumbnailCropper();
-		$cropped   = 0;
-		$failed    = 0;
-		$processed = 0;
+		$override     = self::override_sizes( $sizes );
+		$cropped      = 0;
+		$failed       = 0;
+		$processed    = 0;
+		$halt_message = null;
 
-		foreach ( $ids as $id ) {
-			$summary = $cropper->crop( $id );
+		try {
+			$cropper = new ThumbnailCropper();
 
-			++$processed;
-			$cropped += $summary['cropped'];
-			$failed  += $summary['failed'];
+			foreach ( $ids as $id ) {
+				$summary = $cropper->crop( $id );
 
-			WP_CLI::log( sprintf( '#%d: %d cropped, %d failed', $id, $summary['cropped'], $summary['failed'] ) );
+				++$processed;
+				$cropped += $summary['cropped'];
+				$failed  += $summary['failed'];
 
-			if ( $summary['halted'] ) {
-				$this->restore_sizes( $override );
-				WP_CLI::error(
-					sprintf(
+				WP_CLI::log( sprintf( '#%d: %d cropped, %d failed', $id, $summary['cropped'], $summary['failed'] ) );
+
+				if ( $summary['halted'] ) {
+					$halt_message = sprintf(
 						'API quota exhausted — run halted after %d of %d image(s), %d crop(s) applied.',
 						$processed,
 						count( $ids ),
 						$cropped
-					)
-				);
+					);
+					break;
+				}
 			}
+		} finally {
+			self::restore_sizes( $override );
 		}
 
-		$this->restore_sizes( $override );
+		if ( null !== $halt_message ) {
+			WP_CLI::error( $halt_message );
+		}
 
 		WP_CLI::success( sprintf( 'Done. %d image(s) processed, %d crop(s) applied, %d failed.', $processed, $cropped, $failed ) );
 	}
@@ -254,10 +268,14 @@ final class SmartCropCommand {
 	 * Nothing is written to the database: the filter is request-scoped and
 	 * undone by restore_sizes() once the run finishes.
 	 *
+	 * Public and static (rather than a private instance helper) so the
+	 * override/restore pair — the part of this class with real behavior —
+	 * is directly unit-testable without a WP-CLI bootstrap.
+	 *
 	 * @param array<int, string> $sizes Resolved size names.
 	 * @return callable The filter callback, to pass to restore_sizes().
 	 */
-	private function override_sizes( array $sizes ): callable {
+	public static function override_sizes( array $sizes ): callable {
 		$callback = static function ( $value ) use ( $sizes ) {
 			if ( is_array( $value ) ) {
 				$value['smartcrop_sizes'] = $sizes;
@@ -277,7 +295,7 @@ final class SmartCropCommand {
 	 * @param callable $callback Filter callback returned by override_sizes().
 	 * @return void
 	 */
-	private function restore_sizes( callable $callback ): void {
+	public static function restore_sizes( callable $callback ): void {
 		remove_filter( 'option_' . Options::OPTION_NAME, $callback );
 		Options::clear_cache();
 	}
