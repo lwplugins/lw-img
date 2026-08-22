@@ -15,14 +15,18 @@ use LightweightPlugins\Img\Tests\Unit\MonkeyTestCase;
 use LightweightPlugins\Img\Upload\OutputFormatMap;
 
 /**
- * WP 7.1's client-side uploader reads this map from the server, so mapping
- * jpeg/png to the plugin's output format makes the BROWSER generate
- * thumbnails already converted — zero API calls for sub-sizes.
+ * WP 7.1's client-side uploader reads this map from the REST attachment
+ * response, so mapping jpeg/png to the plugin's output format makes the
+ * BROWSER generate thumbnails already converted — zero API calls for
+ * sub-sizes. Every test below runs in a stubbed REST request context;
+ * test_ignores_the_map_outside_a_rest_request() locks in the opposite
+ * case, which is what protects Restorer, WP-CLI, cron, and the wp-admin
+ * image editor from ever seeing the map.
  */
 final class OutputFormatMapTest extends MonkeyTestCase {
 
 	/**
-	 * Stub the options row.
+	 * Stub the options row and put the request in REST context.
 	 *
 	 * @param array<string, mixed> $options Option values.
 	 */
@@ -36,6 +40,7 @@ final class OutputFormatMapTest extends MonkeyTestCase {
 		Functions\when( 'wp_parse_args' )->alias(
 			static fn ( $args, $defaults ) => array_merge( (array) $defaults, (array) $args )
 		);
+		Functions\when( 'wp_is_serving_rest_request' )->justReturn( true );
 	}
 
 	protected function tearDown(): void {
@@ -104,5 +109,25 @@ final class OutputFormatMapTest extends MonkeyTestCase {
 		);
 
 		$this->assertSame( [ 'image/heic' => 'image/jpeg' ], OutputFormatMap::map( [ 'image/heic' => 'image/jpeg' ] ) );
+	}
+
+	public function test_ignores_the_map_outside_a_rest_request(): void {
+		// Restorer-protection regression lock: Restorer (admin-post), WP-CLI,
+		// cron, and the wp-admin image editor (admin-ajax) all regenerate
+		// thumbnails outside a REST request. If this filter mapped the main
+		// file there too, core would re-convert a just-restored JPEG straight
+		// back to WebP the moment its thumbnails regenerate, orphaning the
+		// recovered original on disk.
+		$this->options(
+			[
+				'auto_convert'  => true,
+				'output_format' => 'webp',
+			]
+		);
+		Functions\when( 'wp_is_serving_rest_request' )->justReturn( false );
+
+		$map = OutputFormatMap::map( [ 'image/heic' => 'image/jpeg' ] );
+
+		$this->assertSame( [ 'image/heic' => 'image/jpeg' ], $map );
 	}
 }
