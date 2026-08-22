@@ -47,7 +47,7 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 
 1. Upload `lw-img` to `/wp-content/plugins/`
 2. Activate the plugin through the 'Plugins' menu
-3. Get an API key at [dashboard.helloimg.io/api-keys](https://dashboard.helloimg.io/api-keys)
+3. Get an API key at [app.helloimg.io](https://app.helloimg.io/)
 4. Go to LW Plugins → Image and paste your API key
 5. Upload images — they'll be converted to WebP automatically
 

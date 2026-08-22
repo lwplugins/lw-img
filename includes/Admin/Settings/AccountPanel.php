@@ -15,8 +15,8 @@ use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
 use LightweightPlugins\Img\Stats\SiteStats;
 
 /**
- * Renders the account tiles: balance (unlimited during open beta), the
- * free-tier gauge, and this site's own optimization total.
+ * Renders the account tiles: balance (unlimited), the free-tier gauge,
+ * and this site's own optimization total.
  */
 final class AccountPanel {
 
@@ -27,6 +27,10 @@ final class AccountPanel {
 	 * @return void
 	 */
 	public static function render( array $account ): void {
+		$dash_url  = \LightweightPlugins\Img\lw_img_dashboard_url();
+		$dash_host = wp_parse_url( $dash_url, PHP_URL_HOST );
+		$dash_text = is_string( $dash_host ) && '' !== $dash_host ? $dash_host : $dash_url;
+
 		$free_used  = (int) ( $account['free_tier']['used'] ?? 0 );
 		$free_limit = (int) ( $account['free_tier']['limit'] ?? 0 );
 		$free_left  = (int) ( $account['free_tier']['remaining'] ?? 0 );
@@ -46,7 +50,10 @@ final class AccountPanel {
 		echo '<div class="lw-img-tile">';
 		echo '<span class="lw-img-tile-k">' . esc_html__( 'Balance', 'lw-img' ) . '</span>';
 		echo '<span class="lw-img-tile-v">' . esc_html__( 'Unlimited', 'lw-img' ) . '</span>';
-		echo '<span class="lw-img-tile-d">' . esc_html__( 'open beta — billing is not live yet', 'lw-img' ) . '</span>';
+		echo '<span class="lw-img-tile-d">' . esc_html(
+			/* translators: %s: dashboard host name. */
+			sprintf( __( 'manage your plan at %s', 'lw-img' ), $dash_text )
+		) . '</span>';
 		echo '</div>';
 
 		echo '<div class="lw-img-tile">';

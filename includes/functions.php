@@ -23,3 +23,19 @@ if ( ! function_exists( __NAMESPACE__ . '\\lw_img_is_configured' ) ) {
 		return '' !== trim( $key );
 	}
 }
+
+if ( ! function_exists( __NAMESPACE__ . '\\lw_img_dashboard_url' ) ) {
+	/**
+	 * URL of the HelloImg dashboard, shown wherever the plugin links out.
+	 *
+	 * @return string
+	 */
+	function lw_img_dashboard_url(): string {
+		/**
+		 * Filters the HelloImg dashboard URL the plugin links to.
+		 *
+		 * @param string $url Dashboard URL.
+		 */
+		return (string) apply_filters( 'lw_img_dashboard_url', 'https://app.helloimg.io/' );
+	}
+}

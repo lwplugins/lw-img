@@ -46,7 +46,7 @@ composer require lwplugins/lw-img
 
 Or download the latest release ZIP from the [Releases](https://github.com/lwplugins/lw-img/releases) page.
 
-After activation: **LW Plugins → Image** → paste your HelloImg API key. HelloImg is in open beta — any key value enables conversion for now.
+After activation: **LW Plugins → Image** → paste your HelloImg API key. Get your API key at [app.helloimg.io](https://app.helloimg.io/).
 
 ## Configuration
 

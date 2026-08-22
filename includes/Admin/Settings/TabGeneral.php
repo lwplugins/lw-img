@@ -116,9 +116,13 @@ final class TabGeneral implements TabInterface {
 		}
 		echo '</div>';
 
+		$dash_url  = \LightweightPlugins\Img\lw_img_dashboard_url();
+		$dash_host = wp_parse_url( $dash_url, PHP_URL_HOST );
+		$dash_text = is_string( $dash_host ) && '' !== $dash_host ? $dash_host : $dash_url;
+
 		echo '<p class="lw-img-gen-hint">'
-			. esc_html__( 'Open beta: keys are not validated yet — any value enables conversion. Get one at', 'lw-img' )
-			. ' <a href="https://dashboard.helloimg.io/api-keys" target="_blank" rel="noopener">dashboard.helloimg.io/api-keys</a> · <a href="#tester" class="lw-img-goto">'
+			. esc_html__( 'Get your API key at', 'lw-img' )
+			. ' <a href="' . esc_url( $dash_url ) . '" target="_blank" rel="noopener">' . esc_html( $dash_text ) . '</a> · <a href="#tester" class="lw-img-goto">'
 			. esc_html__( 'Full environment checks on the Tester tab', 'lw-img' )
 			. '</a></p>';
 		echo '</div>';
@@ -171,7 +175,7 @@ final class TabGeneral implements TabInterface {
 		$steps = [
 			[
 				__( 'Add your API key', 'lw-img' ),
-				__( 'Open beta: keys are not validated yet, so any value works for now.', 'lw-img' ),
+				__( 'Grab your key from the HelloImg dashboard and paste it here — Test connection verifies it instantly.', 'lw-img' ),
 			],
 			[
 				__( 'Upload as usual', 'lw-img' ),
