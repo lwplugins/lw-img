@@ -16,6 +16,7 @@ use LightweightPlugins\Img\Api\Client;
 use LightweightPlugins\Img\Api\OptimizeRequest;
 use LightweightPlugins\Img\Logger;
 use LightweightPlugins\Img\Upload\SmartCrop\CropScheduler;
+use LightweightPlugins\Img\Upload\SubsizeSideload;
 use Throwable;
 
 /**
@@ -57,6 +58,10 @@ final class UploadInterceptor {
 	}
 
 	public function maybe_convert( array $upload ): array {
+		if ( SubsizeSideload::is_current_request() ) {
+			return $upload;
+		}
+
 		$file = (string) ( $upload['file'] ?? '' );
 		$type = (string) ( $upload['type'] ?? '' );
 
