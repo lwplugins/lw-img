@@ -63,4 +63,61 @@ final class CropScheduler {
 	public static function reset(): void {
 		self::$uploads = [];
 	}
+
+	/**
+	 * Hook the metadata filter and the cron event.
+	 *
+	 * @return void
+	 */
+	public static function register(): void {
+		add_filter( 'wp_generate_attachment_metadata', [ self::class, 'maybe_schedule' ], 20, 2 );
+		add_action( self::HOOK, [ self::class, 'run' ] );
+	}
+
+	/**
+	 * Schedule the crop job for a freshly uploaded attachment.
+	 *
+	 * Runs on wp_generate_attachment_metadata, which also fires on restore,
+	 * re-optimize and thumbnail regeneration — the registry check is what
+	 * limits this to genuine new uploads (see the class docblock).
+	 *
+	 * @param mixed $metadata      Generated attachment metadata (passed through).
+	 * @param int   $attachment_id Attachment post ID.
+	 * @return mixed The metadata, always unchanged.
+	 */
+	public static function maybe_schedule( mixed $metadata, int $attachment_id = 0 ): mixed {
+		if ( ! is_array( $metadata ) || 0 === $attachment_id ) {
+			return $metadata;
+		}
+
+		if ( ! (bool) Options::get( 'auto_convert' ) || ! (bool) Options::get( 'smartcrop_enabled' ) ) {
+			return $metadata;
+		}
+
+		if ( [] === (array) Options::get( 'smartcrop_sizes' ) ) {
+			return $metadata;
+		}
+
+		if ( ! self::is_recorded( (string) get_attached_file( $attachment_id ) ) ) {
+			return $metadata;
+		}
+
+		wp_schedule_single_event( time(), self::HOOK, [ $attachment_id ] );
+
+		return $metadata;
+	}
+
+	/**
+	 * Cron entry point: crop one attachment's selected sizes.
+	 *
+	 * @param int $attachment_id Attachment post ID.
+	 * @return void
+	 */
+	public static function run( int $attachment_id ): void {
+		if ( ! (bool) Options::get( 'smartcrop_enabled' ) ) {
+			return;
+		}
+
+		( new ThumbnailCropper() )->crop( $attachment_id );
+	}
 }
