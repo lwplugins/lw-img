@@ -54,6 +54,53 @@ final class ConvertibleDetector {
 		return $this->passes_common_rules( $file_path, $mime_type );
 	}
 
+	/**
+	 * Whether a new upload may be recorded for smart-crop scheduling.
+	 *
+	 * Deliberately NOT should_convert(): the conversion-specific skips
+	 * (already webp/avif, animated gif, the auto_convert toggle, API key)
+	 * must not gate this — a native WebP upload still gets cropped thumbs,
+	 * and the cron handler re-checks the key. What DOES carry over: the
+	 * mime scope, the user's exclusion patterns, and the file-size limits —
+	 * smart crop re-sends the main file once per size, so a file the user
+	 * excluded from the API stays excluded here.
+	 *
+	 * @param string $file_path Absolute file path.
+	 * @param string $mime_type File mime type.
+	 * @return bool
+	 */
+	public function smart_crop_eligible( string $file_path, string $mime_type ): bool {
+		if ( ! str_starts_with( $mime_type, 'image/' ) ) {
+			return false;
+		}
+
+		$allowed = (array) Options::get( 'mime_types' );
+		if ( ! in_array( $mime_type, $allowed, true ) && ! in_array( $mime_type, self::SKIP_TYPES, true ) ) {
+			return false;
+		}
+
+		$patterns = (array) Options::get( 'exclusion_patterns' );
+		if ( [] !== $patterns && $this->exclusions->matches( $file_path, $patterns ) ) {
+			return false;
+		}
+
+		if ( ! is_readable( $file_path ) ) {
+			return false;
+		}
+
+		$max_bytes = ( (int) Options::get( 'max_filesize_mb' ) ) * 1024 * 1024;
+		if ( $max_bytes > 0 && filesize( $file_path ) > $max_bytes ) {
+			return false;
+		}
+
+		$min_bytes = ( (int) Options::get( 'min_filesize_kb' ) ) * 1024;
+		if ( $min_bytes > 0 && filesize( $file_path ) < $min_bytes ) {
+			return false;
+		}
+
+		return true;
+	}
+
 	private function passes_common_rules( string $file_path, string $mime_type ): bool {
 		if ( '' === (string) Options::get( 'api_key' ) ) {
 			return $this->skip( $file_path, 'no API key' );

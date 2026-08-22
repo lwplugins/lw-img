@@ -15,6 +15,7 @@ use LightweightPlugins\Img\Api\ApiException;
 use LightweightPlugins\Img\Api\Client;
 use LightweightPlugins\Img\Api\OptimizeRequest;
 use LightweightPlugins\Img\Logger;
+use LightweightPlugins\Img\Upload\SmartCrop\CropScheduler;
 use Throwable;
 
 /**
@@ -59,6 +60,10 @@ final class UploadInterceptor {
 		$file = (string) ( $upload['file'] ?? '' );
 		$type = (string) ( $upload['type'] ?? '' );
 
+		if ( $this->detector->smart_crop_eligible( $file, $type ) ) {
+			CropScheduler::record( $file );
+		}
+
 		if ( ! $this->detector->should_convert( $file, $type ) ) {
 			return $upload;
 		}
@@ -85,6 +90,8 @@ final class UploadInterceptor {
 			}
 
 			$swapped = $this->swapper->swap( $file, (string) ( $upload['url'] ?? '' ), $result );
+
+			CropScheduler::record( (string) $swapped['file'] );
 
 			$backup_rel = $swapped['lw_img_backup'] ?? null;
 			unset( $swapped['lw_img_backup'] );
