@@ -127,4 +127,35 @@ final class OptimizeRequestTest extends MonkeyTestCase {
 
 		\LightweightPlugins\Img\Options::clear_cache();
 	}
+
+	public function test_smart_crop_payload_carries_resize_with_both_dimensions(): void {
+		$request = OptimizeRequest::for_smart_crop( '/tmp/a.webp', 300, 300, 'webp', 'normal', false );
+
+		$payload = $request->to_data_payload();
+
+		$this->assertSame(
+			[
+				'width'     => 300,
+				'height'    => 300,
+				'smartcrop' => true,
+			],
+			$payload['resize']
+		);
+		$this->assertSame( 'webp', $payload['convert'] );
+	}
+
+	public function test_smart_crop_payload_never_emits_the_fit_inside_box(): void {
+		// resize.smartcrop and max_width/max_height are mutually exclusive on
+		// the API: the box means "fit inside", the crop means "exactly this".
+		$payload = OptimizeRequest::for_smart_crop( '/tmp/a.webp', 300, 300, 'webp', 'normal', false )->to_data_payload();
+
+		$this->assertArrayNotHasKey( 'max_width', $payload );
+		$this->assertArrayNotHasKey( 'max_height', $payload );
+	}
+
+	public function test_plain_requests_emit_no_resize_object(): void {
+		$payload = ( new OptimizeRequest( '/tmp/a.jpg' ) )->to_data_payload();
+
+		$this->assertArrayNotHasKey( 'resize', $payload );
+	}
 }

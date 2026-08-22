@@ -32,7 +32,9 @@ final class OptimizeRequest {
 		public bool $keep_exif = false,
 		public ?string $convert = self::FORMAT_WEBP,
 		public int $max_width = 0,
-		public int $max_height = 0
+		public int $max_height = 0,
+		public ?int $crop_width = null,
+		public ?int $crop_height = null
 	) {}
 
 	/**
@@ -67,6 +69,30 @@ final class OptimizeRequest {
 		);
 	}
 
+	/**
+	 * Build a subject-aware crop request for one thumbnail size.
+	 *
+	 * The main (already converted) file is sent with the thumbnail's exact
+	 * target dimensions; the API places the crop window over the subject.
+	 * $convert is passed explicitly even though the worker preserves the
+	 * input format since 2026-08-18 — belt over that fix.
+	 *
+	 * @param string $file_path Absolute path of the MAIN file.
+	 * @param int    $width     Target width (the generated sub-size's, not the registered one).
+	 * @param int    $height    Target height.
+	 * @param string $convert   Output format matching the main file (jpeg|png|webp|avif).
+	 * @param string $level     Optimization level.
+	 * @param bool   $keep_exif Whether to keep EXIF.
+	 * @return self
+	 */
+	public static function for_smart_crop( string $file_path, int $width, int $height, string $convert, string $level, bool $keep_exif ): self {
+		if ( ! self::valid_level( $level ) ) {
+			$level = self::LEVEL_NORMAL;
+		}
+
+		return new self( $file_path, $level, $keep_exif, $convert, 0, 0, $width, $height );
+	}
+
 	public function to_data_payload(): array {
 		$data = [
 			'level'     => $this->level,
@@ -75,6 +101,16 @@ final class OptimizeRequest {
 
 		if ( null !== $this->convert ) {
 			$data['convert'] = $this->convert;
+		}
+
+		if ( null !== $this->crop_width && null !== $this->crop_height ) {
+			$data['resize'] = [
+				'width'     => $this->crop_width,
+				'height'    => $this->crop_height,
+				'smartcrop' => true,
+			];
+
+			return $data;
 		}
 
 		if ( $this->max_width > 0 ) {
