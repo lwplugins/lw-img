@@ -46,6 +46,7 @@ final class TabUpload implements TabInterface {
 		$this->render_size_limits();
 		$this->render_skip_exclude();
 		$this->render_after();
+		$this->render_smartcrop();
 		echo '</div>';
 	}
 
@@ -254,6 +255,59 @@ final class TabUpload implements TabInterface {
 			]
 		);
 		$this->row_close();
+	}
+
+	/**
+	 * Smart crop: opt-in subject-aware re-cropping of selected thumbnails.
+	 *
+	 * @return void
+	 */
+	private function render_smartcrop(): void {
+		echo '<h3 class="lw-img-gen-heading">' . esc_html__( 'Smart crop', 'lw-img' ) . '</h3>';
+
+		$this->render_switch(
+			[
+				'name'        => 'smartcrop_enabled',
+				'label'       => __( 'Smart-crop thumbnails', 'lw-img' ),
+				'description' => __( 'Re-crop the selected thumbnail sizes around the subject instead of the centre. Each selected size costs one extra API call per upload. Runs in the background right after the upload; on system-cron sites the cropped thumbnails appear within the cron interval.', 'lw-img' ),
+			]
+		);
+
+		// Hidden sentinel: without it, unchecking every box would post no
+		// smartcrop_sizes key at all and the old selection would survive.
+		printf( '<input type="hidden" name="%s[smartcrop_sizes]" value="" />', esc_attr( Options::OPTION_NAME ) );
+
+		$registered = wp_get_registered_image_subsizes();
+		$selected   = array_map( 'strval', (array) Options::get( 'smartcrop_sizes' ) );
+		$has_crops  = false;
+
+		echo '<div class="lw-img-sc-sizes" id="lw-img-sc-sizes">';
+		foreach ( $registered as $name => $size ) {
+			if ( empty( $size['crop'] ) ) {
+				continue;
+			}
+			$has_crops = true;
+			printf(
+				'<label class="lw-img-sc-size"><input type="checkbox" name="%1$s[smartcrop_sizes][]" value="%2$s" %3$s /> <span>%2$s</span> <span class="lw-img-sc-dims">%4$d &times; %5$d</span></label>',
+				esc_attr( Options::OPTION_NAME ),
+				esc_attr( (string) $name ),
+				checked( in_array( (string) $name, $selected, true ), true, false ),
+				(int) $size['width'],
+				(int) $size['height']
+			);
+		}
+		echo '</div>';
+
+		if ( ! $has_crops ) {
+			echo '<p class="description">' . esc_html__( 'No hard-cropped thumbnail sizes are registered on this site — smart crop has nothing to work on. Sizes that scale (keep the aspect ratio) never need it.', 'lw-img' ) . '</p>';
+			return;
+		}
+
+		printf(
+			'<p class="description lw-img-sc-cost" id="lw-img-sc-cost" data-template="%s"></p>',
+			/* translators: %1$s: number of selected sizes, %2$s: total API calls per upload. */
+			esc_attr__( 'Cost per upload: 1 + %1$s = %2$s API calls.', 'lw-img' )
+		);
 	}
 
 	/**

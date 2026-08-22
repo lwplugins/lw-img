@@ -698,3 +698,8 @@
 .lw-img-action:hover .dashicons { color: #00695c; }
 .lw-img-action-hint { color: #646970; font-size: 12px; }
 .lw-img-stats-refresh { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+
+/* Smart crop size list */
+.lw-img-sc-sizes { display: grid; gap: 6px; margin: 12px 0 4px; }
+.lw-img-sc-size { display: flex; align-items: center; gap: 8px; }
+.lw-img-sc-dims { color: #646970; font-family: Consolas, Monaco, monospace; font-size: 12px; }

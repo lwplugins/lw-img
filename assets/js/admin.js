@@ -303,6 +303,26 @@
 		});
 	}
 
+	// Live "1 + N = M API calls" line under the smart-crop size list.
+	function initSmartCrop() {
+		var list = document.getElementById('lw-img-sc-sizes');
+		var cost = document.getElementById('lw-img-sc-cost');
+
+		if (!list || !cost) {
+			return;
+		}
+
+		function update() {
+			var n = list.querySelectorAll('input[type="checkbox"]:checked').length;
+			cost.textContent = cost.getAttribute('data-template')
+				.replace('%1$s', String(n))
+				.replace('%2$s', String(1 + n));
+		}
+
+		list.addEventListener('change', update);
+		update();
+	}
+
 	// Backup tab: master-toggle status + danger card, retention presets.
 	function initBackup() {
 		var master = document.getElementById('backup_enabled');
@@ -447,6 +467,7 @@
 		initBulk();
 		initKeyToggle();
 		initUpload();
+		initSmartCrop();
 		initBackup();
 		initTester();
 		initLog();
