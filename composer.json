@@ -46,6 +46,6 @@
         "phpcs": "phpcs",
         "phpcbf": "phpcbf",
         "analyse": "phpstan analyse --memory-limit=2G",
-        "test": "phpunit"
+        "test": "php -d auto_prepend_file=tests/prepend.php vendor/phpunit/phpunit/phpunit"
     }
 }

@@ -28,6 +28,13 @@ final class OutputFormatMapTest extends MonkeyTestCase {
 	/**
 	 * Stub the options row and put the request in REST context.
 	 *
+	 * Also stubs wp_is_client_side_media_processing_enabled(): Brain Monkey's
+	 * Functions\when() DEFINES the function, which is what makes
+	 * function_exists( 'wp_is_client_side_media_processing_enabled' ) true in
+	 * this suite. Without this stub the 7.1-feature-detection gate in map()
+	 * would return every test's map untouched regardless of the scenario
+	 * under test, since the suite never otherwise defines that symbol.
+	 *
 	 * @param array<string, mixed> $options Option values.
 	 */
 	private function options( array $options ): void {
@@ -41,6 +48,7 @@ final class OutputFormatMapTest extends MonkeyTestCase {
 			static fn ( $args, $defaults ) => array_merge( (array) $defaults, (array) $args )
 		);
 		Functions\when( 'wp_is_serving_rest_request' )->justReturn( true );
+		Functions\when( 'wp_is_client_side_media_processing_enabled' )->justReturn( true );
 	}
 
 	protected function tearDown(): void {
@@ -51,6 +59,7 @@ final class OutputFormatMapTest extends MonkeyTestCase {
 	public function test_maps_jpeg_and_png_to_webp_when_converting(): void {
 		$this->options(
 			[
+				'api_key'       => 'test-key',
 				'auto_convert'  => true,
 				'output_format' => 'webp',
 			]
@@ -65,6 +74,7 @@ final class OutputFormatMapTest extends MonkeyTestCase {
 	public function test_honours_the_avif_output_format(): void {
 		$this->options(
 			[
+				'api_key'       => 'test-key',
 				'auto_convert'  => true,
 				'output_format' => 'avif',
 			]
@@ -78,6 +88,7 @@ final class OutputFormatMapTest extends MonkeyTestCase {
 	public function test_preserves_core_entries_such_as_heic(): void {
 		$this->options(
 			[
+				'api_key'       => 'test-key',
 				'auto_convert'  => true,
 				'output_format' => 'webp',
 			]
@@ -92,6 +103,7 @@ final class OutputFormatMapTest extends MonkeyTestCase {
 		// A gif mapping would flatten animations client-side.
 		$this->options(
 			[
+				'api_key'       => 'test-key',
 				'auto_convert'  => true,
 				'output_format' => 'webp',
 			]
@@ -103,12 +115,32 @@ final class OutputFormatMapTest extends MonkeyTestCase {
 	public function test_leaves_the_map_alone_when_auto_convert_is_off(): void {
 		$this->options(
 			[
+				'api_key'       => 'test-key',
 				'auto_convert'  => false,
 				'output_format' => 'webp',
 			]
 		);
 
 		$this->assertSame( [ 'image/heic' => 'image/jpeg' ], OutputFormatMap::map( [ 'image/heic' => 'image/jpeg' ] ) );
+	}
+
+	public function test_leaves_the_map_alone_when_not_configured(): void {
+		// No API key: the plugin converts nothing server-side either, so the
+		// browser must not convert anything in its place. This is what keeps
+		// a fresh, unconfigured install behaving stock (no log, no backup,
+		// no silent core conversion) instead of contradicting the exclusion
+		// copy in TabUpload.
+		$this->options(
+			[
+				'api_key'       => '',
+				'auto_convert'  => true,
+				'output_format' => 'webp',
+			]
+		);
+
+		$map = OutputFormatMap::map( [ 'image/heic' => 'image/jpeg' ] );
+
+		$this->assertSame( [ 'image/heic' => 'image/jpeg' ], $map );
 	}
 
 	public function test_ignores_the_map_outside_a_rest_request(): void {
@@ -120,6 +152,7 @@ final class OutputFormatMapTest extends MonkeyTestCase {
 		// recovered original on disk.
 		$this->options(
 			[
+				'api_key'       => 'test-key',
 				'auto_convert'  => true,
 				'output_format' => 'webp',
 			]

@@ -60,12 +60,6 @@ final class ThumbnailCropper {
 			return $summary;
 		}
 
-		$convert = self::convert_target_for( $main );
-		if ( null === $convert ) {
-			Logger::debug( 'smart crop: unsupported main format', [ 'file' => $main ] );
-			return $summary;
-		}
-
 		$metadata = wp_get_attachment_metadata( $attachment_id );
 		if ( ! is_array( $metadata ) ) {
 			return $summary;
@@ -83,8 +77,15 @@ final class ThumbnailCropper {
 		$updated   = false;
 
 		foreach ( $jobs as $job ) {
+			$job_convert = self::convert_target_for( $job['file'] );
+			if ( null === $job_convert ) {
+				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: unsupported size format' );
+				++$summary['failed'];
+				continue;
+			}
+
 			try {
-				$bytes = $this->cropped_bytes( $main, $job, $convert, $level, $keep_exif );
+				$bytes = $this->cropped_bytes( $main, $job, $job_convert, $level, $keep_exif );
 				// Guard: metadata file values are basenames, but enforce at filesystem use.
 				$this->swap_file( $directory . '/' . wp_basename( $job['file'] ), $bytes );
 
@@ -115,14 +116,17 @@ final class ThumbnailCropper {
 	}
 
 	/**
-	 * The convert target matching the main file's format.
+	 * The convert target matching the given file's format.
 	 *
-	 * Explicit even though the worker preserves the input format since
-	 * 2026-08-18 — belt over that fix. Returns null for formats the API's
-	 * conversion path cannot encode (gif has no encoder there, and a crop
-	 * would flatten its animation anyway).
+	 * Called both on the main file and, per job, on each size's own file
+	 * name from the attachment metadata — only the extension is read, so
+	 * an absolute path or a bare basename both work. Explicit even though
+	 * the worker preserves the input format since 2026-08-18 — belt over
+	 * that fix. Returns null for formats the API's conversion path cannot
+	 * encode (gif has no encoder there, and a crop would flatten its
+	 * animation anyway).
 	 *
-	 * @param string $file_path Absolute path of the main file.
+	 * @param string $file_path Absolute path or basename of the file.
 	 * @return string|null jpeg|png|webp|avif, or null when unsupported.
 	 */
 	public static function convert_target_for( string $file_path ): ?string {

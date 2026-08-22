@@ -3,7 +3,7 @@
 ## [1.8.1] - 2026-08-22
 
 ### Fixed
-- WordPress 7.1's client-side uploads no longer spend one API call per thumbnail. The browser generates every sub-size itself; each one used to pass through the conversion pipeline individually — measured at 3 calls for a 2-size upload and ~11 on a typical store. The per-thumbnail sideload requests are now recognised and skipped, and an `image_editor_output_format` mapping tells the browser to produce the thumbnails in the plugin's output format locally, so a browser upload is back to exactly one API call with format-matched thumbnails. URL-sideloaded primary images (importers) still convert
+- WordPress 7.1's client-side uploads no longer spend one API call per thumbnail. The browser generates every sub-size itself; each one used to pass through the conversion pipeline individually — measured at 3 calls for a 2-size upload and ~11 on a typical store. The per-thumbnail sideload requests are now recognised and skipped, and an `image_editor_output_format` mapping — active only on WordPress 7.1 with a configured API key — tells the browser to produce the thumbnails in the plugin's output format locally, so a browser upload is back to exactly one API call with format-matched thumbnails. URL-sideloaded primary images (importers) still convert
 - Smart crops now run reliably on client-side uploads: scheduling used to race the browser's thumbnail sideloads (the metadata pass fires before the sizes exist); a marker now carries the job to the finalize pass, where every size is present. If finalize never fires (core treats it as best-effort), `wp lw-img smartcrop` re-crops on demand
 
 ### Changed

@@ -234,7 +234,7 @@ final class TabUpload implements TabInterface {
 			echo ' <button type="button" class="lw-img-up-hint" data-pattern="' . esc_attr( $example ) . '"><code>' . esc_html( $example ) . '</code></button>';
 		}
 		echo '</span>';
-		echo '<p class="description">' . esc_html__( 'One pattern per line, * matches anything. Patterns without / match the filename; with / they match anywhere in the path. Matching files are never converted.', 'lw-img' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'One pattern per line, * matches anything. Patterns without / match the filename; with / they match anywhere in the path. Matching files are never sent to the API.', 'lw-img' ) . '</p>';
 		$this->row_close();
 	}
 

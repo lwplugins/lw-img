@@ -76,9 +76,10 @@ final class AttachmentRebuilder {
 
 		foreach ( $metadata['sizes'] as $size ) {
 			$file = (string) ( $size['file'] ?? '' );
-			if ( '' !== $file && file_exists( $dir . '/' . $file ) ) {
-				// Guard: metadata file values are basenames, but enforce at filesystem use.
-				wp_delete_file( $dir . '/' . wp_basename( $file ) );
+			// Guard: metadata file values are basenames, but enforce at filesystem use.
+			$safe = wp_basename( $file );
+			if ( '' !== $safe && file_exists( $dir . '/' . $safe ) ) {
+				wp_delete_file( $dir . '/' . $safe );
 			}
 		}
 	}
