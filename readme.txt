@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.7.2
+Stable tag: 1.8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,6 +28,7 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 * Free tier: 1,000 images/month via HelloImg
 
 * Bulk optimize the existing Media Library in the background (WP-Cron worker, resumable, or WP-CLI for huge libraries)
+* Smart crop (opt-in): re-crop selected hard-cropped thumbnail sizes around the subject instead of the centre — you pick the sizes and see the per-upload API cost before enabling
 * Built for scale: parallel-safe queue claiming, processing-speed profiles (gentle/normal/fast), and a CPU load guard so a bulk run never starves the site
 * Content URL rewrite on bulk convert/restore (post content + page-builder data, serialization-aware) plus a 301 redirect from old image URLs
 * Tabbed admin: General, Stats, Upload, Bulk, Backup, Tester, and Log
@@ -40,7 +41,6 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 
 **Roadmap:**
 
-* Smart Crop integration
 * LW Site Manager Abilities API integration
 
 == Installation ==
@@ -65,11 +65,19 @@ The upload proceeds with the original format. No upload ever fails because of LW
 
 Yes — use the Bulk tab (or `wp lw-img optimize --all`). The run happens in the background via WP-Cron, so you can close the browser; note WP-Cron only fires while the site receives traffic, so for libraries with thousands of images the command line is the guaranteed path. Converting renames the file (photo.jpg becomes photo.webp) and references in post content and page-builder data (Elementor/Bricks JSON in postmeta) are rewritten automatically — widgets and options are not covered, and images can always be excluded or restored.
 
+= What does smart crop cost? =
+
+One extra API call per selected size per upload — the Upload tab shows the exact multiplier as you pick sizes. Sizes that keep the aspect ratio never appear in the list: nothing is cut off them, so a plain resize gives the same result. If a crop fails, the normal WordPress thumbnail simply stays in place.
+
 = Is there a free tier? =
 
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.8.0 =
+* New: smart crop — opt-in subject-aware re-cropping of the hard-cropped thumbnail sizes you select, on new uploads. Runs in the background, never blocks an upload, and shows its per-upload API cost before you enable it
+* New: per-size failures keep the WordPress thumbnail; a quota error stops the remaining sizes
 
 = 1.7.2 =
 * Change: LW Image is out of pre-release. The "under active development" notice is gone from the readme, the README and every future release note
