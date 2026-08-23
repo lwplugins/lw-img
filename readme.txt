@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.8.2
+Stable tag: 1.8.3
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,11 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.8.3 =
+* Fix: a bulk run halts immediately when the API key is removed or rejected mid-run — images stay pending instead of being stamped "skipped"
+* Fix: rotating the API key no longer risks losing the pasted value — a Save key button always sits next to the field, and Test connection saves an edited key first
+* Change: a bulk run only starts with a working key — the Start action live-checks it and refuses with a notice; the button is disabled when no key is set
 
 = 1.8.2 =
 * Fix: the Tester no longer shows a stale verdict after a settings save — saving the API key (or any setting) now clears the cached report, so the next Tester view runs fresh checks instead of reporting "API not configured" from before the key was entered

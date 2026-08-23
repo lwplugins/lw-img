@@ -241,9 +241,22 @@
 	function initKeyToggle() {
 		var toggle = document.querySelector('.lw-img-key-toggle');
 		var input  = document.getElementById('api_key');
+		var test   = document.querySelector('.lw-img-key-test');
 
 		if (!toggle || !input) {
 			return;
+		}
+
+		// "Test connection" is a plain link; navigating with an edited key
+		// in the field would silently discard the edit. Save instead — the
+		// reloaded page re-checks the connection with the new key anyway.
+		if (test) {
+			test.addEventListener('click', function (event) {
+				if (input.value !== input.defaultValue && input.form) {
+					event.preventDefault();
+					input.form.requestSubmit();
+				}
+			});
 		}
 
 		toggle.addEventListener('click', function () {

@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.8.3] - 2026-08-23
+
+### Fixed
+- A bulk run now halts immediately when the API key is removed or rejected mid-run. Emptying (or rotating) the key used to leave the worker marching through the queue, stamping every image "skipped" — the images stay pending now, exactly like the existing quota halt, and the halt is logged
+- Rotating the API key no longer risks losing the pasted value: a Save key button now always sits next to the field (previously, with a key saved, the only adjacent button was the Test connection link, which navigated away and silently discarded the edit), and clicking Test connection with an edited key saves it first
+
+### Changed
+- A bulk run only starts with a working key: the Start action live-checks the key against the API and refuses with a clear notice when it is missing or rejected; the Start button is disabled with a hint when no key is set
+
 ## [1.8.2] - 2026-08-23
 
 ### Fixed

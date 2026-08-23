@@ -20,6 +20,7 @@ use LightweightPlugins\Img\Media\AttachmentRebuilder;
 use LightweightPlugins\Img\Media\RewriteBuffer;
 use LightweightPlugins\Img\Media\UrlPairs;
 use LightweightPlugins\Img\Media\UrlRewriter;
+use LightweightPlugins\Img\Options;
 use LightweightPlugins\Img\Upload\AnimatedGifProbe;
 use LightweightPlugins\Img\Upload\AttachmentMetaWriter;
 use LightweightPlugins\Img\Upload\ConvertibleDetector;
@@ -96,6 +97,19 @@ final class AttachmentOptimizer {
 	 * @return array{result: string, detail: string, bytes_in?: int, bytes_saved?: int, halt?: bool} Outcome and detail; halt=true means the run must stop (API quota exhausted).
 	 */
 	public function optimize( int $attachment_id ): array {
+		if ( '' === trim( (string) Options::get( 'api_key' ) ) ) {
+			// No key (rotated away mid-run, or never set): halt like a quota
+			// error, before any stamping — otherwise the worker would march
+			// through the queue marking every clean image "skipped".
+			do_action( 'lw_img_upload_failed', 'bulk run', 'API key missing — run halted' );
+
+			return [
+				'result' => self::RESULT_FAILED,
+				'detail' => 'API key missing',
+				'halt'   => true,
+			];
+		}
+
 		if ( ImageRepository::is_optimized( $attachment_id ) ) {
 			return $this->finish( $attachment_id, self::RESULT_SKIPPED, 'already optimized' );
 		}
@@ -121,9 +135,10 @@ final class AttachmentOptimizer {
 		} catch ( ApiException $e ) {
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
 
-			if ( $e->is_quota() ) {
-				// Out of credit: leave the image unstamped (it is fine and
-				// stays pending) and tell the caller to halt the whole run.
+			if ( $e->is_quota() || $e->is_auth() ) {
+				// Out of credit, or the key was rejected (rotated/revoked
+				// mid-run): leave the image unstamped (it is fine and stays
+				// pending) and tell the caller to halt the whole run.
 				return [
 					'result' => self::RESULT_FAILED,
 					'detail' => $e->getMessage(),

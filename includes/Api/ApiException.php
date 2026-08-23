@@ -67,4 +67,23 @@ final class ApiException extends RuntimeException {
 	public function is_quota(): bool {
 		return 402 === $this->getCode() || 'insufficient_balance' === $this->error_code;
 	}
+
+	/**
+	 * Whether the failure means the API key itself was rejected.
+	 *
+	 * Like quota, an auth failure must stop a bulk run instead of stamping
+	 * images failed one by one: every request with the same key fails
+	 * identically, and the images themselves are fine. The live API answers
+	 * a bad key with HTTP 401 and a flat error body, so the status is the
+	 * primary signal; the codes are the belt for future response shapes.
+	 *
+	 * @return bool
+	 */
+	public function is_auth(): bool {
+		if ( in_array( $this->getCode(), [ 401, 403 ], true ) ) {
+			return true;
+		}
+
+		return in_array( $this->error_code, [ 'unauthorized', 'invalid_key' ], true );
+	}
 }

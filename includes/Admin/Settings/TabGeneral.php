@@ -105,11 +105,13 @@ final class TabGeneral implements TabInterface {
 			esc_attr__( 'Hide key', 'lw-img' )
 		);
 
-		if ( '' === $api_key ) {
-			echo '<button type="submit" class="button button-primary">' . esc_html__( 'Save key', 'lw-img' ) . '</button>';
-		} else {
+		// The submit is always here: with only the old "Test connection" link
+		// beside the field, pasting a rotated key and clicking it navigated
+		// away and silently discarded the edit.
+		echo '<button type="submit" class="button button-primary">' . esc_html__( 'Save key', 'lw-img' ) . '</button>';
+		if ( '' !== $api_key ) {
 			printf(
-				'<a href="%s" class="button">%s</a>',
+				'<a href="%s" class="button lw-img-key-test">%s</a>',
 				esc_url( add_query_arg( 'lw-img-retest', (string) time(), admin_url( 'admin.php?page=lw-img' ) ) . '#general' ),
 				esc_html__( 'Test connection', 'lw-img' )
 			);

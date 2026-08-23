@@ -11,6 +11,7 @@ namespace LightweightPlugins\Img\Bulk;
 
 defined( 'ABSPATH' ) || exit;
 
+use LightweightPlugins\Img\Api\Client;
 use LightweightPlugins\Img\Options;
 
 /**
@@ -82,11 +83,38 @@ final class JobHandlers {
 		self::authorize( self::ACTION_START );
 
 		if ( ! BulkJob::is_running() ) {
+			if ( ! self::key_works() ) {
+				wp_safe_redirect( admin_url( 'admin.php?page=lw-img&lw-img-bulk-notice=key#bulk' ) );
+				exit;
+			}
+
 			BulkJob::start( ( new UnoptimizedQuery() )->count( true ) );
 			BackgroundWorker::kick();
 		}
 
 		self::back();
+	}
+
+	/**
+	 * Whether the configured API key currently authenticates.
+	 *
+	 * A live probe, not just non-empty: the rule is "start only with a
+	 * working key" — a rotated-away or revoked key would otherwise halt
+	 * the run on its very first image anyway, one worker tick later.
+	 *
+	 * @return bool
+	 */
+	private static function key_works(): bool {
+		if ( '' === trim( (string) Options::get( 'api_key' ) ) ) {
+			return false;
+		}
+
+		try {
+			( new Client() )->get_account();
+			return true;
+		} catch ( \Throwable $e ) {
+			return false;
+		}
 	}
 
 	/**

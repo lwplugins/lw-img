@@ -47,8 +47,19 @@ final class TabBulk implements TabInterface {
 		$job       = BulkJob::get();
 		$running   = BulkJob::is_running();
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display-only flag set by our own redirect; no state change.
+		$notice = sanitize_key( wp_unslash( $_GET['lw-img-bulk-notice'] ?? '' ) );
+
 		?>
 		<h2><?php esc_html_e( 'Bulk optimize', 'lw-img' ); ?></h2>
+		<?php if ( 'key' === $notice ) : ?>
+			<div class="notice notice-error inline">
+				<p>
+					<?php esc_html_e( 'The bulk run was not started: the API key is missing or was rejected by the API.', 'lw-img' ); ?>
+					<a href="#general" class="lw-img-goto"><?php esc_html_e( 'Check the key on the General tab', 'lw-img' ); ?></a>
+				</p>
+			</div>
+		<?php endif; ?>
 		<p class="description" style="max-width:70ch;"><?php esc_html_e( 'Runs in the background — you can close this tab. References to converted files in post content and page-builder data are rewritten automatically.', 'lw-img' ); ?></p>
 
 		<div
@@ -213,6 +224,9 @@ final class TabBulk implements TabInterface {
 
 		if ( $running ) {
 			echo '<a href="' . esc_url( JobHandlers::url( JobHandlers::ACTION_CANCEL ) ) . '" class="button">' . esc_html__( 'Cancel run', 'lw-img' ) . '</a>';
+		} elseif ( '' === trim( (string) Options::get( 'api_key' ) ) ) {
+			echo '<span class="button button-primary disabled" aria-disabled="true">' . esc_html__( 'Optimize all in background', 'lw-img' ) . '</span> ';
+			echo '<span class="description">' . esc_html__( 'Set your API key first', 'lw-img' ) . ' — <a href="#general" class="lw-img-goto">' . esc_html__( 'General tab', 'lw-img' ) . '</a></span>';
 		} else {
 			printf(
 				'<a href="%s" class="button button-primary%s">%s</a>',
