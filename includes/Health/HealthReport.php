@@ -22,12 +22,30 @@ final class HealthReport {
 	public const REFRESH_ACTION = 'lw_img_health_refresh';
 
 	/**
-	 * Hook the re-run action.
+	 * Hook the re-run action and the settings-save invalidation.
 	 *
 	 * @return void
 	 */
 	public static function register(): void {
 		add_action( 'admin_post_' . self::REFRESH_ACTION, [ self::class, 'refresh' ] );
+		add_action( 'update_option_lw_img_options', [ self::class, 'invalidate' ] );
+		add_action( 'add_option_lw_img_options', [ self::class, 'invalidate' ] );
+	}
+
+	/**
+	 * Drop the cached report when the plugin settings change.
+	 *
+	 * A report generated before a settings save can contradict the new
+	 * settings — the classic case is "API key missing" cached moments
+	 * before the key is pasted in, leaving the Tester red for up to ten
+	 * minutes. Re-probing on the next Tester view is cheaper than a
+	 * stale verdict. The add_option variant covers the very first save,
+	 * which creates the options row instead of updating it.
+	 *
+	 * @return void
+	 */
+	public static function invalidate(): void {
+		delete_transient( self::CACHE_KEY );
 	}
 
 	/**

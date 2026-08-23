@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Tests\Unit\Health;
 
+use Brain\Monkey\Functions;
 use LightweightPlugins\Img\Health\DatabaseChecks;
 use LightweightPlugins\Img\Health\HealthReport;
 use LightweightPlugins\Img\Tests\Unit\MonkeyTestCase;
@@ -126,5 +127,24 @@ final class HealthReportTest extends MonkeyTestCase {
 		$this->assertSame( 2, HealthReport::count_status( $sections, 'critical' ) );
 		$this->assertSame( 1, HealthReport::count_status( $sections, 'ok' ) );
 		$this->assertSame( 0, HealthReport::count_status( $sections, 'warning' ) );
+	}
+
+	public function test_invalidate_deletes_the_cached_report(): void {
+		Functions\expect( 'delete_transient' )->once()->with( HealthReport::CACHE_KEY );
+
+		HealthReport::invalidate();
+	}
+
+	public function test_register_invalidates_on_settings_save(): void {
+		Functions\when( 'add_action' )->alias(
+			static function ( string $hook ) use ( &$hooked ): void {
+				$hooked[] = $hook;
+			}
+		);
+
+		HealthReport::register();
+
+		$this->assertContains( 'update_option_lw_img_options', (array) $hooked );
+		$this->assertContains( 'add_option_lw_img_options', (array) $hooked );
 	}
 }

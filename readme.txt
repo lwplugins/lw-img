@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.8.1
+Stable tag: 1.8.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,9 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.8.2 =
+* Fix: the Tester no longer shows a stale verdict after a settings save — saving the API key (or any setting) now clears the cached report, so the next Tester view runs fresh checks instead of reporting "API not configured" from before the key was entered
 
 = 1.8.1 =
 * Fix: WordPress 7.1's client-side uploads no longer spend one API call per thumbnail. The browser generates every sub-size itself; each one used to pass through the conversion pipeline individually — measured at 3 calls for a 2-size upload and ~11 on a typical store. The per-thumbnail sideload requests are now recognised and skipped, and an image_editor_output_format mapping — active only on WordPress 7.1 with a configured API key — tells the browser to produce the thumbnails in the plugin's output format locally, so a browser upload is back to exactly one API call with format-matched thumbnails. URL-sideloaded primary images (importers) still convert

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.8.2] - 2026-08-23
+
+### Fixed
+- The Tester no longer shows a stale verdict after a settings save. The report is cached for ten minutes (it runs live API and cron probes), and saving the API key did not clear that cache — so a Tester opened before the key was pasted in kept reporting "API not configured" until re-run. Any settings save now invalidates the cached report, and the next Tester view probes fresh
+
 ## [1.8.1] - 2026-08-23
 
 ### Fixed
