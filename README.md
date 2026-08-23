@@ -22,7 +22,23 @@ When a non-WebP image is uploaded to WordPress, LW Image sends it to the HelloIm
 - Built for large libraries: parallel-safe queue claiming means several `wp lw-img optimize --all` workers can drain the queue at once
 - Processing-speed profiles (gentle / normal / fast) with a CPU load guard, so a bulk run never starves the site
 - Content URL rewrite on bulk convert/restore — post content and page-builder data, serialization-aware — plus a 301 redirect from old image URLs
-- WP-CLI: `wp lw-img status` / `optimize` / `restore` / `requeue`
+
+## WP-CLI
+
+```bash
+wp lw-img status                                   # queue, savings and connection overview
+wp lw-img optimize 123 456                         # optimize specific attachments
+wp lw-img optimize --all --limit=500 --speed=fast  # drain the queue (gentle / normal / fast)
+wp lw-img optimize --all --dry-run                 # preview what a run would do
+wp lw-img restore 123 456                          # restore originals from backup (thumbnails regenerated)
+wp lw-img requeue --failed --skipped               # put failed and/or skipped images back in the queue
+wp lw-img leftovers --rescan --format=json         # measure other optimizers' leftover backup folders
+wp lw-img smartcrop 123 456                        # re-crop selected thumbnail sizes around the subject
+wp lw-img smartcrop --all --sizes=thumbnail --yes  # whole library, specific sizes, no prompt
+wp lw-img smartcrop --all --dry-run                # preview the API cost first
+```
+
+Several `wp lw-img optimize --all` workers can run in parallel — queue claiming is concurrency-safe and the Bulk tab follows the run live. `smartcrop` works independently of the upload-time smart-crop toggle, so an existing library can be re-cropped on demand; it is also the remedy when a WordPress 7.1 browser upload never sends its finalize request and a scheduled crop is left behind.
 
 ## Admin
 
