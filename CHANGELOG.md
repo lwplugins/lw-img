@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.8.4] - 2026-08-23
+
+### Changed
+- The Account section now shows live data from the API's account endpoint: your plan name with its monthly limit (or "no monthly limit"), and this month's API-optimized image count and bytes saved for your domain — replacing the placeholder Balance/free-tier tiles. The "Optimized on this site" tile is unchanged (it is this install's own count; the API counts the whole key)
+
 ## [1.8.3] - 2026-08-23
 
 ### Fixed

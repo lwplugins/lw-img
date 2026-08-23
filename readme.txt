@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.8.3
+Stable tag: 1.8.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,9 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.8.4 =
+* Change: the Account section shows live plan, monthly limit, and this month's API usage (images + bytes saved) for your domain, replacing the placeholder Balance/free-tier tiles
 
 = 1.8.3 =
 * Fix: a bulk run halts immediately when the API key is removed or rejected mid-run — images stay pending instead of being stamped "skipped"
