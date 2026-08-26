@@ -11,7 +11,6 @@ namespace LightweightPlugins\Img\Health;
 
 defined( 'ABSPATH' ) || exit;
 
-use LightweightPlugins\Img\Bulk\Throttle;
 use LightweightPlugins\Img\Options;
 
 /**
@@ -69,18 +68,6 @@ final class EnvironmentChecks {
 				'message' => $avif ? __( 'supported', 'lw-img' ) : __( 'not supported — switch the output format to WebP or upgrade the image editor', 'lw-img' ),
 			];
 		}
-
-		$load   = function_exists( 'sys_getloadavg' ) ? sys_getloadavg() : false;
-		$rows[] = [
-			'label'   => __( 'CPU cores / load', 'lw-img' ),
-			'status'  => 'info',
-			'message' => sprintf(
-				/* translators: 1: CPU core count, 2: load average. */
-				__( '%1$d cores, 1-min load %2$s (in containers this may reflect the whole host)', 'lw-img' ),
-				Throttle::cpu_cores(),
-				is_array( $load ) ? number_format_i18n( (float) $load[0], 2 ) : __( 'unavailable', 'lw-img' )
-			),
-		];
 
 		return $rows;
 	}

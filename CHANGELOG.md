@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.6] - 2026-08-26
+
+### Fixed
+- The Test connection result now renders inside the connection card, right next to the button — the admin notice added in 1.8.5 rendered at the top of the panel and proved easy to miss, especially when the status pill already said "Connected"
+
+### Removed
+- The "CPU cores / load" info row is gone from the Tester — in containers the load figure reflects the whole host and only caused confusion; the bulk runner's own load guard is unaffected
+
 ## [1.8.5] - 2026-08-26
 
 ### Added

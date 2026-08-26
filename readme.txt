@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.8.5
+Stable tag: 1.8.6
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,10 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.8.6 =
+* Fix: the Test connection result renders inside the connection card next to the button, where it cannot be missed
+* Change: the "CPU cores / load" info row was removed from the Tester (misleading in containers; the bulk load guard is unaffected)
 
 = 1.8.5 =
 * New: the API key can be defined in wp-config.php (`LW_IMG_API_KEY`) — it wins over the stored option and is never written to the database

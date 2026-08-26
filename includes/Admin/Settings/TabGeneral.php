@@ -50,24 +50,10 @@ final class TabGeneral implements TabInterface {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display-only flag set by our own Test connection link; no state change.
-		if ( isset( $_GET['lw-img-retest'] ) && '' !== $api_key ) {
-			if ( null !== $account ) {
-				$plan = AccountPanel::plan_label( (string) ( $account['plan'] ?? '' ) );
-				echo '<div class="notice notice-success inline"><p>' . esc_html(
-					'' === $plan
-						? __( 'Connection test passed — the API key works.', 'lw-img' )
-						/* translators: %s: plan name. */
-						: sprintf( __( 'Connection test passed — the API key works (plan: %s).', 'lw-img' ), $plan )
-				) . '</p></div>';
-			} else {
-				echo '<div class="notice notice-error inline"><p>' . esc_html(
-					/* translators: %s: error message from the API. */
-					sprintf( __( 'Connection test failed: %s', 'lw-img' ), $error )
-				) . '</p></div>';
-			}
-		}
+		$retested = isset( $_GET['lw-img-retest'] ) && '' !== $api_key;
+		$plan     = null !== $account ? AccountPanel::plan_label( (string) ( $account['plan'] ?? '' ) ) : '';
 
-		$this->render_hero( $api_key, null !== $account, $error );
+		$this->render_hero( $api_key, null !== $account, $error, $retested, $plan );
 
 		if ( null !== $account ) {
 			AccountPanel::render( $account );
@@ -85,9 +71,11 @@ final class TabGeneral implements TabInterface {
 	 * @param string $api_key   Saved API key.
 	 * @param bool   $connected Whether the account fetch succeeded.
 	 * @param string $error     Fetch error message, if any.
+	 * @param bool   $retested  Whether the Test connection link was just clicked.
+	 * @param string $plan      Human-readable plan name, when known.
 	 * @return void
 	 */
-	private function render_hero( string $api_key, bool $connected, string $error ): void {
+	private function render_hero( string $api_key, bool $connected, string $error, bool $retested = false, string $plan = '' ): void {
 		if ( $connected ) {
 			$pill = [ 'ok', __( 'Connected', 'lw-img' ) ];
 			$lead = __( 'New uploads are converted automatically. The key is stored in wp_options.', 'lw-img' );
@@ -145,6 +133,30 @@ final class TabGeneral implements TabInterface {
 			);
 		}
 		echo '</div>';
+
+		// The result renders inside the hero, next to the button that was
+		// clicked — an admin notice at the top of the panel proved easy to
+		// miss, especially when the status pill already said "Connected".
+		if ( $retested ) {
+			if ( $connected ) {
+				$result = '' === $plan
+					? __( 'Connection test passed — the API key works.', 'lw-img' )
+					/* translators: %s: plan name. */
+					: sprintf( __( 'Connection test passed — the API key works (plan: %s).', 'lw-img' ), $plan );
+				printf(
+					'<p class="lw-img-gen-testresult lw-img-gen-testresult--ok"><span class="dashicons dashicons-yes-alt" aria-hidden="true"></span> %s</p>',
+					esc_html( $result )
+				);
+			} else {
+				printf(
+					'<p class="lw-img-gen-testresult lw-img-gen-testresult--fail"><span class="dashicons dashicons-dismiss" aria-hidden="true"></span> %s</p>',
+					esc_html(
+						/* translators: %s: error message from the API. */
+						sprintf( __( 'Connection test failed: %s', 'lw-img' ), $error )
+					)
+				);
+			}
+		}
 
 		$dash_url  = \LightweightPlugins\Img\lw_img_dashboard_url();
 		$dash_host = wp_parse_url( $dash_url, PHP_URL_HOST );

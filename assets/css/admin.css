@@ -703,3 +703,26 @@
 .lw-img-sc-sizes { display: grid; gap: 6px; margin: 12px 0 4px; }
 .lw-img-sc-size { display: flex; align-items: center; gap: 8px; }
 .lw-img-sc-dims { color: #646970; font-family: Consolas, Monaco, monospace; font-size: 12px; }
+
+/* Connection test result, rendered inside the hero next to the button. */
+.lw-img-gen-testresult {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin: 10px 0 0;
+	font-weight: 600;
+}
+
+.lw-img-gen-testresult .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.lw-img-gen-testresult--ok {
+	color: #1e8449;
+}
+
+.lw-img-gen-testresult--fail {
+	color: #b03a2e;
+}
