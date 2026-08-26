@@ -19,6 +19,7 @@ use LightweightPlugins\Img\Bulk\BulkJob;
 use LightweightPlugins\Img\Bulk\StatusMeta;
 use LightweightPlugins\Img\Bulk\Throttle;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
+use LightweightPlugins\Img\Health\RedirectProbe;
 use LightweightPlugins\Img\Media\RewriteBuffer;
 use LightweightPlugins\Img\Stats\SiteStats;
 use WP_CLI;
@@ -228,6 +229,10 @@ final class Commands {
 	 * : Pacing profile: gentle, normal, or fast. Overrides the saved setting
 	 * for this process. All profiles back off while the server load is high.
 	 *
+	 * [--skip-redirect-check]
+	 * : Run even when the web server swallows uploads 404s (old URLs of
+	 * converted images will 404 instead of redirecting — see the Tester tab).
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp lw-img optimize 123 456
@@ -250,6 +255,10 @@ final class Commands {
 		if ( isset( $assoc_args['dry-run'] ) ) {
 			$this->dry_run( $args, $assoc_args );
 			return;
+		}
+
+		if ( ! isset( $assoc_args['skip-redirect-check'] ) && false === RedirectProbe::works() ) {
+			WP_CLI::error( 'The web server answers missing image files itself, so old URLs of converted images would 404 instead of redirecting. Fix the server config (the Tester tab has the nginx snippet) or pass --skip-redirect-check to run anyway.' );
 		}
 
 		$buffer    = new RewriteBuffer();

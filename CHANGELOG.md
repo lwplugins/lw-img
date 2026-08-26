@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.8.5] - 2026-08-26
+
+### Added
+- The API key can now live in wp-config.php: `define( 'LW_IMG_API_KEY', 'himg_...' );` wins over the stored option, is never written to the database, and the settings field shows where the key comes from instead of the value
+- New Tester check "Old-image redirects": a loopback probe verifies that missing-image requests reach WordPress at all. On servers that answer uploads 404s themselves (nginx without an index.php fallback for that location), the plugin's 301 safety net for old URLs of converted images can never run — the check warns and provides the copyable nginx fix
+
+### Changed
+- Bulk optimize refuses to start when old-URL redirects cannot work: retroactive conversion renames public URLs and leans on the 301 net for external links and search results. The admin shows a clear notice; WP-CLI errors out with a `--skip-redirect-check` override for sites that accept the risk. New uploads are unaffected (their converted URL is the only one that ever existed)
+- The Test connection button now reports its result explicitly — success with the plan name, or the exact API error — instead of only reloading the page
+
 ## [1.8.4] - 2026-08-23
 
 ### Changed

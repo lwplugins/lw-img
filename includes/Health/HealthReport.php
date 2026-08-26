@@ -68,6 +68,7 @@ final class HealthReport {
 				'environment' => EnvironmentChecks::rows(),
 				'filesystem'  => FilesystemChecks::rows(),
 				'cron'        => CronChecks::rows(),
+				'redirects'   => RedirectChecks::rows(),
 				'api'         => ApiChecks::rows(),
 			],
 			'generated_at' => time(),

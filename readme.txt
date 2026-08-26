@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.8.4
+Stable tag: 1.8.5
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,12 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.8.5 =
+* New: the API key can be defined in wp-config.php (`LW_IMG_API_KEY`) — it wins over the stored option and is never written to the database
+* New: Tester check "Old-image redirects" — detects servers that answer missing image files themselves (where the 301 redirect for old URLs can never run) and provides the copyable nginx fix
+* Change: bulk optimize refuses to start when old-URL redirects cannot work (admin notice; WP-CLI `--skip-redirect-check` override) — new uploads are unaffected
+* Change: the Test connection button reports its result explicitly instead of only reloading the page
 
 = 1.8.4 =
 * Change: the Account section shows live plan, monthly limit, and this month's API usage (images + bytes saved) for your domain, replacing the placeholder Balance/free-tier tiles

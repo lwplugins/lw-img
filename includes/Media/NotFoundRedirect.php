@@ -26,6 +26,12 @@ final class NotFoundRedirect {
 	private const OLD_EXTENSIONS = [ 'jpg', 'jpeg', 'png', 'gif', 'heic', 'heif', 'tif', 'tiff', 'bmp' ];
 
 	/**
+	 * File name the loopback probe requests to prove that missing-image
+	 * requests reach WordPress at all (see Health\RedirectProbe).
+	 */
+	public const PROBE_BASENAME = 'lw-img-redirect-probe.png';
+
+	/**
 	 * Hook the 404 handler.
 	 *
 	 * @return void
@@ -40,13 +46,28 @@ final class NotFoundRedirect {
 	 * @return void
 	 */
 	public static function maybe_redirect(): void {
-		if ( ! is_404() || ! (bool) Options::get( 'redirect_missing_images' ) ) {
+		if ( ! is_404() ) {
 			return;
 		}
 
 		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- parsed and matched against known attachment paths only, never echoed.
 		$path        = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
-		$base_path   = (string) wp_parse_url( (string) wp_get_upload_dir()['baseurl'], PHP_URL_PATH );
+
+		if ( self::is_probe_path( $path ) ) {
+			// The Tester / bulk-gate probe: answering proves the request
+			// made it past the web server to WordPress. Answered even with
+			// redirects switched off — it tests routing, not the option.
+			header( 'X-LW-Img-Probe: ok' );
+			status_header( 200 );
+			echo 'lw-img-probe-ok';
+			exit;
+		}
+
+		if ( ! (bool) Options::get( 'redirect_missing_images' ) ) {
+			return;
+		}
+
+		$base_path = (string) wp_parse_url( (string) wp_get_upload_dir()['baseurl'], PHP_URL_PATH );
 
 		$parsed = self::parse_request( $path, $base_path );
 		if ( null === $parsed ) {
@@ -60,6 +81,20 @@ final class NotFoundRedirect {
 
 		wp_safe_redirect( $target, 301, 'lw-img' );
 		exit;
+	}
+
+	/**
+	 * Whether a request path is the loopback probe.
+	 *
+	 * Only the basename is matched: the probe is always requested under
+	 * the uploads directory, and a stray hit elsewhere answers a harmless
+	 * marker instead of a page.
+	 *
+	 * @param string $path Request path.
+	 * @return bool
+	 */
+	public static function is_probe_path( string $path ): bool {
+		return str_ends_with( $path, '/' . self::PROBE_BASENAME );
 	}
 
 	/**

@@ -68,4 +68,24 @@ final class NotFoundRedirectTest extends MonkeyTestCase {
 			'uploads base itself' => [ self::BASE ],
 		];
 	}
+
+	/**
+	 * @dataProvider provide_probe_paths
+	 */
+	public function test_recognizes_the_probe_path( string $path, bool $expected ): void {
+		$this->assertSame( $expected, NotFoundRedirect::is_probe_path( $path ) );
+	}
+
+	/**
+	 * @return array<string, array{string, bool}>
+	 */
+	public static function provide_probe_paths(): array {
+		return [
+			'probe under uploads'   => [ self::BASE . '/lw-img-redirect-probe.png', true ],
+			'probe in a subdir'     => [ self::BASE . '/2026/08/lw-img-redirect-probe.png', true ],
+			'ordinary image'        => [ self::BASE . '/2026/08/hero.png', false ],
+			'probe name as prefix'  => [ self::BASE . '/lw-img-redirect-probe.png.jpg', false ],
+			'probe without a slash' => [ 'lw-img-redirect-probe.png', false ],
+		];
+	}
 }

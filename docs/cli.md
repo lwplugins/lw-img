@@ -23,7 +23,10 @@ wp lw-img optimize --all --dry-run          # show what would happen
 claiming — run several workers in parallel and the Bulk tab follows
 along. The run refuses to process without a working API key, and halts
 (leaving images pending) if the key is rejected or the account runs out
-of credit mid-run.
+of credit mid-run. It also refuses when the web server swallows uploads
+404s (old URLs of converted images would 404 instead of redirecting —
+the Tester tab has the nginx fix); pass `--skip-redirect-check` to run
+anyway.
 
 ## `wp lw-img restore`
 

@@ -10,6 +10,11 @@ The connection hero shows whether the API key works, with the key field,
 a *Save key* button, a show/hide toggle, and *Test connection*. (Testing
 with an edited key saves it first, so a rotated key is never lost.)
 
+The key can also come from wp-config.php (`LW_IMG_API_KEY`) — the field
+then shows that instead of an editable value. Clicking *Test connection*
+reports the result explicitly (plan name on success, the exact error on
+failure).
+
 With a working key, the **Account** tiles show live data from the API:
 
 - **Plan** — your plan name and monthly limit (or "no monthly limit")
@@ -65,8 +70,9 @@ never deleted on uninstall.
 
 Environment checks with a verdict hero and a needs-attention list with
 copyable fix commands: database table engines (MyISAM warnings), WebP /
-AVIF thumbnail support, cron loopback, disk space, and API
-reachability. Results are cached for ten minutes; the *Run tests again*
+AVIF thumbnail support, cron loopback, old-image redirects (whether
+missing-image requests reach WordPress — with the nginx fix when they
+do not), disk space, and API reachability. Results are cached for ten minutes; the *Run tests again*
 button and any settings save refresh them.
 
 ## Log

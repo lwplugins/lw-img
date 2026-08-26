@@ -25,6 +25,7 @@ final class TabTester implements TabInterface {
 		'environment' => 'dashicons-performance',
 		'filesystem'  => 'dashicons-open-folder',
 		'cron'        => 'dashicons-clock',
+		'redirects'   => 'dashicons-external',
 		'api'         => 'dashicons-cloud',
 	];
 
@@ -173,6 +174,7 @@ final class TabTester implements TabInterface {
 			'environment' => __( 'PHP & image processing', 'lw-img' ),
 			'filesystem'  => __( 'Filesystem', 'lw-img' ),
 			'cron'        => __( 'Background processing', 'lw-img' ),
+			'redirects'   => __( 'Old-URL redirects', 'lw-img' ),
 			'api'         => __( 'API & plugins', 'lw-img' ),
 		];
 

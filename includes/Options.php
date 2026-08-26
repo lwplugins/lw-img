@@ -39,6 +39,13 @@ final class Options {
 	}
 
 	public static function get( string $key, mixed $default = null ): mixed {
+		if ( 'api_key' === $key ) {
+			$constant = self::constant_api_key();
+			if ( null !== $constant ) {
+				return $constant;
+			}
+		}
+
 		$options = self::get_all();
 
 		if ( array_key_exists( $key, $options ) ) {
@@ -46,6 +53,26 @@ final class Options {
 		}
 
 		return $default ?? ( self::get_defaults()[ $key ] ?? null );
+	}
+
+	/**
+	 * API key defined in wp-config.php, when present.
+	 *
+	 * `define( 'LW_IMG_API_KEY', 'himg_...' );` wins over the stored
+	 * option and is never persisted: the sanitizer reads current values
+	 * through get_all(), which stays database-only, so saving settings
+	 * cannot copy the secret into the database.
+	 *
+	 * @return string|null The key, or null when not defined (or blank).
+	 */
+	public static function constant_api_key(): ?string {
+		if ( ! defined( 'LW_IMG_API_KEY' ) ) {
+			return null;
+		}
+
+		$key = trim( (string) constant( 'LW_IMG_API_KEY' ) );
+
+		return '' === $key ? null : $key;
 	}
 
 	public static function set( string $key, mixed $value ): bool {

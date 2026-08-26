@@ -49,6 +49,24 @@ final class TabGeneral implements TabInterface {
 			}
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display-only flag set by our own Test connection link; no state change.
+		if ( isset( $_GET['lw-img-retest'] ) && '' !== $api_key ) {
+			if ( null !== $account ) {
+				$plan = AccountPanel::plan_label( (string) ( $account['plan'] ?? '' ) );
+				echo '<div class="notice notice-success inline"><p>' . esc_html(
+					'' === $plan
+						? __( 'Connection test passed — the API key works.', 'lw-img' )
+						/* translators: %s: plan name. */
+						: sprintf( __( 'Connection test passed — the API key works (plan: %s).', 'lw-img' ), $plan )
+				) . '</p></div>';
+			} else {
+				echo '<div class="notice notice-error inline"><p>' . esc_html(
+					/* translators: %s: error message from the API. */
+					sprintf( __( 'Connection test failed: %s', 'lw-img' ), $error )
+				) . '</p></div>';
+			}
+		}
+
 		$this->render_hero( $api_key, null !== $account, $error );
 
 		if ( null !== $account ) {
@@ -91,24 +109,34 @@ final class TabGeneral implements TabInterface {
 		echo '<p class="lw-img-gen-lead">' . esc_html( $lead ) . '</p>';
 
 		echo '<div class="lw-img-gen-keyrow">';
-		$this->render_text_field(
-			[
-				'name'        => 'api_key',
-				'type'        => 'password',
-				'placeholder' => 'himg_...',
-				'aria_label'  => __( 'HelloImg API key', 'lw-img' ),
-			]
-		);
-		printf(
-			'<button type="button" class="button lw-img-key-toggle" aria-pressed="false" title="%1$s" aria-label="%1$s" data-label-show="%1$s" data-label-hide="%2$s"><span class="dashicons dashicons-visibility" aria-hidden="true"></span></button>',
-			esc_attr__( 'Show key', 'lw-img' ),
-			esc_attr__( 'Hide key', 'lw-img' )
-		);
+		if ( null !== Options::constant_api_key() ) {
+			// The key lives in wp-config.php: show that (never the value),
+			// and offer nothing to edit — the constant wins over any save.
+			printf(
+				'<input type="text" class="regular-text" value="%s" disabled aria-label="%s" />',
+				esc_attr__( 'Defined in wp-config.php (LW_IMG_API_KEY)', 'lw-img' ),
+				esc_attr__( 'HelloImg API key', 'lw-img' )
+			);
+		} else {
+			$this->render_text_field(
+				[
+					'name'        => 'api_key',
+					'type'        => 'password',
+					'placeholder' => 'himg_...',
+					'aria_label'  => __( 'HelloImg API key', 'lw-img' ),
+				]
+			);
+			printf(
+				'<button type="button" class="button lw-img-key-toggle" aria-pressed="false" title="%1$s" aria-label="%1$s" data-label-show="%1$s" data-label-hide="%2$s"><span class="dashicons dashicons-visibility" aria-hidden="true"></span></button>',
+				esc_attr__( 'Show key', 'lw-img' ),
+				esc_attr__( 'Hide key', 'lw-img' )
+			);
 
-		// The submit is always here: with only the old "Test connection" link
-		// beside the field, pasting a rotated key and clicking it navigated
-		// away and silently discarded the edit.
-		echo '<button type="submit" class="button button-primary">' . esc_html__( 'Save key', 'lw-img' ) . '</button>';
+			// The submit is always here: with only the old "Test connection" link
+			// beside the field, pasting a rotated key and clicking it navigated
+			// away and silently discarded the edit.
+			echo '<button type="submit" class="button button-primary">' . esc_html__( 'Save key', 'lw-img' ) . '</button>';
+		}
 		if ( '' !== $api_key ) {
 			printf(
 				'<a href="%s" class="button lw-img-key-test">%s</a>',

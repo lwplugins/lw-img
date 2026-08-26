@@ -12,6 +12,7 @@ namespace LightweightPlugins\Img\Bulk;
 defined( 'ABSPATH' ) || exit;
 
 use LightweightPlugins\Img\Api\Client;
+use LightweightPlugins\Img\Health\RedirectProbe;
 use LightweightPlugins\Img\Options;
 
 /**
@@ -85,6 +86,16 @@ final class JobHandlers {
 		if ( ! BulkJob::is_running() ) {
 			if ( ! self::key_works() ) {
 				wp_safe_redirect( admin_url( 'admin.php?page=lw-img&lw-img-bulk-notice=key#bulk' ) );
+				exit;
+			}
+
+			// A bulk run rewrites public URLs and leans on the 301 safety
+			// net for external links. When the web server swallows uploads
+			// 404s, that net cannot exist — refuse rather than strand old
+			// URLs. Only an explicit false blocks: an unverifiable probe
+			// (loopback blocked) must not disable the feature.
+			if ( false === RedirectProbe::works() ) {
+				wp_safe_redirect( admin_url( 'admin.php?page=lw-img&lw-img-bulk-notice=redirects#bulk' ) );
 				exit;
 			}
 

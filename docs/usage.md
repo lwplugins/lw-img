@@ -43,7 +43,12 @@ the old image URLs.
 A run **halts immediately** (images stay pending, nothing is stamped)
 when the API reports the account out of credit, or when the API key is
 removed or rejected mid-run. Starting a run requires a working key — the
-Start action live-checks it first.
+Start action live-checks it first — and requires working old-URL
+redirects: on servers that answer missing image files themselves (nginx
+without an index.php fallback for uploads), the 301 safety net for
+converted images' old URLs can never run, so the bulk run refuses to
+start. The Tester tab detects this and shows the copyable nginx fix;
+new uploads are unaffected either way.
 
 Already-optimized images are never touched again: changing the output
 format later does not retroactively re-convert anything. Re-processing
@@ -70,6 +75,19 @@ Two things that are by design, not bugs:
   square sizes, so there is nothing to crop away.
 - Bulk optimize and thumbnail regenerators never smart-crop; only real
   uploads (and the CLI command) do.
+
+## API key in wp-config.php
+
+Instead of the settings field, the key can be defined in code:
+
+```php
+define( 'LW_IMG_API_KEY', 'himg_...' );
+```
+
+The constant wins over the stored option and is never written to the
+database — useful for staging/production configs and for keeping the
+secret out of DB dumps. The settings field then shows where the key
+comes from instead of an editable value.
 
 ## Hooks
 
