@@ -77,6 +77,12 @@ After activation: **LW Plugins → Image** → paste your HelloImg API key. Get 
 | Backup retention | 30 days | `0` = keep forever |
 | Bulk speed | `normal` | `gentle` / `normal` / `fast` |
 
+## Documentation
+
+Full guides live in [`docs/`](docs/README.md): [usage](docs/usage.md)
+(pipeline, bulk, backups, smart crop, hooks), [admin](docs/admin.md)
+(every tab + Media Library), and [WP-CLI](docs/cli.md).
+
 ## Requirements
 
 - WordPress 6.0+
