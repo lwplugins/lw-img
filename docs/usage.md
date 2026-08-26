@@ -47,12 +47,71 @@ Start action live-checks it first — and requires working old-URL
 redirects: on servers that answer missing image files themselves (nginx
 without an index.php fallback for uploads), the 301 safety net for
 converted images' old URLs can never run, so the bulk run refuses to
-start. The Tester tab detects this and shows the copyable nginx fix;
-new uploads are unaffected either way.
+start. The Tester tab detects this and shows the copyable nginx fix —
+see [Web server configuration for old-URL
+redirects](#web-server-configuration-for-old-url-redirects) for the
+per-server details; new uploads are unaffected either way.
 
 Already-optimized images are never touched again: changing the output
 format later does not retroactively re-convert anything. Re-processing
 is always explicit (row action, requeue, or CLI).
+
+## Web server configuration for old-URL redirects
+
+The 301 safety net only works when a request for a **missing** image
+file reaches WordPress. Whether it does depends on the web server — the
+Tester tab's *Old-image redirects* check tells you where you stand, and
+bulk optimize refuses to start until it passes.
+
+### Apache
+
+Nothing to add. The standard WordPress `.htaccess` already sends every
+request for a non-existent file to `index.php`:
+
+```apache
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+```
+
+If the check still fails on Apache, that block has been removed or
+overridden (custom rules that answer image extensions directly, or
+`AllowOverride None` without an equivalent vhost config) — restore the
+standard block.
+
+### nginx
+
+nginx answers static-file misses itself by default, so WordPress never
+sees them. Add this to the site's server block:
+
+```nginx
+location ~* ^/wp-content/uploads/.*\.(png|jpe?g|gif|bmp|tiff?)$ {
+    try_files $uri /index.php?$args;
+}
+```
+
+Existing files are still served directly by nginx; only misses fall
+through. Two placement notes: nginx uses the **first matching regex
+location**, so this block must appear *before* any generic static-asset
+location (`location ~* \.(jpg|png|css|js)$ { expires max; }` and the
+like), and if that generic block sets cache headers you want to keep,
+copy them into this one. Reload nginx afterwards.
+
+### LiteSpeed
+
+LiteSpeed Enterprise reads the standard WordPress `.htaccess`, so as on
+Apache there is nothing to add. On **OpenLiteSpeed**, make sure rewrite
+rules and ".htaccess auto load" are enabled for the virtual host
+(Rewrite → Enable Rewrite + Auto Load from .htaccess), then restart —
+without those, OpenLiteSpeed behaves like unconfigured nginx and
+swallows the misses.
+
+### CDN caveat
+
+A CDN in front of the site (Cloudflare and similar) may have **cached
+the 404s** from before the fix. After the server change, purge the
+cache for the affected URLs (or `/wp-content/uploads/*`), or the old
+responses keep being served until they expire.
 
 ## Backups and restore
 
