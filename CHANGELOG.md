@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.8.7] - 2026-08-28
+
+### Changed
+- The default optimization level is now **lossless** — fresh installs convert pixel-perfectly (WebP VP8L) out of the box. Existing installs keep their saved level. Note the trade-off: a losslessly re-encoded JPEG photo is usually larger than the source, so the size guard keeps the original and the image is skipped; photo-heavy sites should switch to normal or stronger
+
 ## [1.8.6] - 2026-08-26
 
 ### Fixed

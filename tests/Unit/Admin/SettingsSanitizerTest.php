@@ -73,7 +73,8 @@ final class SettingsSanitizerTest extends MonkeyTestCase {
 	public function test_unknown_level_falls_back_to_current_value(): void {
 		$sanitized = SettingsSanitizer::sanitize( [ 'level' => 'bogus' ] );
 
-		$this->assertSame( 'normal', $sanitized['level'] );
+		// Nothing is saved in this fixture, so "current" is the default level.
+		$this->assertSame( 'lossless', $sanitized['level'] );
 	}
 
 	public function test_output_format_is_whitelisted(): void {

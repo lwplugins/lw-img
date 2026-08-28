@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.8.6
+Stable tag: 1.8.7
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,7 +23,7 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 * Size guard: the original is kept if the converted file would not be smaller
 * Graceful fallback — if the API is unreachable, the original upload is kept
 * Original image backup (on by default) with configurable retention — restore any optimized image from the Media Library, thumbnails are regenerated automatically
-* Three optimization levels: normal, aggressive, ultra
+* Four optimization levels: lossless (pixel-perfect, the default), normal, aggressive, ultra
 * Optional EXIF preservation
 * Free tier: 1,000 images/month via HelloImg
 
@@ -74,6 +74,9 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.8.7 =
+* Change: the default optimization level is now lossless (pixel-perfect) — existing installs keep their saved level; photo-heavy sites should switch to normal or stronger, since losslessly re-encoded JPEGs are usually larger and get skipped by the size guard
 
 = 1.8.6 =
 * Fix: the Test connection result renders inside the connection card next to the button, where it cannot be missed
