@@ -69,7 +69,7 @@ After activation: **LW Plugins → Image** → paste your HelloImg API key. Get 
 | Setting | Default | Notes |
 |---|---|---|
 | Output format | `webp` | `webp` (widest support) or `avif` |
-| Optimization level | `lossless` | `lossless` / `normal` / `aggressive` / `ultra` |
+| Optimization level | `normal` | `lossless` / `normal` / `aggressive` / `ultra` |
 | Keep EXIF | off | Smaller files, and drops camera/GPS metadata |
 | Skip already-WebP | on | Saves credits |
 | Skip animated GIF | off | Converted to animated WebP by default |

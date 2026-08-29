@@ -33,7 +33,7 @@ final class DefaultOptions {
 	private static function upload(): array {
 		return [
 			'auto_convert'       => true,
-			'level'              => 'lossless',
+			'level'              => 'normal',
 			'output_format'      => 'webp',
 			'keep_exif'          => false,
 			'max_width'          => 0,

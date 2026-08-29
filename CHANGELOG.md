@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.8.8] - 2026-08-29
+
+### Changed
+- The default optimization level is back to **normal**. A side-by-side eye test on a real photo settled it: normal is visually transparent (~41 dB PSNR, no difference at 100% view) at roughly half the size, while the lossless default made JPEG photos skip (a lossless re-encode is larger, so the size guard keeps the original) — a fresh install looked like the plugin was doing nothing on photo sites. Lossless remains one click away for pixel-perfect graphics work; saved settings are untouched either way
+
 ## [1.8.7] - 2026-08-28
 
 ### Changed

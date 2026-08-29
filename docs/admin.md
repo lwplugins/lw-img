@@ -41,7 +41,7 @@ The auto-conversion pipeline, grouped by question:
 |---|---|---|
 | Auto-convert uploads | on | The master toggle |
 | Output format | `webp` | or `avif` |
-| Optimization level | `lossless` | `lossless` / `normal` / `aggressive` / `ultra` |
+| Optimization level | `normal` | `lossless` / `normal` / `aggressive` / `ultra` |
 | Keep EXIF | off | Off drops camera/GPS metadata |
 | Max width / height | 0 / 0 | Resize on upload; `0` = no limit, never upscales |
 | Skip already-WebP | on | Saves credits |
@@ -51,11 +51,13 @@ The auto-conversion pipeline, grouped by question:
 | MIME types | JPEG, PNG, HEIC/HEIF, TIFF, BMP, GIF | Which types enter the pipeline |
 | Smart crop | off | Enable + pick the hard-cropped sizes; the per-upload API cost is shown before you commit |
 
-The default level is **lossless**: conversions are pixel-perfect
-(WebP's VP8L mode), which shrinks PNGs and graphics substantially. A
-losslessly re-encoded JPEG photo usually comes back *larger*, so the
-size guard keeps the original and the image is skipped — on photo-heavy
-sites, switch to `normal` (or stronger) to actually convert photos.
+The default level is **normal** — on photos it is visually transparent
+(measured ~41 dB PSNR on a real photo, no difference at 100% view)
+while cutting sizes roughly in half. **Lossless** (WebP's VP8L mode) is
+there for pixel-perfect needs: it shrinks PNGs and graphics
+substantially, but a losslessly re-encoded JPEG photo usually comes
+back *larger*, so the size guard keeps the original and the image is
+skipped.
 
 ## Bulk
 

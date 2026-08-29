@@ -33,7 +33,7 @@ final class OptionsTest extends MonkeyTestCase {
 	public function test_get_falls_back_to_default_when_nothing_saved(): void {
 		Functions\when( 'get_option' )->justReturn( [] );
 
-		$this->assertSame( 'lossless', Options::get( 'level' ) );
+		$this->assertSame( 'normal', Options::get( 'level' ) );
 		$this->assertTrue( (bool) Options::get( 'auto_convert' ) );
 		$this->assertSame( 10, Options::get( 'max_filesize_mb' ) );
 	}
