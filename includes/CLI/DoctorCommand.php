@@ -42,16 +42,18 @@ final class DoctorCommand {
 	public function __invoke( array $args, array $assoc_args ): void {
 		$report = HealthReport::get( true );
 		$rows   = self::flatten( $report['sections'] );
+		$format = isset( $assoc_args['format'] ) ? (string) $assoc_args['format'] : 'table';
 
-		WP_CLI\Utils\format_items(
-			isset( $assoc_args['format'] ) ? (string) $assoc_args['format'] : 'table',
-			$rows,
-			[ 'section', 'check', 'status', 'message' ]
-		);
+		WP_CLI\Utils\format_items( $format, $rows, [ 'section', 'check', 'status', 'message' ] );
 
-		foreach ( $rows as $row ) {
-			if ( '' !== (string) ( $row['fix'] ?? '' ) ) {
-				WP_CLI::log( sprintf( 'fix (%s): %s', $row['check'], $row['fix'] ) );
+		// Machine formats get ONLY the data on stdout — a trailing summary
+		// would corrupt json/csv/yaml for whatever is parsing the pipe. The
+		// critical exit below still applies: error() writes to stderr.
+		if ( 'table' === $format ) {
+			foreach ( $rows as $row ) {
+				if ( '' !== (string) ( $row['fix'] ?? '' ) ) {
+					WP_CLI::log( sprintf( 'fix (%s): %s', $row['check'], $row['fix'] ) );
+				}
 			}
 		}
 
@@ -61,13 +63,15 @@ final class DoctorCommand {
 			WP_CLI::error( sprintf( '%d critical check(s) failed.', $counts['critical'] ) );
 		}
 
-		WP_CLI::success(
-			sprintf(
-				'%d checks — %s.',
-				count( $rows ),
-				implode( ', ', array_map( static fn ( string $s, int $n ): string => "$n $s", array_keys( $counts ), $counts ) )
-			)
-		);
+		if ( 'table' === $format ) {
+			WP_CLI::success(
+				sprintf(
+					'%d checks — %s.',
+					count( $rows ),
+					implode( ', ', array_map( static fn ( string $s, int $n ): string => "$n $s", array_keys( $counts ), $counts ) )
+				)
+			);
+		}
 	}
 
 	/**
