@@ -229,6 +229,10 @@ final class Commands {
 	 * : Pacing profile: gentle, normal, or fast. Overrides the saved setting
 	 * for this process. All profiles back off while the server load is high.
 	 *
+	 * [--level=<level>]
+	 * : Convert at this optimization level instead of the saved setting:
+	 * lossless, normal, aggressive, or ultra.
+	 *
 	 * [--skip-redirect-check]
 	 * : Run even when the web server swallows uploads 404s (old URLs of
 	 * converted images will 404 instead of redirecting — see the Tester tab).
@@ -238,6 +242,7 @@ final class Commands {
 	 *     wp lw-img optimize 123 456
 	 *     wp lw-img optimize --all
 	 *     wp lw-img optimize --all --speed=gentle
+	 *     wp lw-img optimize 123 --level=lossless
 	 *     wp lw-img optimize --all --limit=50 --dry-run
 	 *
 	 * @param array<int, string>    $args       Positional arguments.
@@ -262,7 +267,7 @@ final class Commands {
 		}
 
 		$buffer    = new RewriteBuffer();
-		$optimizer = new AttachmentOptimizer( null, null, null, null, $buffer );
+		$optimizer = new AttachmentOptimizer( null, null, null, LevelOption::parse( $assoc_args ), $buffer );
 		$counts    = [
 			AttachmentOptimizer::RESULT_OPTIMIZED => 0,
 			AttachmentOptimizer::RESULT_SKIPPED   => 0,

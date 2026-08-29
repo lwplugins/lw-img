@@ -2,6 +2,10 @@
 
 ## [1.8.8] - 2026-08-29
 
+### Added
+- `wp lw-img doctor` — the Tester tab's environment checks from the terminal, as a table (or csv/json/yaml). Prints the copyable fix for failing checks and exits non-zero on criticals, so it slots into monitoring and remote diagnosis
+- `wp lw-img optimize --level=<level>` — convert at a specific optimization level for one run, overriding the saved setting (the CLI counterpart of the Media Library's re-optimize action)
+
 ### Changed
 - The default optimization level is back to **normal**. A side-by-side eye test on a real photo settled it: normal is visually transparent (~41 dB PSNR, no difference at 100% view) at roughly half the size, while the lossless default made JPEG photos skip (a lossless re-encode is larger, so the size guard keeps the original) — a fresh install looked like the plugin was doing nothing on photo sites. Lossless remains one click away for pixel-perfect graphics work; saved settings are untouched either way
 

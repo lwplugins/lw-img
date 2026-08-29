@@ -59,6 +59,18 @@ Measures backup folders and sidecar originals left behind by other
 optimizer plugins (dedicated backup dirs and beside-the-image patterns
 alike). Read-only — LW Image never deletes them.
 
+## `wp lw-img doctor`
+
+```bash
+wp lw-img doctor                 # every Tester check, fresh, as a table
+wp lw-img doctor --format=json   # table | csv | json | yaml | count
+```
+
+The Tester tab's environment checks from the terminal — database
+engines, image-editor support, cron loopback, old-image redirects (with
+the nginx fix printed when it fails), disk space, API reachability.
+Exits non-zero when any check is critical, so it can sit in monitoring.
+
 ## `wp lw-img smartcrop`
 
 ```bash

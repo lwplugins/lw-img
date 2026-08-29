@@ -76,6 +76,8 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 == Changelog ==
 
 = 1.8.8 =
+* New: wp lw-img doctor — the Tester's environment checks from the terminal, with non-zero exit on critical failures
+* New: wp lw-img optimize --level=<level> — override the saved optimization level for one run
 * Change: the default optimization level is back to normal — visually transparent on photos at roughly half the size, while the lossless default made fresh installs skip most JPEG photos; lossless stays available for pixel-perfect graphics
 
 = 1.8.7 =
