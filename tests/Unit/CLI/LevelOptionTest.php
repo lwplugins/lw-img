@@ -42,7 +42,7 @@ final class LevelOptionTest extends MonkeyTestCase {
 	}
 
 	public function test_unknown_level_is_rejected(): void {
-		\Brain\Monkey\Functions\when( 'esc_html' )->returnArg();
+		\Brain\Monkey\Functions\when( 'sanitize_key' )->returnArg();
 		$this->expectException( \InvalidArgumentException::class );
 
 		LevelOption::normalize( 'bogus' );

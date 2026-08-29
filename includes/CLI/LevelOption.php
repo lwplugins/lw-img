@@ -42,9 +42,10 @@ final class LevelOption {
 		];
 
 		if ( ! in_array( $level, $known, true ) ) {
-			throw new \InvalidArgumentException(
-				esc_html( sprintf( 'unknown level "%s" — use one of: %s', $raw, implode( ', ', $known ) ) )
-			);
+			$message = sprintf( 'unknown level "%s" — use one of: %s', sanitize_key( $raw ), implode( ', ', $known ) );
+
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- CLI-only: the message goes to the terminal via WP_CLI::error(), where HTML entities would render literally.
+			throw new \InvalidArgumentException( $message );
 		}
 
 		return $level;
