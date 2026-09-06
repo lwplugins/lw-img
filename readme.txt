@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.8.8
+Stable tag: 1.8.9
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,9 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.8.9 =
+* Fix: the release package and Composer dist no longer ship tests, docs or development configuration
 
 = 1.8.8 =
 * New: wp lw-img doctor — the Tester's environment checks from the terminal, with non-zero exit on critical failures
