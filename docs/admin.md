@@ -47,7 +47,7 @@ The auto-conversion pipeline, grouped by question:
 | Skip already-WebP | on | Saves credits |
 | Skip animated GIF | off | Off converts to animated WebP |
 | Max / min file size | 10 MB / 0 KB | Files outside the range are skipped |
-| Exclusion patterns | — | Wildcard patterns on file name or path; matching files are never sent to the API |
+| Pattern rules | — | Wildcard pattern + action: skip entirely, keep original dimensions, use a specific level, keep EXIF. Every matching rule applies; skip wins; first level rule wins |
 | MIME types | JPEG, PNG, HEIC/HEIF, TIFF, BMP, GIF | Which types enter the pipeline |
 | Smart crop | off | Enable + pick the hard-cropped sizes; the per-upload API cost is shown before you commit |
 

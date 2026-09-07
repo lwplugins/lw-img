@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.8.9
+Stable tag: 1.9.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,7 +36,7 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 * Stats tab: total savings, biggest wins, backup folder size, and originals left behind by other optimizers (ShortPixel backup folders and Swift Performance .swift-original files)
 * Recognizes images already optimized by ShortPixel, TinyPNG, Imagify, Smush, or EWWW and leaves them untouched
 * Media Library savings column, "Optimize now" / "Restore original" row actions, attachment info box, Compare, Re-optimize
-* Exclusion patterns (wildcard filename/path rules) and min/max file size limits
+* Pattern rules (wildcard filename/path rules: skip, keep dimensions, level, keep EXIF) and min/max file size limits
 * WP-CLI: wp lw-img status / optimize / restore / requeue / leftovers / smartcrop
 
 **Roadmap:**
@@ -74,6 +74,18 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.9.0 =
+* New: pattern rules — per wildcard pattern: skip entirely, keep original dimensions, use a specific optimization level, or keep EXIF; applies to uploads, bulk and smart crop (existing exclusion patterns migrate automatically)
+* New: Media Library filter by LW Image status (optimized / skipped / failed / not yet processed); Bulk tiles and the finished banner open it in list view
+* New: wp lw-img list --status=<status>
+* New: retry a skipped or failed image at a chosen level from the attachment screen
+* New: "This run uses" card on the Bulk tab — level, output, resize, rules, EXIF, backup, and a note that thumbnails regenerate automatically
+* Update: skipped "not smaller" entries record and show the original and would-be sizes in the Log, the Media Library column and the attachment box; Log rows link to the attachment
+* Update: bulk start shows a checking state, Elapsed counts before the first tick, the feed says it is waiting
+* Update: the Save button appears only on tabs that hold settings
+* Update: the old-URL redirect description explains that nothing is stored
+* Update: lw_img_optimize_request_args now runs for bulk and on-demand conversions too; lw_img_upload_skipped / lw_img_upload_failed gain an optional context argument
 
 = 1.8.9 =
 * Fix: the release package and Composer dist no longer ship tests, docs or development configuration
