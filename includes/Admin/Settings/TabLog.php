@@ -171,11 +171,32 @@ final class TabLog implements TabInterface {
 				esc_html( $ts > 0 ? (string) wp_date( 'Y-m-d H:i', $ts ) : '—' ),
 				esc_attr( $status ),
 				esc_html( $this->status_label( $status ) ),
-				esc_html( $file ),
+				wp_kses_post( $this->file_html( $entry, $file ) ),
 				wp_kses_post( $this->details_html( $entry, $status ) )
 			);
 		}
 		echo '</ul>';
+	}
+
+	/**
+	 * File name, linked to the attachment editor when the entry knows its id.
+	 *
+	 * @param array<string, mixed> $entry Log entry.
+	 * @param string               $file  Base name.
+	 * @return string
+	 */
+	private function file_html( array $entry, string $file ): string {
+		$id = (int) ( $entry['attachment_id'] ?? 0 );
+		if ( $id <= 0 ) {
+			return esc_html( $file );
+		}
+
+		$link = get_edit_post_link( $id, 'url' );
+		if ( ! is_string( $link ) || '' === $link ) {
+			return esc_html( $file );
+		}
+
+		return '<a href="' . esc_url( $link ) . '">' . esc_html( $file ) . '</a>';
 	}
 
 	/**
@@ -206,6 +227,23 @@ final class TabLog implements TabInterface {
 
 		if ( EventLog::STATUS_RESTORED === $status ) {
 			return '<span class="lw-img-log-d">' . esc_html__( 'original restored from backup', 'lw-img' ) . '</span>';
+		}
+
+		$size_in  = (int) ( $entry['size_in'] ?? 0 );
+		$size_out = (int) ( $entry['size_out'] ?? 0 );
+		if ( EventLog::STATUS_SKIPPED === $status && $size_in > 0 && $size_out > 0 ) {
+			return sprintf(
+				'<span class="lw-img-log-d">%s — %s</span>',
+				esc_html( (string) ( $entry['reason'] ?? '' ) ),
+				esc_html(
+					sprintf(
+						/* translators: 1: original file size, 2: size the converted file would have had. */
+						__( '%1$s original, converted would be %2$s', 'lw-img' ),
+						(string) size_format( $size_in ),
+						(string) size_format( $size_out )
+					)
+				)
+			);
 		}
 
 		return '<span class="lw-img-log-d">' . esc_html( (string) ( $entry['reason'] ?? '' ) ) . '</span>';

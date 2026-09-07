@@ -29,8 +29,8 @@ final class EventLog {
 
 	public static function register(): void {
 		add_action( 'lw_img_upload_converted', [ self::class, 'on_converted' ], 10, 3 );
-		add_action( 'lw_img_upload_skipped', [ self::class, 'on_skipped' ], 10, 2 );
-		add_action( 'lw_img_upload_failed', [ self::class, 'on_failed' ], 10, 2 );
+		add_action( 'lw_img_upload_skipped', [ self::class, 'on_skipped' ], 10, 3 );
+		add_action( 'lw_img_upload_failed', [ self::class, 'on_failed' ], 10, 3 );
 		add_action( 'lw_img_restored', [ self::class, 'on_restored' ], 10, 2 );
 	}
 
@@ -67,34 +67,76 @@ final class EventLog {
 		);
 	}
 
-	public static function on_skipped( string $file_path, string $reason ): void {
+	/**
+	 * @param string               $file_path Absolute path.
+	 * @param string               $reason    Skip reason.
+	 * @param array<string, mixed> $context   Optional attachment_id / original_size / new_size.
+	 * @return void
+	 */
+	public static function on_skipped( string $file_path, string $reason, array $context = [] ): void {
 		if ( ! self::enabled() ) {
 			return;
 		}
 
 		self::record(
-			[
-				'status' => self::STATUS_SKIPPED,
-				'file'   => basename( $file_path ),
-				'mime'   => self::guess_mime( $file_path ) ?? '',
-				'reason' => $reason,
-			]
+			array_merge(
+				[
+					'status' => self::STATUS_SKIPPED,
+					'file'   => basename( $file_path ),
+					'mime'   => self::guess_mime( $file_path ) ?? '',
+					'reason' => $reason,
+				],
+				self::context_fields( $context )
+			)
 		);
 	}
 
-	public static function on_failed( string $file_path, string $error ): void {
+	/**
+	 * @param string               $file_path Absolute path.
+	 * @param string               $error     Error message.
+	 * @param array<string, mixed> $context   Optional attachment_id.
+	 * @return void
+	 */
+	public static function on_failed( string $file_path, string $error, array $context = [] ): void {
 		if ( ! self::enabled() ) {
 			return;
 		}
 
 		self::record(
-			[
-				'status' => self::STATUS_FAILED,
-				'file'   => basename( $file_path ),
-				'mime'   => self::guess_mime( $file_path ) ?? '',
-				'error'  => $error,
-			]
+			array_merge(
+				[
+					'status' => self::STATUS_FAILED,
+					'file'   => basename( $file_path ),
+					'mime'   => self::guess_mime( $file_path ) ?? '',
+					'error'  => $error,
+				],
+				self::context_fields( $context )
+			)
 		);
+	}
+
+	/**
+	 * Only positive values are worth storing (the ring buffer lives in wp_options).
+	 *
+	 * @param array<string, mixed> $context Action context.
+	 * @return array<string, int>
+	 */
+	private static function context_fields( array $context ): array {
+		$fields = [];
+		$map    = [
+			'attachment_id' => 'attachment_id',
+			'original_size' => 'size_in',
+			'new_size'      => 'size_out',
+		];
+
+		foreach ( $map as $from => $to ) {
+			$value = (int) ( $context[ $from ] ?? 0 );
+			if ( $value > 0 ) {
+				$fields[ $to ] = $value;
+			}
+		}
+
+		return $fields;
 	}
 
 	public static function all(): array {
