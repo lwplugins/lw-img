@@ -46,6 +46,7 @@ final class HealthReport {
 	 */
 	public static function invalidate(): void {
 		delete_transient( self::CACHE_KEY );
+		RedirectProbe::forget();
 	}
 
 	/**

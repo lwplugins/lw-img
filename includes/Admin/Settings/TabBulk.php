@@ -17,6 +17,7 @@ use LightweightPlugins\Img\Bulk\StatusEndpoint;
 use LightweightPlugins\Img\Bulk\StatusMeta;
 use LightweightPlugins\Img\Bulk\Throttle;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
+use LightweightPlugins\Img\Health\RedirectProbe;
 use LightweightPlugins\Img\Media\StatusFilter;
 use LightweightPlugins\Img\Options;
 
@@ -258,8 +259,13 @@ final class TabBulk implements TabInterface {
 		if ( $running ) {
 			echo '<a href="' . esc_url( JobHandlers::url( JobHandlers::ACTION_CANCEL ) ) . '" class="button">' . esc_html__( 'Cancel run', 'lw-img' ) . '</a>';
 		} elseif ( '' === trim( (string) Options::get( 'api_key' ) ) ) {
-			echo '<span class="button button-primary disabled" aria-disabled="true">' . esc_html__( 'Optimize all in background', 'lw-img' ) . '</span> ';
-			echo '<span class="description">' . esc_html__( 'Set your API key first', 'lw-img' ) . ' — <a href="#general" class="lw-img-goto">' . esc_html__( 'General tab', 'lw-img' ) . '</a></span>';
+			$this->render_blocked_start( __( 'Set your API key first', 'lw-img' ), 'general', __( 'General tab', 'lw-img' ) );
+		} elseif ( false === RedirectProbe::cached() ) {
+			$this->render_blocked_start(
+				__( 'Cannot start on this server: it answers missing image files itself, so old URLs of converted images would 404 instead of redirecting. Fix the web server first', 'lw-img' ),
+				'tester',
+				__( 'see the fix on the Tester tab', 'lw-img' )
+			);
 		} else {
 			printf(
 				'<a href="%s" class="button button-primary lw-img-bulk-start%s" data-busy="%s">%s</a>',
@@ -295,6 +301,19 @@ final class TabBulk implements TabInterface {
 		$this->render_speed_form();
 
 		echo '</div>';
+	}
+
+	/**
+	 * A disabled Start button with the reason and a link to the tab that fixes it.
+	 *
+	 * @param string $reason    Why the run cannot start.
+	 * @param string $tab       Tab slug to link to.
+	 * @param string $tab_label Link text.
+	 * @return void
+	 */
+	private function render_blocked_start( string $reason, string $tab, string $tab_label ): void {
+		echo '<span class="button button-primary disabled" aria-disabled="true">' . esc_html__( 'Optimize all in background', 'lw-img' ) . '</span> ';
+		echo '<span class="description lw-img-bulk-blocked" role="status">' . esc_html( $reason ) . ' — <a href="#' . esc_attr( $tab ) . '" class="lw-img-goto">' . esc_html( $tab_label ) . '</a></span>';
 	}
 
 	/**

@@ -23,6 +23,47 @@ use LightweightPlugins\Img\Media\NotFoundRedirect;
 final class RedirectProbe {
 
 	/**
+	 * Transient holding the last definite verdict ('yes' / 'no').
+	 */
+	public const CACHE_KEY = 'lw_img_redirect_probe';
+
+	/**
+	 * Seconds a verdict stays cached: long enough that the Bulk tab does
+	 * not fire a loopback request on every view, short enough that a
+	 * server fix shows up without waiting.
+	 */
+	public const CACHE_TTL = 600;
+
+	/**
+	 * The probe verdict, cached for CACHE_TTL. Only definite results are
+	 * stored — an unreachable loopback (null) is retried next time.
+	 *
+	 * @return bool|null See works().
+	 */
+	public static function cached(): ?bool {
+		$stored = get_transient( self::CACHE_KEY );
+		if ( 'yes' === $stored || 'no' === $stored ) {
+			return 'yes' === $stored;
+		}
+
+		$works = self::works();
+		if ( null !== $works ) {
+			set_transient( self::CACHE_KEY, $works ? 'yes' : 'no', self::CACHE_TTL );
+		}
+
+		return $works;
+	}
+
+	/**
+	 * Drop the cached verdict (settings saved, Tester re-run).
+	 *
+	 * @return void
+	 */
+	public static function forget(): void {
+		delete_transient( self::CACHE_KEY );
+	}
+
+	/**
 	 * Run the probe.
 	 *
 	 * @return bool|null True when the marker came back (redirects work),

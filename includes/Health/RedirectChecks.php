@@ -20,10 +20,29 @@ defined( 'ABSPATH' ) || exit;
 final class RedirectChecks {
 
 	/**
-	 * Nginx location block that lets missing image requests fall through
-	 * to WordPress while existing files are still served directly.
+	 * Nginx block that lets missing image requests under uploads fall
+	 * through to WordPress while existing files are still served directly.
+	 *
+	 * A `^~` prefix location on purpose: it beats every regex location, so
+	 * it also works when an earlier include (a typical static-asset block
+	 * with `try_files $uri =404`) already matches image extensions. Inside
+	 * a `^~` block the outer regex locations no longer apply, which is why
+	 * the cache headers and the .php denial are repeated here.
 	 */
-	public const NGINX_FIX = 'location ~* ^/wp-content/uploads/.*\.(png|jpe?g|gif|bmp|tiff?)$ { try_files $uri /index.php?$args; }';
+	public const NGINX_FIX = "location ^~ /wp-content/uploads/ {\n"
+		. "    location ~* \\.(?:jpe?g|png|gif|bmp|tiff?)$ {\n"
+		. "        expires max; access_log off; log_not_found off;\n"
+		. "        add_header Cache-Control \"public\";\n"
+		. "        try_files \$uri /index.php\$is_args\$args;\n"
+		. "    }\n"
+		. "    location ~* \\.(?:css|js|ico|svg|woff2?|ttf|eot|webp|avif|mp4|webm|pdf)$ {\n"
+		. "        expires max; access_log off; log_not_found off;\n"
+		. "        add_header Cache-Control \"public\";\n"
+		. "        try_files \$uri =404;\n"
+		. "    }\n"
+		. "    location ~* \\.php$ { deny all; }\n"
+		. "    try_files \$uri =404;\n"
+		. '}';
 
 	/**
 	 * The check rows for the health report.
@@ -55,7 +74,7 @@ final class RedirectChecks {
 			return [
 				'label'   => $label,
 				'status'  => 'warning',
-				'message' => __( 'Your web server answers missing image files itself, so WordPress never sees those requests and old URLs of bulk-converted images return 404 instead of redirecting. Bulk optimize will not start until this is fixed. For nginx, add the block below to the site config.', 'lw-img' ),
+				'message' => __( 'Your web server answers missing image files itself, so WordPress never sees those requests and old URLs of bulk-converted images return 404 instead of redirecting. Bulk optimize will not start until this is fixed. For nginx, add the block below to the site config (a prefix location — a plain regex location would lose to earlier static-asset rules).', 'lw-img' ),
 				'fix'     => self::NGINX_FIX,
 			];
 		}

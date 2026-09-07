@@ -46,4 +46,35 @@ final class RedirectProbeTest extends MonkeyTestCase {
 
 		$this->assertNull( RedirectProbe::works() );
 	}
+	public function test_cached_returns_the_stored_verdict_without_a_request(): void {
+		Functions\when( 'get_transient' )->justReturn( 'no' );
+		Functions\expect( 'wp_safe_remote_get' )->never();
+
+		$this->assertFalse( RedirectProbe::cached() );
+	}
+
+	public function test_cached_probes_and_stores_a_definite_verdict(): void {
+		Functions\when( 'get_transient' )->justReturn( false );
+		Functions\when( 'wp_safe_remote_get' )->justReturn( [ 'headers' => [] ] );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'wp_remote_retrieve_header' )->justReturn( 'ok' );
+		Functions\expect( 'set_transient' )->once()->with( RedirectProbe::CACHE_KEY, 'yes', 600 )->andReturn( true );
+
+		$this->assertTrue( RedirectProbe::cached() );
+	}
+
+	public function test_cached_does_not_store_an_unknown_verdict(): void {
+		Functions\when( 'get_transient' )->justReturn( false );
+		Functions\when( 'wp_safe_remote_get' )->justReturn( new \stdClass() );
+		Functions\when( 'is_wp_error' )->justReturn( true );
+		Functions\expect( 'set_transient' )->never();
+
+		$this->assertNull( RedirectProbe::cached() );
+	}
+
+	public function test_forget_deletes_the_cached_verdict(): void {
+		Functions\expect( 'delete_transient' )->once()->with( RedirectProbe::CACHE_KEY )->andReturn( true );
+
+		RedirectProbe::forget();
+	}
 }
