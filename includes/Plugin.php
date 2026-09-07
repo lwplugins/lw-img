@@ -22,6 +22,7 @@ use LightweightPlugins\Img\Bulk\ReoptimizeHandler;
 use LightweightPlugins\Img\Bulk\StatusEndpoint;
 use LightweightPlugins\Img\CLI\Commands as CLICommands;
 use LightweightPlugins\Img\CLI\DoctorCommand;
+use LightweightPlugins\Img\CLI\ListCommand;
 use LightweightPlugins\Img\CLI\SmartCropCommand;
 use LightweightPlugins\Img\Compat\CompetitorNotice;
 use LightweightPlugins\Img\Db\Schema;
@@ -89,6 +90,7 @@ final class Plugin {
 			\WP_CLI::add_command( 'lw-img', CLICommands::class );
 			\WP_CLI::add_command( 'lw-img smartcrop', SmartCropCommand::class );
 			\WP_CLI::add_command( 'lw-img doctor', DoctorCommand::class );
+			\WP_CLI::add_command( 'lw-img list', ListCommand::class );
 		}
 	}
 

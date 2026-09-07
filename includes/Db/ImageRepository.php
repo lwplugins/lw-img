@@ -287,4 +287,22 @@ final class ImageRepository {
 	public static function flush_cache(): void {
 		self::$cache = [];
 	}
+
+	/**
+	 * Records with a status, newest decision first.
+	 *
+	 * @param string $status Status constant.
+	 * @param int    $limit  Max rows.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function list_by_status( string $status, int $limit ): array {
+		global $wpdb;
+
+		$table = Schema::table();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- own table name; status and limit are placeholders. CLI listing, run on demand.
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT attachment_id, status, detail, orig_size, new_size FROM {$table} WHERE status = %s ORDER BY id DESC LIMIT %d", $status, $limit ), ARRAY_A );
+
+		return is_array( $rows ) ? $rows : [];
+	}
 }
