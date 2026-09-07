@@ -33,6 +33,7 @@ use LightweightPlugins\Img\Media\InfoMetabox;
 use LightweightPlugins\Img\Media\NotFoundRedirect;
 use LightweightPlugins\Img\Media\RowActions;
 use LightweightPlugins\Img\Media\SavingsColumn;
+use LightweightPlugins\Img\Media\StatusFilter;
 use LightweightPlugins\Img\Stats\SiteStats;
 use LightweightPlugins\Img\Upload\OutputFormatMap;
 use LightweightPlugins\Img\Upload\Rules\RuleMigration;
@@ -78,6 +79,7 @@ final class Plugin {
 			StatusEndpoint::register();
 			RowActions::register();
 			SavingsColumn::register();
+			StatusFilter::register();
 			InfoMetabox::register();
 			ComparePage::register();
 			new SettingsPage();
