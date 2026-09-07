@@ -417,6 +417,8 @@
 .lw-img-tile-ok .lw-img-tile-v   { color: #00a876; }
 .lw-img-tile-skip .lw-img-tile-v { color: #996800; }
 .lw-img-tile-fail .lw-img-tile-v { color: #d63638; }
+.lw-img-tile-link { text-decoration: none; color: inherit; display: block; }
+.lw-img-tile-link:hover, .lw-img-tile-link:focus { border-color: #2271b1; box-shadow: 0 0 0 1px #2271b1; }
 
 .lw-img-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 0 12px; }
 .lw-img-chips .lw-img-k { display: inline; }

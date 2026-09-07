@@ -17,6 +17,7 @@ use LightweightPlugins\Img\Bulk\StatusEndpoint;
 use LightweightPlugins\Img\Bulk\StatusMeta;
 use LightweightPlugins\Img\Bulk\Throttle;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
+use LightweightPlugins\Img\Media\StatusFilter;
 use LightweightPlugins\Img\Options;
 
 /**
@@ -169,6 +170,18 @@ final class TabBulk implements TabInterface {
 				)
 			)
 		);
+
+		$skipped = (int) ( $job['skipped'] ?? 0 );
+		if ( $skipped > 0 ) {
+			printf(
+				'<p class="description"><a href="%s">%s</a></p>',
+				esc_url( StatusFilter::url( StatusMeta::SKIPPED ) ),
+				esc_html(
+					/* translators: %s: number of skipped images. */
+					sprintf( __( 'See the %s skipped images in the Media Library', 'lw-img' ), number_format_i18n( $skipped ) )
+				)
+			);
+		}
 	}
 
 	/**
@@ -181,20 +194,22 @@ final class TabBulk implements TabInterface {
 	 */
 	private function render_tiles( int $pending, int $optimized, array $counts ): void {
 		$tiles = [
-			[ 'lw-img-count-pending', __( 'Pending', 'lw-img' ), $pending, '' ],
-			[ 'lw-img-count-optimized', __( 'Optimized', 'lw-img' ), $optimized, 'lw-img-tile-ok' ],
-			[ 'lw-img-count-skipped', __( 'Skipped', 'lw-img' ), $counts[ StatusMeta::SKIPPED ], 'lw-img-tile-skip' ],
-			[ 'lw-img-count-failed', __( 'Failed', 'lw-img' ), $counts[ StatusMeta::FAILED ], 'lw-img-tile-fail' ],
+			[ 'lw-img-count-pending', __( 'Pending', 'lw-img' ), $pending, '', StatusFilter::PENDING ],
+			[ 'lw-img-count-optimized', __( 'Optimized', 'lw-img' ), $optimized, 'lw-img-tile-ok', StatusMeta::OPTIMIZED ],
+			[ 'lw-img-count-skipped', __( 'Skipped', 'lw-img' ), $counts[ StatusMeta::SKIPPED ], 'lw-img-tile-skip', StatusMeta::SKIPPED ],
+			[ 'lw-img-count-failed', __( 'Failed', 'lw-img' ), $counts[ StatusMeta::FAILED ], 'lw-img-tile-fail', StatusMeta::FAILED ],
 		];
 
 		echo '<div class="lw-img-tiles">';
-		foreach ( $tiles as [ $id, $label, $value, $class ] ) {
+		foreach ( $tiles as [ $id, $label, $value, $class, $status ] ) {
 			printf(
-				'<div class="lw-img-tile %1$s"><span class="lw-img-k">%2$s</span><span class="lw-img-tile-v" id="%3$s">%4$s</span></div>',
+				'<a class="lw-img-tile lw-img-tile-link %1$s" href="%5$s" title="%6$s"><span class="lw-img-k">%2$s</span><span class="lw-img-tile-v" id="%3$s">%4$s</span></a>',
 				esc_attr( $class ),
 				esc_html( $label ),
 				esc_attr( $id ),
-				esc_html( number_format_i18n( $value ) )
+				esc_html( number_format_i18n( $value ) ),
+				esc_url( StatusFilter::url( $status ) ),
+				esc_attr__( 'Show these images in the Media Library', 'lw-img' )
 			);
 		}
 		echo '</div>';
