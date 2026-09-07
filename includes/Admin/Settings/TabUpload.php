@@ -221,20 +221,14 @@ final class TabUpload implements TabInterface {
 		);
 		$this->row_close();
 
-		$this->row_open( __( 'Exclusions', 'lw-img' ) );
-		$this->render_textarea_field(
-			[
-				'name'        => 'exclusion_patterns',
-				'placeholder' => "*-original.jpg\n2026/08/*",
-				'aria_label'  => __( 'Exclusion patterns, one per line', 'lw-img' ),
-			]
-		);
+		$this->row_open( __( 'Pattern rules', 'lw-img' ) );
+		( new RuleListRenderer() )->render( (array) Options::get( 'pattern_rules' ) );
 		echo '<span class="lw-img-up-hints">' . esc_html__( 'Examples:', 'lw-img' );
 		foreach ( [ '*-logo.png', '2026/08/*', 'clients/*/raw-*' ] as $example ) {
 			echo ' <button type="button" class="lw-img-up-hint" data-pattern="' . esc_attr( $example ) . '"><code>' . esc_html( $example ) . '</code></button>';
 		}
 		echo '</span>';
-		echo '<p class="description">' . esc_html__( 'One pattern per line, * matches anything. Patterns without / match the filename; with / they match anywhere in the path. Matching files are never sent to the API.', 'lw-img' ) . '</p>';
+		echo '<p class="description">' . esc_html__( '* matches anything. A pattern without / matches the file name; with / it matches anywhere in the path. Every matching rule applies to uploads and bulk runs alike ("Skip entirely" also keeps the file out of smart crop). "Skip entirely" wins over the others; if two level rules match, the first one listed wins.', 'lw-img' ) . '</p>';
 		$this->row_close();
 	}
 

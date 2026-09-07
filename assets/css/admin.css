@@ -726,3 +726,12 @@
 .lw-img-gen-testresult--fail {
 	color: #b03a2e;
 }
+
+/* Pattern rules (Upload tab) */
+.lw-img-rules { border-collapse: collapse; margin: 0 0 8px; }
+.lw-img-rules th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #646970; padding: 0 8px 4px 0; }
+.lw-img-rules td { padding: 0 8px 6px 0; vertical-align: middle; }
+.lw-img-rules .lw-img-rule-pattern { width: 220px; }
+.lw-img-rules .lw-img-rule-remove { color: #646970; padding: 0; }
+.lw-img-rules .lw-img-rule-remove:hover { color: #d63638; }
+.lw-img-rule-level[hidden] { display: none; }

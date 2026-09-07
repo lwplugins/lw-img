@@ -301,17 +301,76 @@
 				}
 			});
 		});
+	}
+
+	// Upload tab: pattern-rule repeater (add / remove / level select visibility / example chips).
+	function initRules() {
+		var wrap = document.getElementById('lw-img-rules');
+		if (!wrap) {
+			return;
+		}
+
+		var body     = document.getElementById('lw-img-rules-body');
+		var template = document.getElementById('lw-img-rule-template');
+
+		function syncLevel(row) {
+			var action = row.querySelector('.lw-img-rule-action');
+			var level  = row.querySelector('.lw-img-rule-level');
+			if (action && level) {
+				level.hidden = action.value !== 'level';
+			}
+		}
+
+		function addRow(pattern) {
+			var index = parseInt(wrap.getAttribute('data-next') || '0', 10);
+			var html  = template.innerHTML.replace(/__INDEX__/g, String(index));
+			var tbody = document.createElement('tbody');
+			tbody.innerHTML = html;
+			var row = tbody.firstElementChild;
+			body.appendChild(row);
+			wrap.setAttribute('data-next', String(index + 1));
+			syncLevel(row);
+			var input = row.querySelector('.lw-img-rule-pattern');
+			if (input) {
+				input.value = pattern || '';
+				input.focus();
+			}
+			return row;
+		}
+
+		wrap.addEventListener('click', function (e) {
+			if (e.target.closest('.lw-img-rule-add')) {
+				addRow('');
+			}
+			var remove = e.target.closest('.lw-img-rule-remove');
+			if (remove) {
+				var row = remove.closest('tr');
+				if (row) {
+					row.remove();
+				}
+			}
+		});
+
+		wrap.addEventListener('change', function (e) {
+			if (e.target.classList.contains('lw-img-rule-action')) {
+				syncLevel(e.target.closest('tr'));
+			}
+		});
+
+		Array.prototype.forEach.call(body.querySelectorAll('tr'), syncLevel);
 
 		document.querySelectorAll('.lw-img-up-hint').forEach(function (hint) {
 			hint.addEventListener('click', function () {
-				var area = document.getElementById('exclusion_patterns');
-				if (!area) {
-					return;
-				}
 				var pattern = this.getAttribute('data-pattern') || '';
-				area.value = area.value.replace(/\s+$/, '');
-				area.value += (area.value ? '\n' : '') + pattern;
-				area.focus();
+				var empty   = Array.prototype.filter.call(body.querySelectorAll('.lw-img-rule-pattern'), function (input) {
+					return input.value.trim() === '';
+				})[0];
+				if (empty) {
+					empty.value = pattern;
+					empty.focus();
+				} else {
+					addRow(pattern);
+				}
 			});
 		});
 	}
@@ -480,6 +539,7 @@
 		initBulk();
 		initKeyToggle();
 		initUpload();
+		initRules();
 		initSmartCrop();
 		initBackup();
 		initTester();
