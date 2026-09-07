@@ -249,7 +249,7 @@ final class TabUpload implements TabInterface {
 			[
 				'name'        => 'redirect_missing_images',
 				'label'       => __( 'Redirect old image URLs to the converted file', 'lw-img' ),
-				'description' => __( 'Recommended. External links, sent newsletters, and search engines still pointing at photo.jpg get a 301 to photo.webp instead of a 404.', 'lw-img' ),
+				'description' => __( 'Recommended. Nothing is stored: when a request for photo.jpg 404s, the plugin matches the path to its converted attachment and answers with a 301 to photo.webp — external links, sent newsletters and search results keep working. The Tester tab checks that the server lets these requests through.', 'lw-img' ),
 			]
 		);
 		$this->row_close();
