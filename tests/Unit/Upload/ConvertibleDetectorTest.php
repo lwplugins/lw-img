@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Tests\Unit\Upload;
 
+use Brain\Monkey\Actions;
 use Brain\Monkey\Functions;
 use LightweightPlugins\Img\Options;
 use LightweightPlugins\Img\Tests\Unit\MonkeyTestCase;
@@ -166,17 +167,49 @@ final class ConvertibleDetectorTest extends MonkeyTestCase {
 		$this->assertFalse( $detector->should_convert( self::FIXTURES . 'static.gif', 'image/jpeg' ) );
 	}
 
-	public function test_skips_files_matching_an_exclusion_pattern(): void {
+	public function test_skips_files_matching_an_exclude_rule(): void {
 		$this->saved_options(
 			[
-				'api_key'            => 'himg_x',
-				'exclusion_patterns' => [ 'static.*' ],
+				'api_key'       => 'himg_x',
+				'pattern_rules' => [ [ 'pattern' => 'static.*', 'action' => 'exclude', 'value' => '' ] ],
 			]
 		);
 
 		$detector = new ConvertibleDetector();
 
 		$this->assertFalse( $detector->should_convert( self::FIXTURES . 'static.gif', 'image/jpeg' ) );
+	}
+
+	public function test_keep_size_rule_does_not_exclude(): void {
+		$this->saved_options(
+			[
+				'api_key'       => 'himg_x',
+				'pattern_rules' => [ [ 'pattern' => 'static.*', 'action' => 'keep_size', 'value' => '' ] ],
+			]
+		);
+
+		$this->assertTrue( ( new ConvertibleDetector() )->should_convert( self::FIXTURES . 'static.gif', 'image/jpeg' ) );
+	}
+
+	public function test_on_demand_skip_carries_the_attachment_id(): void {
+		$this->saved_options(
+			[
+				'api_key'       => 'himg_x',
+				'pattern_rules' => [ [ 'pattern' => 'static.*', 'action' => 'exclude', 'value' => '' ] ],
+			]
+		);
+		Actions\expectDone( 'lw_img_upload_skipped' )
+			->once()
+			->with( self::FIXTURES . 'static.gif', 'excluded by rule', [ 'attachment_id' => 42 ] );
+
+		$this->assertFalse( ( new ConvertibleDetector() )->should_convert_on_demand( self::FIXTURES . 'static.gif', 'image/jpeg', 42 ) );
+	}
+
+	public function test_upload_skip_has_an_empty_context(): void {
+		$this->saved_options( [ 'api_key' => '' ] );
+		Actions\expectDone( 'lw_img_upload_skipped' )->once()->with( self::FIXTURES . 'static.gif', 'no API key', [] );
+
+		$this->assertFalse( ( new ConvertibleDetector() )->should_convert( self::FIXTURES . 'static.gif', 'image/jpeg' ) );
 	}
 
 	public function test_on_demand_conversion_ignores_the_auto_convert_toggle(): void {
@@ -216,8 +249,8 @@ final class ConvertibleDetectorTest extends MonkeyTestCase {
 		$this->assertFalse( ( new ConvertibleDetector() )->smart_crop_eligible( $file, 'application/pdf' ) );
 	}
 
-	public function test_smart_crop_eligible_honours_exclusion_patterns(): void {
-		$this->saved_options( [ 'exclusion_patterns' => [ '*.jpg' ] ] );
+	public function test_smart_crop_eligible_honours_exclude_rules(): void {
+		$this->saved_options( [ 'pattern_rules' => [ [ 'pattern' => '*.jpg', 'action' => 'exclude', 'value' => '' ] ] ] );
 		$file = $this->make_temp_file( 200 * 1024, 'excluded.jpg' );
 
 		$this->assertFalse( ( new ConvertibleDetector() )->smart_crop_eligible( $file, 'image/jpeg' ) );
