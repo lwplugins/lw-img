@@ -144,6 +144,14 @@ final class InfoMetabox {
 			esc_url( OptimizeHandler::url( $post->ID ) ),
 			$decided ? esc_html__( 'Try again', 'lw-img' ) : esc_html__( 'Optimize now', 'lw-img' )
 		);
+
+		if ( $decided ) {
+			echo '<p class="description">' . esc_html__( 'Try again at a specific level:', 'lw-img' ) . '</p><p>';
+			foreach ( [ 'lossless', 'normal', 'aggressive', 'ultra' ] as $target_level ) {
+				echo '<a class="button button-small" href="' . esc_url( OptimizeHandler::url( $post->ID, $target_level ) ) . '">' . esc_html( ucfirst( $target_level ) ) . '</a> ';
+			}
+			echo '</p>';
+		}
 	}
 
 	/**
