@@ -78,6 +78,7 @@ final class TabBulk implements TabInterface {
 			id="lw-img-bulk"
 			data-nonce="<?php echo esc_attr( wp_create_nonce( StatusEndpoint::NONCE_ACTION ) ); ?>"
 			data-running="<?php echo esc_attr( $running ? '1' : '0' ); ?>"
+			data-elapsed="<?php echo esc_attr( (string) ( $running ? max( 0, time() - (int) ( $job['started_at'] ?? 0 ) ) : 0 ) ); ?>"
 		>
 			<?php if ( $running ) : ?>
 				<?php $this->render_running( $job ); ?>
@@ -142,7 +143,9 @@ final class TabBulk implements TabInterface {
 			<code id="lw-img-now-item"><?php echo esc_html( (string) ( $job['current'] ?? '…' ) ); ?></code>
 		</div>
 
-		<ul class="lw-img-feed" id="lw-img-feed" aria-label="<?php esc_attr_e( 'Recent activity', 'lw-img' ); ?>"></ul>
+		<ul class="lw-img-feed" id="lw-img-feed" aria-label="<?php esc_attr_e( 'Recent activity', 'lw-img' ); ?>">
+			<li class="lw-img-feed-empty"><?php esc_html_e( 'Waiting for the first background tick… WP-Cron starts within a minute on most hosts.', 'lw-img' ); ?></li>
+		</ul>
 		<?php
 	}
 
@@ -255,9 +258,10 @@ final class TabBulk implements TabInterface {
 			echo '<span class="description">' . esc_html__( 'Set your API key first', 'lw-img' ) . ' — <a href="#general" class="lw-img-goto">' . esc_html__( 'General tab', 'lw-img' ) . '</a></span>';
 		} else {
 			printf(
-				'<a href="%s" class="button button-primary%s">%s</a>',
+				'<a href="%s" class="button button-primary lw-img-bulk-start%s" data-busy="%s">%s</a>',
 				esc_url( JobHandlers::url( JobHandlers::ACTION_START ) ),
 				0 === $pending ? ' disabled' : '',
+				esc_attr__( 'Checking API key and redirects, counting images…', 'lw-img' ),
 				esc_html__( 'Optimize all in background', 'lw-img' )
 			);
 		}

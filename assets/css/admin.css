@@ -737,3 +737,8 @@
 .lw-img-rules .lw-img-rule-remove { color: #646970; padding: 0; }
 .lw-img-rules .lw-img-rule-remove:hover { color: #d63638; }
 .lw-img-rule-level[hidden] { display: none; }
+
+/* Bulk tab: start-click feedback + empty-feed placeholder */
+.lw-img-bulk-starting { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; color: #646970; }
+.lw-img-bulk-starting .spinner { float: none; margin: 0; }
+.lw-img-feed-empty { color: #646970; font-style: italic; }

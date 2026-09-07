@@ -96,11 +96,31 @@
 	function initBulk() {
 		var container = document.getElementById('lw-img-bulk');
 
+		var start = document.querySelector('.lw-img-bulk-start');
+		if (start && !start.classList.contains('disabled')) {
+			start.addEventListener('click', function () {
+				var note = document.createElement('span');
+				note.className = 'lw-img-bulk-starting';
+				note.innerHTML = '<span class="spinner is-active"></span>';
+				note.appendChild(document.createTextNode(this.getAttribute('data-busy') || ''));
+				this.classList.add('disabled');
+				this.setAttribute('aria-disabled', 'true');
+				this.insertAdjacentElement('afterend', note);
+			});
+		}
+
 		if (!container || container.getAttribute('data-running') !== '1' || typeof window.ajaxurl === 'undefined') {
 			return;
 		}
 
 		var finished = false;
+
+		var elapsed = parseInt(container.getAttribute('data-elapsed') || '0', 10);
+		setText('lw-img-meta-elapsed', formatDuration(elapsed));
+		window.setInterval(function () {
+			elapsed += 1;
+			setText('lw-img-meta-elapsed', formatDuration(elapsed));
+		}, 1000);
 
 		function setText(id, text) {
 			var el = document.getElementById(id);
@@ -150,6 +170,9 @@
 		function renderFeed(entries) {
 			var feed = document.getElementById('lw-img-feed');
 			if (!feed) {
+				return;
+			}
+			if (!entries.length) {
 				return;
 			}
 			feed.textContent = '';
@@ -207,11 +230,13 @@
 
 					// Meta row.
 					if (d.elapsed > 0) {
-						setText('lw-img-meta-elapsed', formatDuration(d.elapsed));
-						var perMin = d.processed / (d.elapsed / 60);
-						setText('lw-img-meta-speed', perMin >= 1 ? Math.round(perMin) + ' / min' : (perMin * 60).toFixed(1) + ' / h');
-						if (d.processed > 0 && d.total > d.processed) {
-							setText('lw-img-meta-eta', '~' + formatDuration((d.total - d.processed) * (d.elapsed / d.processed)));
+						elapsed = d.elapsed;
+						if (d.processed > 0) {
+							var perMin = d.processed / (d.elapsed / 60);
+							setText('lw-img-meta-speed', perMin >= 1 ? Math.round(perMin) + ' / min' : (perMin * 60).toFixed(1) + ' / h');
+							if (d.total > d.processed) {
+								setText('lw-img-meta-eta', '~' + formatDuration((d.total - d.processed) * (d.elapsed / d.processed)));
+							}
 						}
 					}
 					setText('lw-img-meta-saved', formatBytes(d.bytes_saved));
