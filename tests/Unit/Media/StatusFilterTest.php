@@ -41,7 +41,10 @@ final class StatusFilterTest extends MonkeyTestCase {
 
 	public function test_where_filters_by_status_or_by_absence(): void {
 		$this->assertSame( " AND lw_img.status = 'skipped'", StatusFilter::where_clause( 'skipped' ) );
-		$this->assertSame( ' AND lw_img.attachment_id IS NULL', StatusFilter::where_clause( 'pending' ) );
+		$this->assertSame(
+			' AND (lw_img.attachment_id IS NULL OR lw_img.status = \'pending\')',
+			StatusFilter::where_clause( 'pending' )
+		);
 	}
 
 	public function test_requested_whitelists_the_query_var(): void {

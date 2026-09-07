@@ -128,7 +128,7 @@ final class StatusFilter {
 
 	public static function where_clause( string $status ): string {
 		if ( self::PENDING === $status ) {
-			return ' AND lw_img.attachment_id IS NULL';
+			return ' AND (lw_img.attachment_id IS NULL OR lw_img.status = \'' . esc_sql( ImageRepository::STATUS_PENDING ) . '\')';
 		}
 
 		return " AND lw_img.status = '" . esc_sql( $status ) . "'";
