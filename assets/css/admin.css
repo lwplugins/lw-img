@@ -603,7 +603,8 @@
 .lw-img-ts-attn b { display: block; }
 .lw-img-ts-attn p { margin: 0; color: #646970; font-size: 12px; max-width: 66ch; }
 .lw-img-ts-fix { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-.lw-img-ts-fix code { background: #fff; border: 1px solid #dcdcde; border-radius: 3px; padding: 2px 8px; font-size: 12px; }
+.lw-img-ts-fix code { background: #fff; border: 1px solid #dcdcde; border-radius: 3px; padding: 2px 8px; font-size: 12px; white-space: pre; overflow-x: auto; max-width: 100%; }
+.lw-img-bulk-blocked { color: #b32d2e; }
 .lw-img-ts-copy { font-size: 11px; color: #00a876; background: none; border: 0; cursor: pointer; padding: 0; font-weight: 600; }
 .lw-img-ts-sect { border: 1px solid #dcdcde; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
 .lw-img-ts-sect-head { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #f6f7f7; border-bottom: 1px solid #dcdcde; font-weight: 600; }

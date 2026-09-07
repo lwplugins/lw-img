@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.9.1] - 2026-09-07
+
+### Changed
+- Bulk tab: when the web server answers missing image files itself, the Start button is disabled with the reason and a link to the Tester tab before you click, not only after; the post-click refusal notice is scrolled into view
+- The redirect probe verdict is cached for 10 minutes (cleared on settings save) so the Bulk tab does not fire a loopback request on every view
+
+### Fixed
+- The nginx fix shown by the Tester tab and `wp lw-img doctor` is now a `^~` prefix location block with the cache headers and the `.php` denial repeated inside it. The previous regex location never won against the static-asset rules most hosts ship (`location ~* \.(css|js|jpe?g|…)$ { try_files $uri =404; }` included earlier), so old-URL redirects stayed broken after applying it
+
 ## [1.9.0] - 2026-09-07
 
 ### Added

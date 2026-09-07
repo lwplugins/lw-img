@@ -96,6 +96,15 @@
 	function initBulk() {
 		var container = document.getElementById('lw-img-bulk');
 
+		// A refused start redirects back with an inline error above the
+		// dashboard; bring it into view so it cannot be missed.
+		var refusal = document.querySelector('#tab-bulk .notice-error');
+		if (refusal) {
+			refusal.scrollIntoView({ block: 'center' });
+			refusal.setAttribute('tabindex', '-1');
+			refusal.focus({ preventScroll: true });
+		}
+
 		var start = document.querySelector('.lw-img-bulk-start');
 		if (start && !start.classList.contains('disabled')) {
 			start.addEventListener('click', function () {

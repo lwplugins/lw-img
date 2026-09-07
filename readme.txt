@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.9.0
+Stable tag: 1.9.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,11 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.9.1 =
+* Update: the Bulk tab says up front when a run cannot start because the web server answers missing image files itself (disabled button + reason + link to the Tester tab), instead of only after clicking; the refusal notice is scrolled into view
+* Fix: the nginx fix shown by the Tester and wp lw-img doctor is now a ^~ prefix location block — the previous regex location never won against the static-asset rules most hosts ship, so old-URL redirects stayed broken after applying it
+* Change: the redirect probe result is cached for 10 minutes (cleared on settings save), so the Bulk tab does not make a loopback request on every view
 
 = 1.9.0 =
 * New: pattern rules — per wildcard pattern: skip entirely, keep original dimensions, use a specific optimization level, or keep EXIF; applies to uploads, bulk and smart crop (existing exclusion patterns migrate automatically)

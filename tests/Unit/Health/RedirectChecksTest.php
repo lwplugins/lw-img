@@ -33,7 +33,13 @@ final class RedirectChecksTest extends MonkeyTestCase {
 		$row = RedirectChecks::classify( false );
 
 		$this->assertSame( 'warning', $row['status'] );
-		$this->assertStringContainsString( 'try_files', (string) $row['fix'] );
+		$fix = (string) $row['fix'];
+		// A prefix location: regex locations from earlier includes (typical
+		// static-asset blocks) would otherwise win and swallow the 404.
+		$this->assertStringStartsWith( 'location ^~ /wp-content/uploads/', $fix );
+		$this->assertStringContainsString( 'try_files $uri /index.php', $fix );
+		$this->assertStringContainsString( 'deny all', $fix );
+		$this->assertStringContainsString( 'expires', $fix );
 	}
 
 	public function test_unverifiable_probe_is_info_without_a_fix(): void {
