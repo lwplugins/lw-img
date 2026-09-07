@@ -65,7 +65,11 @@ A live dashboard for background runs: segmented progress bar, elapsed /
 speed / ETA, and an activity feed. Controls: start (disabled until a
 working API key is set), cancel, *Retry N failed*, *Re-scan N skipped*
 (after settings changes), and the speed profile (gentle / normal /
-fast).
+fast). The *This run uses* card shows the Upload-tab settings the next
+run will apply (level, output, resize, pattern rules, EXIF, backup).
+The Pending / Optimized / Skipped / Failed tiles link to the Media
+Library, pre-filtered to that status via the **LW Image** status
+dropdown.
 
 ## Backup
 
@@ -96,3 +100,5 @@ and savings), with filter chips, a search box, and client-side paging.
   level
 - Images already optimized by another optimizer plugin are recognized
   and left untouched
+- In list view, an **LW Image** status dropdown filters attachments by
+  optimized / skipped / failed / not yet processed

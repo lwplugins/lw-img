@@ -37,7 +37,7 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 * Recognizes images already optimized by ShortPixel, TinyPNG, Imagify, Smush, or EWWW and leaves them untouched
 * Media Library savings column, "Optimize now" / "Restore original" row actions, attachment info box, Compare, Re-optimize
 * Pattern rules (wildcard filename/path rules: skip, keep dimensions, level, keep EXIF) and min/max file size limits
-* WP-CLI: wp lw-img status / optimize / restore / requeue / leftovers / smartcrop
+* WP-CLI: wp lw-img status / list / optimize / restore / requeue / leftovers / smartcrop / doctor
 
 **Roadmap:**
 
@@ -86,6 +86,7 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 * Update: the Save button appears only on tabs that hold settings
 * Update: the old-URL redirect description explains that nothing is stored
 * Update: lw_img_optimize_request_args now runs for bulk and on-demand conversions too; lw_img_upload_skipped / lw_img_upload_failed gain an optional context argument
+* Update: the exclusion-patterns migration to skip rules is one-way; downgrading to 1.8.9 drops the migrated rules
 
 = 1.8.9 =
 * Fix: the release package and Composer dist no longer ship tests, docs or development configuration

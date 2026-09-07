@@ -57,4 +57,15 @@ final class StatusFilterTest extends MonkeyTestCase {
 		unset( $_GET[ StatusFilter::QUERY_VAR ] );
 		$this->assertNull( StatusFilter::requested() );
 	}
+
+	public function test_mime_clause_scopes_pending_to_the_allowed_mime_types(): void {
+		$this->assertSame(
+			" AND wp_posts.post_mime_type IN ('image/jpeg', 'image/png')",
+			StatusFilter::mime_clause( [ 'image/jpeg', 'image/png' ], 'wp_posts' )
+		);
+	}
+
+	public function test_mime_clause_returns_empty_string_when_no_mime_types(): void {
+		$this->assertSame( '', StatusFilter::mime_clause( [], 'wp_posts' ) );
+	}
 }

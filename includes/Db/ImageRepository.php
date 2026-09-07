@@ -289,7 +289,7 @@ final class ImageRepository {
 	}
 
 	/**
-	 * Records with a status, newest decision first.
+	 * Records with a status, most recently inserted first.
 	 *
 	 * @param string $status Status constant.
 	 * @param int    $limit  Max rows.

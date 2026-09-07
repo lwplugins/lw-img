@@ -139,11 +139,11 @@ final class UploadInterceptor {
 					'msg'  => $e->getMessage(),
 				]
 			);
-			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
+			do_action( 'lw_img_upload_failed', $file, $e->getMessage(), [] );
 			return $upload;
 		} catch ( Throwable $e ) {
 			Logger::error( 'upload unexpected error', [ 'msg' => $e->getMessage() ] );
-			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
+			do_action( 'lw_img_upload_failed', $file, $e->getMessage(), [] );
 			return $upload;
 		}
 	}

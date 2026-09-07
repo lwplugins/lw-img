@@ -88,7 +88,7 @@ final class SettingsRenderer {
 			);
 			$tab->render();
 			if ( $tab->has_settings() ) {
-				submit_button();
+				submit_button( '', 'primary', 'submit-' . $tab->get_slug() );
 			}
 			echo '</div>';
 		}

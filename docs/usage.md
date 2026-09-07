@@ -16,10 +16,10 @@ What never converts:
 - Animated GIFs when *Skip animated GIF* is on (otherwise they become
   animated WebP with frames and timing preserved)
 
-Pattern rules apply to uploads and bulk runs alike (a skip rule also keeps
-the file out of smart crop) — the Bulk tab shows which Upload settings a run
-will use. Thumbnails are regenerated
-from the converted file after every conversion.
+Pattern rules apply to uploads and bulk runs alike (a skip rule also
+keeps the file out of smart crop) — the Bulk tab shows which Upload
+settings a run will use. Thumbnails are regenerated from the
+converted file after every conversion.
 
 If the API call fails, the original upload is kept untouched. Nothing
 ever breaks because of LW Image.
@@ -168,6 +168,6 @@ Actions (fired by the plugin, useful for logging/monitoring):
 
 | Hook | Fires when |
 |---|---|
-| `lw_img_upload_skipped` | A file was deliberately not converted: `(string $file, string $reason, array $context)` — context may hold `attachment_id`, `original_size`, `new_size` |
-| `lw_img_upload_failed` | A conversion or crop attempt failed: `(string $file, string $reason, array $context)` — context may hold `attachment_id` |
+| `lw_img_upload_skipped` | A file was deliberately not converted: `(string $file, string $reason, array $context)` — `$context` is always passed (may be an empty array); may hold `attachment_id`, `original_size`, `new_size` |
+| `lw_img_upload_failed` | A conversion or crop attempt failed: `(string $file, string $reason, array $context)` — `$context` is always passed (may be an empty array); may hold `attachment_id` |
 | `lw_img_restored` | An attachment was restored from backup: `(int $attachment_id, string $file)` |

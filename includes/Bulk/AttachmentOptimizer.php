@@ -101,7 +101,7 @@ final class AttachmentOptimizer {
 			// No key (rotated away mid-run, or never set): halt like a quota
 			// error, before any stamping — otherwise the worker would march
 			// through the queue marking every clean image "skipped".
-			do_action( 'lw_img_upload_failed', 'bulk run', 'API key missing — run halted' );
+			do_action( 'lw_img_upload_failed', 'bulk run', 'API key missing — run halted', [ 'attachment_id' => $attachment_id ] );
 
 			return [
 				'result' => self::RESULT_FAILED,

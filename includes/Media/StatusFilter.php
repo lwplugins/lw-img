@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use LightweightPlugins\Img\Db\ImageRepository;
 use LightweightPlugins\Img\Db\Schema;
+use LightweightPlugins\Img\Options;
 use WP_Query;
 
 /**
@@ -94,11 +95,12 @@ final class StatusFilter {
 	}
 
 	/**
-	 * @param string   $join  Current JOIN SQL.
-	 * @param WP_Query $query The query.
+	 * @param string        $join  Current JOIN SQL.
+	 * @param WP_Query|null $query The query, or null when a caller invokes the
+	 *                             filter with only the first argument.
 	 * @return string
 	 */
-	public static function join( string $join, WP_Query $query ): string {
+	public static function join( string $join, ?WP_Query $query = null ): string {
 		if ( ! self::applies( $query ) ) {
 			return $join;
 		}
@@ -109,17 +111,30 @@ final class StatusFilter {
 	}
 
 	/**
-	 * @param string   $where Current WHERE SQL.
-	 * @param WP_Query $query The query.
+	 * @param string        $where Current WHERE SQL.
+	 * @param WP_Query|null $query The query, or null when a caller invokes the
+	 *                             filter with only the first argument.
 	 * @return string
 	 */
-	public static function where( string $where, WP_Query $query ): string {
-		$status = self::requested();
-		if ( null === $status || ! self::applies( $query ) ) {
+	public static function where( string $where, ?WP_Query $query = null ): string {
+		if ( ! self::applies( $query ) ) {
 			return $where;
 		}
 
-		return $where . self::where_clause( $status );
+		$status = self::requested();
+		if ( null === $status ) {
+			return $where;
+		}
+
+		$where .= self::where_clause( $status );
+
+		if ( self::PENDING === $status ) {
+			global $wpdb;
+
+			$where .= self::mime_clause( array_map( 'strval', (array) Options::get( 'mime_types' ) ), $wpdb->posts );
+		}
+
+		return $where;
 	}
 
 	public static function join_clause( string $table, string $posts_table ): string {
@@ -134,8 +149,30 @@ final class StatusFilter {
 		return " AND lw_img.status = '" . esc_sql( $status ) . "'";
 	}
 
-	private static function applies( WP_Query $query ): bool {
-		return is_admin()
+	/**
+	 * Scopes the "pending" status to the mime types the plugin actually
+	 * processes, so the count matches Bulk tab's Pending tile.
+	 *
+	 * @param array<int, string> $mime_types  Allowed mime types.
+	 * @param string             $posts_table The posts table name.
+	 * @return string
+	 */
+	public static function mime_clause( array $mime_types, string $posts_table ): string {
+		if ( [] === $mime_types ) {
+			return '';
+		}
+
+		$escaped = array_map(
+			static fn ( string $mime ): string => "'" . esc_sql( $mime ) . "'",
+			$mime_types
+		);
+
+		return " AND {$posts_table}.post_mime_type IN (" . implode( ', ', $escaped ) . ')';
+	}
+
+	private static function applies( ?WP_Query $query ): bool {
+		return null !== $query
+			&& is_admin()
 			&& $query->is_main_query()
 			&& 'attachment' === $query->get( 'post_type' )
 			&& null !== self::requested();

@@ -15,6 +15,7 @@
 - The Save button renders only under tabs that hold settings (General, Upload, Backup, Log)
 - The old-URL redirect description explains that redirects are computed on the 404, nothing is stored
 - `lw_img_optimize_request_args` runs for bulk and on-demand conversions too; `lw_img_upload_skipped` / `lw_img_upload_failed` gain an optional third `array $context` argument
+- The exclusion-patterns migration to skip rules is one-way; downgrading to 1.8.9 drops the migrated rules
 
 ## [1.8.9] - 2026-09-06
 
