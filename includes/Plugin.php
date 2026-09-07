@@ -22,6 +22,7 @@ use LightweightPlugins\Img\Bulk\ReoptimizeHandler;
 use LightweightPlugins\Img\Bulk\StatusEndpoint;
 use LightweightPlugins\Img\CLI\Commands as CLICommands;
 use LightweightPlugins\Img\CLI\DoctorCommand;
+use LightweightPlugins\Img\CLI\ListCommand;
 use LightweightPlugins\Img\CLI\SmartCropCommand;
 use LightweightPlugins\Img\Compat\CompetitorNotice;
 use LightweightPlugins\Img\Db\Schema;
@@ -33,8 +34,10 @@ use LightweightPlugins\Img\Media\InfoMetabox;
 use LightweightPlugins\Img\Media\NotFoundRedirect;
 use LightweightPlugins\Img\Media\RowActions;
 use LightweightPlugins\Img\Media\SavingsColumn;
+use LightweightPlugins\Img\Media\StatusFilter;
 use LightweightPlugins\Img\Stats\SiteStats;
 use LightweightPlugins\Img\Upload\OutputFormatMap;
+use LightweightPlugins\Img\Upload\Rules\RuleMigration;
 use LightweightPlugins\Img\Upload\SmartCrop\CropScheduler;
 use LightweightPlugins\Img\Upload\UploadInterceptor;
 
@@ -54,6 +57,7 @@ final class Plugin {
 
 	private function init_components(): void {
 		Schema::maybe_install();
+		RuleMigration::run();
 
 		EventLog::register();
 		RetentionCleaner::register();
@@ -76,6 +80,7 @@ final class Plugin {
 			StatusEndpoint::register();
 			RowActions::register();
 			SavingsColumn::register();
+			StatusFilter::register();
 			InfoMetabox::register();
 			ComparePage::register();
 			new SettingsPage();
@@ -85,6 +90,7 @@ final class Plugin {
 			\WP_CLI::add_command( 'lw-img', CLICommands::class );
 			\WP_CLI::add_command( 'lw-img smartcrop', SmartCropCommand::class );
 			\WP_CLI::add_command( 'lw-img doctor', DoctorCommand::class );
+			\WP_CLI::add_command( 'lw-img list', ListCommand::class );
 		}
 	}
 

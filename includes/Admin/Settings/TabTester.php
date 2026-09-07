@@ -41,6 +41,10 @@ final class TabTester implements TabInterface {
 		return 'dashicons-yes-alt';
 	}
 
+	public function has_settings(): bool {
+		return false;
+	}
+
 	public function render(): void {
 		$report   = HealthReport::get();
 		$sections = $report['sections'];

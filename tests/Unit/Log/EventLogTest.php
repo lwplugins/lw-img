@@ -135,4 +135,45 @@ final class EventLogTest extends MonkeyTestCase {
 
 		$this->assertSame( [], EventLog::all() );
 	}
+
+	public function test_skip_context_is_stored(): void {
+		$this->stub_options( [] );
+		$captured = null;
+		Functions\expect( 'update_option' )->once()->andReturnUsing(
+			static function ( string $name, array $log ) use ( &$captured ): bool {
+				$captured = $log;
+				return true;
+			}
+		);
+
+		EventLog::on_skipped(
+			'/up/a.jpg',
+			'optimized result not smaller',
+			[
+				'attachment_id' => 12,
+				'original_size' => 1000,
+				'new_size'      => 1100,
+			]
+		);
+
+		$this->assertSame( 12, $captured[0]['attachment_id'] );
+		$this->assertSame( 1000, $captured[0]['size_in'] );
+		$this->assertSame( 1100, $captured[0]['size_out'] );
+	}
+
+	public function test_skip_without_context_stores_no_context_keys(): void {
+		$this->stub_options( [] );
+		$captured = null;
+		Functions\expect( 'update_option' )->once()->andReturnUsing(
+			static function ( string $name, array $log ) use ( &$captured ): bool {
+				$captured = $log;
+				return true;
+			}
+		);
+
+		EventLog::on_skipped( '/up/a.jpg', 'no API key' );
+
+		$this->assertArrayNotHasKey( 'attachment_id', $captured[0] );
+		$this->assertArrayNotHasKey( 'size_in', $captured[0] );
+	}
 }

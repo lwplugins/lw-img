@@ -17,6 +17,7 @@ use LightweightPlugins\Img\Bulk\StatusEndpoint;
 use LightweightPlugins\Img\Bulk\StatusMeta;
 use LightweightPlugins\Img\Bulk\Throttle;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
+use LightweightPlugins\Img\Media\StatusFilter;
 use LightweightPlugins\Img\Options;
 
 /**
@@ -37,6 +38,10 @@ final class TabBulk implements TabInterface {
 
 	public function get_icon(): string {
 		return 'dashicons-images-alt2';
+	}
+
+	public function has_settings(): bool {
+		return false;
 	}
 
 	public function render(): void {
@@ -73,11 +78,16 @@ final class TabBulk implements TabInterface {
 			id="lw-img-bulk"
 			data-nonce="<?php echo esc_attr( wp_create_nonce( StatusEndpoint::NONCE_ACTION ) ); ?>"
 			data-running="<?php echo esc_attr( $running ? '1' : '0' ); ?>"
+			data-elapsed="<?php echo esc_attr( (string) ( $running ? max( 0, time() - (int) ( $job['started_at'] ?? 0 ) ) : 0 ) ); ?>"
 		>
 			<?php if ( $running ) : ?>
 				<?php $this->render_running( $job ); ?>
 			<?php elseif ( BulkJob::STATE_DONE === ( $job['state'] ?? '' ) ) : ?>
 				<?php $this->render_done_banner( $job ); ?>
+			<?php endif; ?>
+
+			<?php if ( ! $running ) : ?>
+				<?php ( new BulkRunSummary() )->render(); ?>
 			<?php endif; ?>
 
 			<?php $this->render_tiles( $pending, $optimized, $counts ); ?>
@@ -137,7 +147,9 @@ final class TabBulk implements TabInterface {
 			<code id="lw-img-now-item"><?php echo esc_html( (string) ( $job['current'] ?? '…' ) ); ?></code>
 		</div>
 
-		<ul class="lw-img-feed" id="lw-img-feed" aria-label="<?php esc_attr_e( 'Recent activity', 'lw-img' ); ?>"></ul>
+		<ul class="lw-img-feed" id="lw-img-feed" aria-label="<?php esc_attr_e( 'Recent activity', 'lw-img' ); ?>">
+			<li class="lw-img-feed-empty"><?php esc_html_e( 'Waiting for the first background tick… WP-Cron starts within a minute on most hosts.', 'lw-img' ); ?></li>
+		</ul>
 		<?php
 	}
 
@@ -165,6 +177,18 @@ final class TabBulk implements TabInterface {
 				)
 			)
 		);
+
+		$skipped = (int) ( $job['skipped'] ?? 0 );
+		if ( $skipped > 0 ) {
+			printf(
+				'<p class="description"><a href="%s">%s</a></p>',
+				esc_url( StatusFilter::url( StatusMeta::SKIPPED ) ),
+				esc_html(
+					/* translators: %s: number of skipped images. */
+					sprintf( __( 'See the %s skipped images in the Media Library', 'lw-img' ), number_format_i18n( $skipped ) )
+				)
+			);
+		}
 	}
 
 	/**
@@ -177,20 +201,22 @@ final class TabBulk implements TabInterface {
 	 */
 	private function render_tiles( int $pending, int $optimized, array $counts ): void {
 		$tiles = [
-			[ 'lw-img-count-pending', __( 'Pending', 'lw-img' ), $pending, '' ],
-			[ 'lw-img-count-optimized', __( 'Optimized', 'lw-img' ), $optimized, 'lw-img-tile-ok' ],
-			[ 'lw-img-count-skipped', __( 'Skipped', 'lw-img' ), $counts[ StatusMeta::SKIPPED ], 'lw-img-tile-skip' ],
-			[ 'lw-img-count-failed', __( 'Failed', 'lw-img' ), $counts[ StatusMeta::FAILED ], 'lw-img-tile-fail' ],
+			[ 'lw-img-count-pending', __( 'Pending', 'lw-img' ), $pending, '', StatusFilter::PENDING ],
+			[ 'lw-img-count-optimized', __( 'Optimized', 'lw-img' ), $optimized, 'lw-img-tile-ok', StatusMeta::OPTIMIZED ],
+			[ 'lw-img-count-skipped', __( 'Skipped', 'lw-img' ), $counts[ StatusMeta::SKIPPED ], 'lw-img-tile-skip', StatusMeta::SKIPPED ],
+			[ 'lw-img-count-failed', __( 'Failed', 'lw-img' ), $counts[ StatusMeta::FAILED ], 'lw-img-tile-fail', StatusMeta::FAILED ],
 		];
 
 		echo '<div class="lw-img-tiles">';
-		foreach ( $tiles as [ $id, $label, $value, $class ] ) {
+		foreach ( $tiles as [ $id, $label, $value, $class, $status ] ) {
 			printf(
-				'<div class="lw-img-tile %1$s"><span class="lw-img-k">%2$s</span><span class="lw-img-tile-v" id="%3$s">%4$s</span></div>',
+				'<a class="lw-img-tile lw-img-tile-link %1$s" href="%5$s" title="%6$s"><span class="lw-img-k">%2$s</span><span class="lw-img-tile-v" id="%3$s">%4$s</span></a>',
 				esc_attr( $class ),
 				esc_html( $label ),
 				esc_attr( $id ),
-				esc_html( number_format_i18n( $value ) )
+				esc_html( number_format_i18n( $value ) ),
+				esc_url( StatusFilter::url( $status ) ),
+				esc_attr__( 'Show these images in the Media Library', 'lw-img' )
 			);
 		}
 		echo '</div>';
@@ -236,9 +262,10 @@ final class TabBulk implements TabInterface {
 			echo '<span class="description">' . esc_html__( 'Set your API key first', 'lw-img' ) . ' — <a href="#general" class="lw-img-goto">' . esc_html__( 'General tab', 'lw-img' ) . '</a></span>';
 		} else {
 			printf(
-				'<a href="%s" class="button button-primary%s">%s</a>',
+				'<a href="%s" class="button button-primary lw-img-bulk-start%s" data-busy="%s">%s</a>',
 				esc_url( JobHandlers::url( JobHandlers::ACTION_START ) ),
 				0 === $pending ? ' disabled' : '',
+				esc_attr__( 'Checking API key and redirects, counting images…', 'lw-img' ),
 				esc_html__( 'Optimize all in background', 'lw-img' )
 			);
 		}

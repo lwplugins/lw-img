@@ -47,6 +47,17 @@ wp lw-img requeue --failed --skipped    # also re-evaluate skips (after settings
 Clears the outcome stamps so the next `optimize` run picks the images up
 again.
 
+## `wp lw-img list`
+
+```bash
+wp lw-img list --status=skipped
+wp lw-img list --status=failed --format=json --limit=500
+```
+
+Attachments by LW Image status (`optimized`, `skipped`, `failed`) with id,
+file, detail and the original / converted sizes. For "result not smaller"
+skips the converted size is the one the API returned.
+
 ## `wp lw-img leftovers`
 
 ```bash

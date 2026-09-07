@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.9.0] - 2026-09-07
+
+### Added
+- Pattern rules on the Upload tab: per wildcard pattern choose skip entirely, keep original dimensions, use a specific optimization level, or keep EXIF. Every matching rule applies (skip wins, first level rule wins). Applies to uploads, bulk runs and smart crop; saved exclusion patterns migrate to skip rules automatically
+- Media Library list filter "LW Image: optimized / skipped / failed / not yet processed"; the Bulk tab's tiles and finished banner link into it (list view — WordPress remembers the last view mode)
+- `wp lw-img list --status=<optimized|skipped|failed> [--format] [--limit]`
+- Retry a skipped or failed image at a chosen level from the attachment edit screen
+- "This run uses" card on the Bulk tab listing the Upload settings a run applies, plus a note that thumbnails are regenerated automatically
+
+### Changed
+- "Result not smaller" skips store the original and would-be sizes; the Log, the Media Library column and the attachment box show them. Log rows link to the attachment when the id is known
+- Bulk start: the button shows a checking state until the run begins; Elapsed counts from the start even before the first processed image; the feed says it is waiting for the first tick
+- The Save button renders only under tabs that hold settings (General, Upload, Backup, Log)
+- The old-URL redirect description explains that redirects are computed on the 404, nothing is stored
+- `lw_img_optimize_request_args` runs for bulk and on-demand conversions too; `lw_img_upload_skipped` / `lw_img_upload_failed` gain an optional third `array $context` argument
+- The exclusion-patterns migration to skip rules is one-way; downgrading to 1.8.9 drops the migrated rules
+
 ## [1.8.9] - 2026-09-06
 
 ### Fixed

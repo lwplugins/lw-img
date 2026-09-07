@@ -11,6 +11,8 @@ namespace LightweightPlugins\Img\Bulk;
 
 defined( 'ABSPATH' ) || exit;
 
+use LightweightPlugins\Img\Api\OptimizeRequest;
+
 /**
  * Admin-post endpoint (nonce + capability checked) and its result notice.
  */
@@ -31,20 +33,20 @@ final class OptimizeHandler {
 	/**
 	 * Nonce-protected optimize URL for an attachment.
 	 *
-	 * @param int $attachment_id Attachment post ID.
+	 * @param int    $attachment_id Attachment post ID.
+	 * @param string $level         Optional level override for this attempt.
 	 * @return string
 	 */
-	public static function url( int $attachment_id ): string {
-		return wp_nonce_url(
-			add_query_arg(
-				[
-					'action'     => self::ACTION,
-					'attachment' => $attachment_id,
-				],
-				admin_url( 'admin-post.php' )
-			),
-			self::ACTION . '_' . $attachment_id
-		);
+	public static function url( int $attachment_id, string $level = '' ): string {
+		$args = [
+			'action'     => self::ACTION,
+			'attachment' => $attachment_id,
+		];
+		if ( '' !== $level ) {
+			$args['level'] = $level;
+		}
+
+		return wp_nonce_url( add_query_arg( $args, admin_url( 'admin-post.php' ) ), self::ACTION . '_' . $attachment_id );
 	}
 
 	/**
@@ -61,7 +63,10 @@ final class OptimizeHandler {
 
 		check_admin_referer( self::ACTION . '_' . $attachment_id );
 
-		$outcome = ( new AttachmentOptimizer() )->optimize( $attachment_id );
+		$level = isset( $_GET['level'] ) ? sanitize_key( wp_unslash( (string) $_GET['level'] ) ) : '';
+		$level = OptimizeRequest::valid_level( $level ) ? $level : null;
+
+		$outcome = ( new AttachmentOptimizer( null, null, null, $level ) )->optimize( $attachment_id );
 
 		wp_safe_redirect(
 			add_query_arg( 'lw_img_opt', $outcome['result'], admin_url( 'upload.php' ) )

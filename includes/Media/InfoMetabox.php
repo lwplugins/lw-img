@@ -144,6 +144,14 @@ final class InfoMetabox {
 			esc_url( OptimizeHandler::url( $post->ID ) ),
 			$decided ? esc_html__( 'Try again', 'lw-img' ) : esc_html__( 'Optimize now', 'lw-img' )
 		);
+
+		if ( $decided ) {
+			echo '<p class="description">' . esc_html__( 'Try again at a specific level:', 'lw-img' ) . '</p><p>';
+			foreach ( [ 'lossless', 'normal', 'aggressive', 'ultra' ] as $target_level ) {
+				echo '<a class="button button-small" href="' . esc_url( OptimizeHandler::url( $post->ID, $target_level ) ) . '">' . esc_html( ucfirst( $target_level ) ) . '</a> ';
+			}
+			echo '</p>';
+		}
 	}
 
 	/**
@@ -168,7 +176,7 @@ final class InfoMetabox {
 		// real saving gets — stops people re-running it over and over.
 		if ( 'result not smaller' === $detail ) {
 			echo '<p><strong style="font-size:1.3em;color:' . esc_attr( SavingsColumn::GREEN ) . ';">0%</strong></p>';
-			echo '<p class="description">' . esc_html__( 'Skipped — the optimized version came back no smaller, so the original was kept. This image is already as small as it gets.', 'lw-img' ) . '</p>';
+			echo '<p class="description">' . esc_html( SavingsColumn::not_smaller_text( $record ) ) . ' ' . esc_html__( 'A stronger level may still shrink it — try one below.', 'lw-img' ) . '</p>';
 			return;
 		}
 

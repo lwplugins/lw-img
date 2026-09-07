@@ -10,11 +10,16 @@ is then built from the optimized file. One upload = one API call.
 What never converts:
 
 - Already-WebP/AVIF uploads (with *Skip already-WebP* on — saves credits)
-- Files matching your exclusion patterns, or outside the size limits
+- Files matching a "skip entirely" pattern rule, or outside the size limits
 - Anything when no API key is configured — the plugin then changes
   nothing at all
 - Animated GIFs when *Skip animated GIF* is on (otherwise they become
   animated WebP with frames and timing preserved)
+
+Pattern rules apply to uploads and bulk runs alike (a skip rule also
+keeps the file out of smart crop) — the Bulk tab shows which Upload
+settings a run will use. Thumbnails are regenerated from the
+converted file after every conversion.
 
 If the API call fails, the original upload is kept untouched. Nothing
 ever breaks because of LW Image.
@@ -156,13 +161,13 @@ Filters:
 |---|---|
 | `lw_img_should_convert` | Final veto on converting a file: `(bool $convert, string $file_path, string $mime_type)` |
 | `lw_img_dashboard_url` | Replace the HelloImg dashboard URL shown in the admin (white-labeling) |
-| `lw_img_optimize_request_args` | Filter the API request payload before it is sent: `(array $args, string $file_path)` |
+| `lw_img_optimize_request_args` | Filter the API request payload before it is sent: `(array $args, string $file_path)` — runs for uploads and for bulk / on-demand conversions |
 | `lw_img_competitor_plugins` | Extend the list of recognized other-optimizer plugins |
 
 Actions (fired by the plugin, useful for logging/monitoring):
 
 | Hook | Fires when |
 |---|---|
-| `lw_img_upload_skipped` | A file was deliberately not converted: `(string $file, string $reason)` |
-| `lw_img_upload_failed` | A conversion or crop attempt failed: `(string $file, string $reason)` |
+| `lw_img_upload_skipped` | A file was deliberately not converted: `(string $file, string $reason, array $context)` — `$context` is always passed (may be an empty array); may hold `attachment_id`, `original_size`, `new_size` |
+| `lw_img_upload_failed` | A conversion or crop attempt failed: `(string $file, string $reason, array $context)` — `$context` is always passed (may be an empty array); may hold `attachment_id` |
 | `lw_img_restored` | An attachment was restored from backup: `(int $attachment_id, string $file)` |

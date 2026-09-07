@@ -40,6 +40,10 @@ final class TabBackup implements TabInterface {
 		return 'dashicons-backup';
 	}
 
+	public function has_settings(): bool {
+		return true;
+	}
+
 	public function render(): void {
 		$enabled = (bool) Options::get( 'backup_enabled' );
 

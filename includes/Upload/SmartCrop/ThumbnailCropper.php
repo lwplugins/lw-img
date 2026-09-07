@@ -79,7 +79,7 @@ final class ThumbnailCropper {
 		foreach ( $jobs as $job ) {
 			$job_convert = self::convert_target_for( $job['file'] );
 			if ( null === $job_convert ) {
-				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: unsupported size format' );
+				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: unsupported size format', [ 'attachment_id' => $attachment_id ] );
 				++$summary['failed'];
 				continue;
 			}
@@ -95,14 +95,14 @@ final class ThumbnailCropper {
 				$updated = true;
 				++$summary['cropped'];
 			} catch ( ApiException $e ) {
-				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: ' . $e->getMessage() );
+				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: ' . $e->getMessage(), [ 'attachment_id' => $attachment_id ] );
 				++$summary['failed'];
 				if ( $e->is_quota() ) {
 					$summary['halted'] = true;
 					break;
 				}
 			} catch ( Throwable $e ) {
-				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: ' . $e->getMessage() );
+				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: ' . $e->getMessage(), [ 'attachment_id' => $attachment_id ] );
 				++$summary['failed'];
 			}
 		}

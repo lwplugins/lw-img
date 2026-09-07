@@ -102,20 +102,6 @@ final class SettingsSanitizerTest extends MonkeyTestCase {
 		$this->assertSame( 'himg_abc123', $sanitized['api_key'] );
 	}
 
-	public function test_exclusion_patterns_textarea_is_split_into_a_clean_list(): void {
-		$sanitized = SettingsSanitizer::sanitize(
-			[ 'exclusion_patterns' => "*-original.jpg\r\n\n  2026/08/*  \n\n" ]
-		);
-
-		$this->assertSame( [ '*-original.jpg', '2026/08/*' ], $sanitized['exclusion_patterns'] );
-	}
-
-	public function test_exclusion_patterns_default_to_empty_list(): void {
-		$sanitized = SettingsSanitizer::sanitize( [] );
-
-		$this->assertSame( [], $sanitized['exclusion_patterns'] );
-	}
-
 	public function test_smartcrop_sizes_keeps_valid_size_names(): void {
 		$result = SettingsSanitizer::sanitize(
 			[ 'smartcrop_sizes' => [ 'woocommerce_thumbnail', 'shop_catalog' ] ]
@@ -147,5 +133,36 @@ final class SettingsSanitizerTest extends MonkeyTestCase {
 		$result = SettingsSanitizer::sanitize( [] );
 
 		$this->assertFalse( $result['smartcrop_enabled'] );
+	}
+
+	public function test_pattern_rules_keep_valid_rows_and_drop_bad_ones(): void {
+		$sanitized = SettingsSanitizer::sanitize(
+			[
+				'pattern_rules' => [
+					[ 'pattern' => '  *-full.jpg ', 'action' => 'keep_size', 'value' => 'ignored' ],
+					[ 'pattern' => '2026/*', 'action' => 'level', 'value' => 'ultra' ],
+					[ 'pattern' => 'logo-*', 'action' => 'level', 'value' => 'bogus' ],
+					[ 'pattern' => '', 'action' => 'exclude', 'value' => '' ],
+					[ 'pattern' => 'x.jpg', 'action' => 'teleport', 'value' => '' ],
+					'garbage',
+				],
+			]
+		);
+
+		$this->assertSame(
+			[
+				[ 'pattern' => '*-full.jpg', 'action' => 'keep_size', 'value' => '' ],
+				[ 'pattern' => '2026/*', 'action' => 'level', 'value' => 'ultra' ],
+			],
+			$sanitized['pattern_rules']
+		);
+	}
+
+	public function test_missing_pattern_rules_means_no_rules(): void {
+		$this->assertSame( [], SettingsSanitizer::sanitize( [] )['pattern_rules'] );
+	}
+
+	public function test_exclusion_patterns_is_no_longer_an_option(): void {
+		$this->assertArrayNotHasKey( 'exclusion_patterns', SettingsSanitizer::sanitize( [] ) );
 	}
 }

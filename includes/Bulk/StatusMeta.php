@@ -29,21 +29,25 @@ final class StatusMeta {
 	/**
 	 * Record the outcome of an attempt.
 	 *
-	 * @param int    $attachment_id Attachment post ID.
-	 * @param string $status        One of the status constants.
-	 * @param string $detail        Human-readable reason/detail.
-	 * @param bool   $transient     Whether a failure looks transient (worth an automatic retry).
+	 * @param int                  $attachment_id Attachment post ID.
+	 * @param string               $status        One of the status constants.
+	 * @param string               $detail        Human-readable reason/detail.
+	 * @param bool                 $transient     Whether a failure looks transient (worth an automatic retry).
+	 * @param array<string, mixed> $extra         Additional columns (e.g. orig_size/new_size for a "not smaller" skip).
 	 * @return void
 	 */
-	public static function write( int $attachment_id, string $status, string $detail, bool $transient = false ): void {
+	public static function write( int $attachment_id, string $status, string $detail, bool $transient = false, array $extra = [] ): void {
 		ImageRepository::save(
 			$attachment_id,
-			[
-				'status'       => $status,
-				'detail'       => mb_substr( $detail, 0, 191 ),
-				'is_transient' => $transient ? 1 : 0,
-				'claimed_at'   => 0,
-			]
+			array_merge(
+				$extra,
+				[
+					'status'       => $status,
+					'detail'       => mb_substr( $detail, 0, 191 ),
+					'is_transient' => $transient ? 1 : 0,
+					'claimed_at'   => 0,
+				]
+			)
 		);
 	}
 

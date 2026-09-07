@@ -47,7 +47,7 @@ The auto-conversion pipeline, grouped by question:
 | Skip already-WebP | on | Saves credits |
 | Skip animated GIF | off | Off converts to animated WebP |
 | Max / min file size | 10 MB / 0 KB | Files outside the range are skipped |
-| Exclusion patterns | — | Wildcard patterns on file name or path; matching files are never sent to the API |
+| Pattern rules | — | Wildcard pattern + action: skip entirely, keep original dimensions, use a specific level, keep EXIF. Every matching rule applies; skip wins; first level rule wins |
 | MIME types | JPEG, PNG, HEIC/HEIF, TIFF, BMP, GIF | Which types enter the pipeline |
 | Smart crop | off | Enable + pick the hard-cropped sizes; the per-upload API cost is shown before you commit |
 
@@ -65,7 +65,11 @@ A live dashboard for background runs: segmented progress bar, elapsed /
 speed / ETA, and an activity feed. Controls: start (disabled until a
 working API key is set), cancel, *Retry N failed*, *Re-scan N skipped*
 (after settings changes), and the speed profile (gentle / normal /
-fast).
+fast). The *This run uses* card shows the Upload-tab settings the next
+run will apply (level, output, resize, pattern rules, EXIF, backup).
+The Pending / Optimized / Skipped / Failed tiles link to the Media
+Library, pre-filtered to that status via the **LW Image** status
+dropdown.
 
 ## Backup
 
@@ -96,3 +100,5 @@ and savings), with filter chips, a search box, and client-side paging.
   level
 - Images already optimized by another optimizer plugin are recognized
   and left untouched
+- In list view, an **LW Image** status dropdown filters attachments by
+  optimized / skipped / failed / not yet processed
