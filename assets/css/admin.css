@@ -742,3 +742,10 @@
 .lw-img-bulk-starting { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; color: #646970; }
 .lw-img-bulk-starting .spinner { float: none; margin: 0; }
 .lw-img-feed-empty { color: #646970; font-style: italic; }
+
+/* Bulk tab: "This run uses" card (idle state) */
+.lw-img-run-uses { border: 1px solid #dcdcde; border-radius: 6px; padding: 12px 14px; margin: 0 0 16px; max-width: 70ch; }
+.lw-img-run-uses ul { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 6px 0 8px; }
+.lw-img-run-uses li { margin: 0; }
+.lw-img-run-uses li span { color: #646970; margin-right: 4px; }
+.lw-img-run-uses .description { margin: 0; }

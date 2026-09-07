@@ -86,6 +86,10 @@ final class TabBulk implements TabInterface {
 				<?php $this->render_done_banner( $job ); ?>
 			<?php endif; ?>
 
+			<?php if ( ! $running ) : ?>
+				<?php ( new BulkRunSummary() )->render(); ?>
+			<?php endif; ?>
+
 			<?php $this->render_tiles( $pending, $optimized, $counts ); ?>
 			<?php $this->render_skip_reasons(); ?>
 			<?php $this->render_controls( $running, $pending, $counts ); ?>
