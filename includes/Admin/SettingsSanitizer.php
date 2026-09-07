@@ -11,7 +11,9 @@ namespace LightweightPlugins\Img\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
+use LightweightPlugins\Img\Api\OptimizeRequest;
 use LightweightPlugins\Img\Options;
+use LightweightPlugins\Img\Upload\Rules\RuleSet;
 
 /**
  * Sanitizes submitted settings against the known defaults.
@@ -54,8 +56,8 @@ final class SettingsSanitizer {
 	}
 
 	private static function sanitize_value( string $key, mixed $default, mixed $fallback, mixed $value ): mixed {
-		if ( 'exclusion_patterns' === $key ) {
-			return self::sanitize_patterns( $value );
+		if ( 'pattern_rules' === $key ) {
+			return self::sanitize_rules( $value );
 		}
 
 		if ( 'smartcrop_sizes' === $key ) {
@@ -102,26 +104,47 @@ final class SettingsSanitizer {
 	}
 
 	/**
-	 * Normalize the exclusion patterns textarea (or array) into a clean list.
+	 * Normalize the pattern-rule rows: trim the pattern, whitelist the
+	 * action, validate the level value, drop anything incomplete.
 	 *
-	 * @param mixed $value Submitted value: newline-separated string or array.
-	 * @return array<int, string>
+	 * @param mixed $value Submitted rows: list of {pattern, action, value}.
+	 * @return array<int, array{pattern: string, action: string, value: string}>
 	 */
-	private static function sanitize_patterns( mixed $value ): array {
-		if ( is_string( $value ) ) {
-			$value = preg_split( '/\r\n|\r|\n/', $value );
-		}
-
+	private static function sanitize_rules( mixed $value ): array {
 		if ( ! is_array( $value ) ) {
 			return [];
 		}
 
-		$patterns = array_map(
-			static fn ( $pattern ): string => trim( sanitize_text_field( (string) $pattern ) ),
-			$value
-		);
+		$rules = [];
 
-		return array_values( array_filter( $patterns, static fn ( string $pattern ): bool => '' !== $pattern ) );
+		foreach ( $value as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$pattern = trim( sanitize_text_field( (string) ( $row['pattern'] ?? '' ) ) );
+			$action  = sanitize_key( (string) ( $row['action'] ?? '' ) );
+
+			if ( '' === $pattern || ! in_array( $action, RuleSet::ACTIONS, true ) ) {
+				continue;
+			}
+
+			$level = '';
+			if ( RuleSet::ACTION_LEVEL === $action ) {
+				$level = sanitize_key( (string) ( $row['value'] ?? '' ) );
+				if ( ! OptimizeRequest::valid_level( $level ) ) {
+					continue;
+				}
+			}
+
+			$rules[] = [
+				'pattern' => $pattern,
+				'action'  => $action,
+				'value'   => $level,
+			];
+		}
+
+		return $rules;
 	}
 
 	/**

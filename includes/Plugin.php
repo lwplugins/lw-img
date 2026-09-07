@@ -35,6 +35,7 @@ use LightweightPlugins\Img\Media\RowActions;
 use LightweightPlugins\Img\Media\SavingsColumn;
 use LightweightPlugins\Img\Stats\SiteStats;
 use LightweightPlugins\Img\Upload\OutputFormatMap;
+use LightweightPlugins\Img\Upload\Rules\RuleMigration;
 use LightweightPlugins\Img\Upload\SmartCrop\CropScheduler;
 use LightweightPlugins\Img\Upload\UploadInterceptor;
 
@@ -54,6 +55,7 @@ final class Plugin {
 
 	private function init_components(): void {
 		Schema::maybe_install();
+		RuleMigration::run();
 
 		EventLog::register();
 		RetentionCleaner::register();
