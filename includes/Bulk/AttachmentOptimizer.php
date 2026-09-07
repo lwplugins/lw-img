@@ -126,14 +126,14 @@ final class AttachmentOptimizer {
 			return $this->finish( $attachment_id, self::RESULT_SKIPPED, 'file missing' );
 		}
 
-		if ( ! $this->detector->should_convert_on_demand( $file, $mime ) ) {
+		if ( ! $this->detector->should_convert_on_demand( $file, $mime, $attachment_id ) ) {
 			return $this->finish( $attachment_id, self::RESULT_SKIPPED, 'skip rules apply' );
 		}
 
 		try {
 			return $this->convert( $attachment_id, $file, $mime );
 		} catch ( ApiException $e ) {
-			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
+			do_action( 'lw_img_upload_failed', $file, $e->getMessage(), [ 'attachment_id' => $attachment_id ] );
 
 			if ( $e->is_quota() || $e->is_auth() ) {
 				// Out of credit, or the key was rejected (rotated/revoked
@@ -148,7 +148,7 @@ final class AttachmentOptimizer {
 
 			return $this->finish( $attachment_id, self::RESULT_FAILED, $e->getMessage(), $e->is_transient() );
 		} catch ( Throwable $e ) {
-			do_action( 'lw_img_upload_failed', $file, $e->getMessage() );
+			do_action( 'lw_img_upload_failed', $file, $e->getMessage(), [ 'attachment_id' => $attachment_id ] );
 			return $this->finish( $attachment_id, self::RESULT_FAILED, $e->getMessage() );
 		}
 	}
@@ -156,14 +156,15 @@ final class AttachmentOptimizer {
 	/**
 	 * Stamp the outcome and build the result array.
 	 *
-	 * @param int    $attachment_id Attachment post ID.
-	 * @param string $result        Outcome constant.
-	 * @param string $detail        Human-readable detail.
-	 * @param bool   $transient     Whether a failure looks transient.
+	 * @param int                  $attachment_id Attachment post ID.
+	 * @param string               $result        Outcome constant.
+	 * @param string               $detail        Human-readable detail.
+	 * @param bool                 $transient     Whether a failure looks transient.
+	 * @param array<string, mixed> $extra         Additional columns to store.
 	 * @return array{result: string, detail: string}
 	 */
-	private function finish( int $attachment_id, string $result, string $detail, bool $transient = false ): array {
-		StatusMeta::write( $attachment_id, $result, $detail, $transient );
+	private function finish( int $attachment_id, string $result, string $detail, bool $transient = false, array $extra = [] ): array {
+		StatusMeta::write( $attachment_id, $result, $detail, $transient, $extra );
 
 		return [
 			'result' => $result,
@@ -184,12 +185,30 @@ final class AttachmentOptimizer {
 			? OptimizeRequest::FORMAT_WEBP
 			: null;
 
-		$request = OptimizeRequest::from_options( $file, $override, $this->level_override );
+		$request = OptimizeRequest::filtered( $file, $override, $this->level_override );
 		$result  = ( new Client() )->optimize( $request );
 
 		if ( ! $result->is_smaller() ) {
-			do_action( 'lw_img_upload_skipped', $file, 'optimized result not smaller' );
-			return $this->finish( $attachment_id, self::RESULT_SKIPPED, 'result not smaller' );
+			do_action(
+				'lw_img_upload_skipped',
+				$file,
+				'optimized result not smaller',
+				[
+					'attachment_id' => $attachment_id,
+					'original_size' => $result->original_size,
+					'new_size'      => $result->new_size,
+				]
+			);
+			return $this->finish(
+				$attachment_id,
+				self::RESULT_SKIPPED,
+				'result not smaller',
+				false,
+				[
+					'orig_size' => $result->original_size,
+					'new_size'  => $result->new_size,
+				]
+			);
 		}
 
 		$old_url  = (string) wp_get_attachment_url( $attachment_id );

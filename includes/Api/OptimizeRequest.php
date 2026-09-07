@@ -12,6 +12,7 @@ namespace LightweightPlugins\Img\Api;
 defined( 'ABSPATH' ) || exit;
 
 use LightweightPlugins\Img\Options;
+use LightweightPlugins\Img\Upload\Rules\RuleSet;
 
 /**
  * Value object describing a /v1/optimize request.
@@ -44,12 +45,14 @@ final class OptimizeRequest {
 	 * @param string|null $convert_override Force a specific output format (e.g. 'webp'
 	 *                                      for animated input, where only WebP keeps
 	 *                                      the animation). Null uses the saved option.
-	 * @param string|null $level_override   Force a specific optimization level
-	 *                                      (used by re-optimize). Null uses the saved option.
+	 * @param string|null $level_override   Force a specific level (re-optimize, CLI --level);
+	 *                                      beats a level rule.
 	 * @return self
 	 */
 	public static function from_options( string $file_path, ?string $convert_override = null, ?string $level_override = null ): self {
-		$level = $level_override ?? (string) Options::get( 'level' );
+		$match = RuleSet::from_options()->resolve( $file_path );
+
+		$level = $level_override ?? $match->level ?? (string) Options::get( 'level' );
 		if ( ! self::valid_level( $level ) ) {
 			$level = self::LEVEL_NORMAL;
 		}
@@ -62,10 +65,33 @@ final class OptimizeRequest {
 		return new self(
 			$file_path,
 			$level,
-			(bool) Options::get( 'keep_exif' ),
+			(bool) Options::get( 'keep_exif' ) || $match->keep_exif,
 			$format,
-			max( 0, (int) Options::get( 'max_width' ) ),
-			max( 0, (int) Options::get( 'max_height' ) )
+			$match->keep_size ? 0 : max( 0, (int) Options::get( 'max_width' ) ),
+			$match->keep_size ? 0 : max( 0, (int) Options::get( 'max_height' ) )
+		);
+	}
+
+	/**
+	 * `from_options()` plus the `lw_img_optimize_request_args` filter — the
+	 * single factory every conversion path (upload, bulk, row action) uses.
+	 *
+	 * @param string      $file_path        Absolute path of the file to optimize.
+	 * @param string|null $convert_override Force an output format (null = saved option).
+	 * @param string|null $level_override   Force a level (null = rule or saved option).
+	 * @return self
+	 */
+	public static function filtered( string $file_path, ?string $convert_override = null, ?string $level_override = null ): self {
+		$request = self::from_options( $file_path, $convert_override, $level_override );
+		$args    = (array) apply_filters( 'lw_img_optimize_request_args', $request->to_data_payload(), $file_path );
+
+		return new self(
+			$file_path,
+			(string) ( $args['level'] ?? $request->level ),
+			(bool) ( $args['keep_exif'] ?? $request->keep_exif ),
+			(string) ( $args['convert'] ?? $request->convert ),
+			(int) ( $args['max_width'] ?? $request->max_width ),
+			(int) ( $args['max_height'] ?? $request->max_height )
 		);
 	}
 

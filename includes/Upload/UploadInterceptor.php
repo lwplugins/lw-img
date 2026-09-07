@@ -75,22 +75,20 @@ final class UploadInterceptor {
 
 		try {
 			$client  = new Client();
-			$request = OptimizeRequest::from_options( $file, $this->animation_safe_override( $file, $type ) );
-
-			$args    = (array) apply_filters( 'lw_img_optimize_request_args', $request->to_data_payload(), $file );
-			$request = new OptimizeRequest(
-				$file,
-				(string) ( $args['level'] ?? $request->level ),
-				(bool) ( $args['keep_exif'] ?? $request->keep_exif ),
-				(string) ( $args['convert'] ?? $request->convert ),
-				(int) ( $args['max_width'] ?? $request->max_width ),
-				(int) ( $args['max_height'] ?? $request->max_height )
-			);
+			$request = OptimizeRequest::filtered( $file, $this->animation_safe_override( $file, $type ) );
 
 			$result = $client->optimize( $request );
 
 			if ( ! $result->is_smaller() ) {
-				do_action( 'lw_img_upload_skipped', $file, 'optimized result not smaller' );
+				do_action(
+					'lw_img_upload_skipped',
+					$file,
+					'optimized result not smaller',
+					[
+						'original_size' => $result->original_size,
+						'new_size'      => $result->new_size,
+					]
+				);
 				return $upload;
 			}
 

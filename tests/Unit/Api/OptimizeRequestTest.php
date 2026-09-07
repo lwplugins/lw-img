@@ -158,4 +158,78 @@ final class OptimizeRequestTest extends MonkeyTestCase {
 
 		$this->assertArrayNotHasKey( 'resize', $payload );
 	}
+
+	/**
+	 * Saved-options stub shared by the rule tests.
+	 *
+	 * @param array<string, mixed> $saved Stored options.
+	 * @return void
+	 */
+	private function saved( array $saved ): void {
+		\Brain\Monkey\Functions\when( 'wp_parse_args' )->alias(
+			static fn ( $args, $defaults = [] ): array => array_merge( (array) $defaults, (array) $args )
+		);
+		\Brain\Monkey\Functions\when( 'get_option' )->justReturn( $saved );
+		\LightweightPlugins\Img\Options::clear_cache();
+	}
+
+	public function test_keep_size_rule_drops_the_resize_box(): void {
+		$this->saved(
+			[
+				'max_width'     => 1600,
+				'max_height'    => 1600,
+				'pattern_rules' => [ [ 'pattern' => '*-full.jpg', 'action' => 'keep_size', 'value' => '' ] ],
+			]
+		);
+
+		$kept    = OptimizeRequest::from_options( '/up/hero-full.jpg' );
+		$resized = OptimizeRequest::from_options( '/up/hero.jpg' );
+
+		$this->assertSame( 0, $kept->max_width );
+		$this->assertSame( 0, $kept->max_height );
+		$this->assertSame( 1600, $resized->max_width );
+		\LightweightPlugins\Img\Options::clear_cache();
+	}
+
+	public function test_level_rule_overrides_the_saved_level_but_not_an_explicit_override(): void {
+		$this->saved(
+			[
+				'level'         => 'normal',
+				'pattern_rules' => [ [ 'pattern' => 'logo-*', 'action' => 'level', 'value' => 'lossless' ] ],
+			]
+		);
+
+		$this->assertSame( 'lossless', OptimizeRequest::from_options( '/up/logo-a.png' )->level );
+		$this->assertSame( 'normal', OptimizeRequest::from_options( '/up/photo.jpg' )->level );
+		$this->assertSame( 'ultra', OptimizeRequest::from_options( '/up/logo-a.png', null, 'ultra' )->level );
+		\LightweightPlugins\Img\Options::clear_cache();
+	}
+
+	public function test_keep_exif_rule_only_turns_exif_on(): void {
+		$this->saved(
+			[
+				'keep_exif'     => false,
+				'pattern_rules' => [ [ 'pattern' => 'photo-*', 'action' => 'keep_exif', 'value' => '' ] ],
+			]
+		);
+
+		$this->assertTrue( OptimizeRequest::from_options( '/up/photo-1.jpg' )->keep_exif );
+		$this->assertFalse( OptimizeRequest::from_options( '/up/other.jpg' )->keep_exif );
+		\LightweightPlugins\Img\Options::clear_cache();
+	}
+
+	public function test_filtered_applies_the_request_args_filter(): void {
+		$this->saved( [ 'max_width' => 1600 ] );
+		\Brain\Monkey\Filters\expectApplied( 'lw_img_optimize_request_args' )
+			->once()
+			->andReturnUsing(
+				static fn ( array $args ): array => array_merge( $args, [ 'max_width' => 0, 'level' => 'ultra' ] )
+			);
+
+		$request = OptimizeRequest::filtered( '/up/a.jpg' );
+
+		$this->assertSame( 0, $request->max_width );
+		$this->assertSame( 'ultra', $request->level );
+		\LightweightPlugins\Img\Options::clear_cache();
+	}
 }
