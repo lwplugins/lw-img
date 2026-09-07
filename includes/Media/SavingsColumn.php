@@ -135,7 +135,7 @@ final class SavingsColumn {
 			printf(
 				'<strong style="color:%1$s;">0%%</strong><br><span class="description">%2$s</span>',
 				esc_attr( self::GREEN ),
-				esc_html__( 'Skipped — already as small as it gets', 'lw-img' )
+				esc_html( self::not_smaller_text( $record ) )
 			);
 			return;
 		}
@@ -148,5 +148,27 @@ final class SavingsColumn {
 			esc_html_e( 'Skipped', 'lw-img' );
 		}
 		echo '</span>';
+	}
+
+	/**
+	 * "Already as small as it gets", with the two sizes when we stored them.
+	 *
+	 * @param array<string, string> $record Stored record.
+	 * @return string
+	 */
+	public static function not_smaller_text( array $record ): string {
+		$orig = (int) ( $record['orig_size'] ?? 0 );
+		$new  = (int) ( $record['new_size'] ?? 0 );
+
+		if ( $orig <= 0 || $new <= 0 ) {
+			return __( 'Skipped — already as small as it gets', 'lw-img' );
+		}
+
+		return sprintf(
+			/* translators: 1: size the converted file would have had, 2: original file size. */
+			__( 'Skipped — converted would be %1$s vs %2$s original', 'lw-img' ),
+			(string) size_format( $new ),
+			(string) size_format( $orig )
+		);
 	}
 }

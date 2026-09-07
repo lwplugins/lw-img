@@ -168,7 +168,7 @@ final class InfoMetabox {
 		// real saving gets — stops people re-running it over and over.
 		if ( 'result not smaller' === $detail ) {
 			echo '<p><strong style="font-size:1.3em;color:' . esc_attr( SavingsColumn::GREEN ) . ';">0%</strong></p>';
-			echo '<p class="description">' . esc_html__( 'Skipped — the optimized version came back no smaller, so the original was kept. This image is already as small as it gets.', 'lw-img' ) . '</p>';
+			echo '<p class="description">' . esc_html( SavingsColumn::not_smaller_text( $record ) ) . ' ' . esc_html__( 'A stronger level may still shrink it — try one below.', 'lw-img' ) . '</p>';
 			return;
 		}
 
