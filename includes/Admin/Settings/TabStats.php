@@ -33,6 +33,10 @@ final class TabStats implements TabInterface {
 		return 'dashicons-chart-bar';
 	}
 
+	public function has_settings(): bool {
+		return false;
+	}
+
 	public function render(): void {
 		$stats = SiteStats::get();
 

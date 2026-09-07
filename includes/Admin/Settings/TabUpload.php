@@ -35,6 +35,10 @@ final class TabUpload implements TabInterface {
 		return 'dashicons-upload';
 	}
 
+	public function has_settings(): bool {
+		return true;
+	}
+
 	public function render(): void {
 		echo '<h2>' . esc_html__( 'Upload', 'lw-img' ) . '</h2>';
 		echo '<p class="lw-img-sub">' . esc_html__( 'What happens to every new image upload.', 'lw-img' ) . '</p>';

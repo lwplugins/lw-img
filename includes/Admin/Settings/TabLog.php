@@ -35,6 +35,10 @@ final class TabLog implements TabInterface {
 		return 'dashicons-list-view';
 	}
 
+	public function has_settings(): bool {
+		return true;
+	}
+
 	public function render(): void {
 		$entries = EventLog::all();
 

@@ -39,6 +39,10 @@ final class TabBulk implements TabInterface {
 		return 'dashicons-images-alt2';
 	}
 
+	public function has_settings(): bool {
+		return false;
+	}
+
 	public function render(): void {
 		$query     = new UnoptimizedQuery();
 		$pending   = $query->count();

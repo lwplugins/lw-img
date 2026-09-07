@@ -19,5 +19,11 @@ interface TabInterface {
 
 	public function get_icon(): string;
 
+	/**
+	 * Whether the panel contains fields of the settings form (and so needs
+	 * a Save button under it).
+	 */
+	public function has_settings(): bool;
+
 	public function render(): void;
 }

@@ -36,6 +36,10 @@ final class TabGeneral implements TabInterface {
 		return 'dashicons-admin-generic';
 	}
 
+	public function has_settings(): bool {
+		return true;
+	}
+
 	public function render(): void {
 		$api_key = (string) Options::get( 'api_key' );
 		$account = null;

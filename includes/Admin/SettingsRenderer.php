@@ -56,7 +56,6 @@ final class SettingsRenderer {
 
 					<div class="lw-img-tab-content">
 						<?php $this->render_panels(); ?>
-						<?php submit_button(); ?>
 					</div>
 				</div>
 			</form>
@@ -88,6 +87,9 @@ final class SettingsRenderer {
 				esc_attr( $active_class )
 			);
 			$tab->render();
+			if ( $tab->has_settings() ) {
+				submit_button();
+			}
 			echo '</div>';
 		}
 	}
