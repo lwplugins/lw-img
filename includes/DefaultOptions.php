@@ -66,6 +66,7 @@ final class DefaultOptions {
 			'enable_log'              => true,
 			'smartcrop_enabled'       => false,
 			'smartcrop_sizes'         => [],
+			'delete_on_uninstall'     => false,
 		];
 	}
 }

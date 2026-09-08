@@ -11,6 +11,7 @@ namespace LightweightPlugins\Img;
 
 defined( 'ABSPATH' ) || exit;
 
+use LightweightPlugins\Img\Admin\DeactivationDialog;
 use LightweightPlugins\Img\Admin\SettingsPage;
 use LightweightPlugins\Img\Backup\AttachmentDeleteCleanup;
 use LightweightPlugins\Img\Backup\RestoreHandler;
@@ -83,6 +84,7 @@ final class Plugin {
 			StatusFilter::register();
 			InfoMetabox::register();
 			ComparePage::register();
+			DeactivationDialog::register();
 			new SettingsPage();
 		}
 

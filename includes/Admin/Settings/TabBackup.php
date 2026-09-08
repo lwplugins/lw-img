@@ -55,6 +55,23 @@ final class TabBackup implements TabInterface {
 		$this->render_storage();
 		$this->render_retention();
 		$this->render_restore();
+		$this->render_uninstall();
+	}
+
+	/**
+	 * What plugin deletion removes — kept by default.
+	 *
+	 * @return void
+	 */
+	private function render_uninstall(): void {
+		echo '<h3 class="lw-img-gen-heading">' . esc_html__( 'On uninstall', 'lw-img' ) . '</h3>';
+		$this->render_switch(
+			[
+				'name'        => 'delete_on_uninstall',
+				'label'       => __( 'Delete all LW Image data when the plugin is deleted', 'lw-img' ),
+				'description' => __( 'Off (default): settings, API key, pattern rules, event log and per-image statistics survive a delete and reinstall. On: they are removed on uninstall. Backup originals are kept either way. The Deactivate link on the Plugins screen asks the same question.', 'lw-img' ),
+			]
+		);
 	}
 
 	/**

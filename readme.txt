@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.9.1
+Stable tag: 1.9.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,7 +55,7 @@ LW Image is a lightweight image optimization plugin that converts non-WebP uploa
 
 = Does this keep the original JPEG / PNG file? =
 
-The Media Library file is replaced by the WebP version, and WordPress sub-sizes (thumbnails) are generated from the WebP source. By default the original is kept as a backup in wp-content/uploads/lw-img-backups/ and can be restored any time from the Media Library ("Restore original"). Backups are cleaned up after the configured retention period (30 days by default, 0 = keep forever). Backups are never deleted on uninstall.
+The Media Library file is replaced by the WebP version, and WordPress sub-sizes (thumbnails) are generated from the WebP source. By default the original is kept as a backup in wp-content/uploads/lw-img-backups/ and can be restored any time from the Media Library ("Restore original"). Backups are cleaned up after the configured retention period (30 days by default, 0 = keep forever). Backups are never deleted on uninstall. Deleting the plugin also keeps your settings, API key, log and image statistics by default — the Deactivate link asks whether to remove them, and the Backup tab has the same switch.
 
 = What happens if my HelloImg balance runs out? =
 
@@ -74,6 +74,11 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.9.2 =
+* Change: deleting the plugin now KEEPS your settings, API key, pattern rules, event log and per-image statistics by default — a delete-and-reinstall no longer wipes them
+* New: the Deactivate link on the Plugins screen asks whether to keep or delete the plugin's data on a later uninstall; the same switch lives on the Backup tab
+* Change: uninstall always clears its cron events, transients and bulk-run state; backup originals are never touched
 
 = 1.9.1 =
 * Update: the Bulk tab says up front when a run cannot start because the web server answers missing image files itself (disabled button + reason + link to the Tester tab), instead of only after clicking; the refusal notice is scrolled into view

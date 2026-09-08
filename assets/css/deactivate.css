@@ -1,0 +1,7 @@
+.lw-img-deact { position: fixed; inset: 0; z-index: 100100; background: rgba(0, 0, 0, .55); display: flex; align-items: center; justify-content: center; }
+.lw-img-deact[hidden] { display: none; }
+.lw-img-deact-box { background: #fff; border-radius: 6px; width: min(520px, calc(100% - 32px)); padding: 20px 24px; box-shadow: 0 8px 30px rgba(0, 0, 0, .3); }
+.lw-img-deact-box h2 { margin: 0 0 8px; font-size: 18px; }
+.lw-img-deact-opt { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0; }
+.lw-img-deact-opt input { margin-top: 3px; }
+.lw-img-deact-actions { margin: 16px 0 0; display: flex; gap: 8px; }

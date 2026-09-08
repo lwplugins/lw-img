@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.9.2] - 2026-09-08
+
+### Changed
+- Deleting the plugin keeps the settings, API key, pattern rules, event log and per-image statistics by default (`delete_on_uninstall` = off); previously uninstall.php dropped all of them, so a delete-and-reinstall lost everything
+- uninstall.php always clears cron events, transients and the bulk-run state; backup originals under `uploads/lw-img-backups/` are never touched
+
+### Added
+- Deactivation dialog on the Plugins screen (keep everything / delete all data on uninstall), saved via a nonce-protected AJAX call; the same switch on the Backup tab. Without JavaScript the link deactivates as before and nothing is deleted
+- `Uninstall\DataPolicy` (pure, tested) and `Uninstall\Uninstaller` — uninstall.php delegates to them through the Composer autoloader
+
 ## [1.9.1] - 2026-09-07
 
 ### Changed

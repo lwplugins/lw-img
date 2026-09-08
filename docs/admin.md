@@ -76,7 +76,10 @@ dropdown.
 The backup lifecycle at a glance: whether backups are on, storage tiles,
 retention presets (default 30 days, `0` = keep forever), and how to
 restore. Backups live in `wp-content/uploads/lw-img-backups/` and are
-never deleted on uninstall.
+never deleted on uninstall. Deleting the plugin keeps the settings, API key,
+log and per-image statistics too, unless "Delete all LW Image data when the
+plugin is deleted" is switched on here (the Deactivate link on the Plugins
+screen asks the same question).
 
 ## Tester
 
