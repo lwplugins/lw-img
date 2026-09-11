@@ -8,6 +8,7 @@
  *
  *  - filter `lw_img_should_convert`        ( bool $should_convert, string $file_path, string $mime_type ): bool
  *  - filter `lw_img_optimize_request_args` ( array $args, string $file_path ): array — runs for uploads AND bulk / on-demand
+ *  - filter `lw_img_site_host`             ( string $host ): string — overrides the host sent as the X-HIMG-Site request header on every API call (multisite, reverse proxies); defaults to home_url()'s host
  *  - action `lw_img_upload_converted`     ( string $original_path, string $new_path, array $result )
  *  - action `lw_img_upload_skipped`       ( string $file_path, string $reason, array $context ) — $context is always passed (may be an empty array); may hold attachment_id, original_size, new_size
  *  - action `lw_img_upload_failed`        ( string $file_path, string $error, array $context ) — $context is always passed (may be an empty array); may hold attachment_id

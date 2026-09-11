@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.9.2] - 2026-09-08
+## [1.9.3] - 2026-09-11
 
 ### Changed
 - Deleting the plugin keeps the settings, API key, pattern rules, event log and per-image statistics by default (`delete_on_uninstall` = off); previously uninstall.php dropped all of them, so a delete-and-reinstall lost everything
@@ -10,6 +10,10 @@
 - Deactivation dialog on the Plugins screen (keep everything / delete all data on uninstall), saved via a nonce-protected AJAX call; the same switch on the Backup tab. Without JavaScript the link deactivates as before and nothing is deleted
 - `Uninstall\DataPolicy` (pure, tested) and `Uninstall\Uninstaller` — uninstall.php delegates to them through the Composer autoloader
 - "Select all" / "Select none" links above the smart-crop thumbnail-size list (the cost line updates with them)
+- Every API call carries `X-HIMG-Site` (the site host, filterable via `lw_img_site_host`) — live keys are bound to their website on the API side; the General tab warns when the key belongs to another site
+
+### Fixed
+- The account panel read the monthly limit as a plain number; the API returns a `{monthly_images, used, ...}` object, so `is_numeric()` was always false and Free-plan sites were told they had no monthly limit
 
 ## [1.9.1] - 2026-09-07
 

@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.9.2
+Stable tag: 1.9.3
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,11 +75,13 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
 
-= 1.9.2 =
+= 1.9.3 =
 * Change: deleting the plugin now KEEPS your settings, API key, pattern rules, event log and per-image statistics by default — a delete-and-reinstall no longer wipes them
 * New: the Deactivate link on the Plugins screen asks whether to keep or delete the plugin's data on a later uninstall; the same switch lives on the Backup tab
 * Change: uninstall always clears its cron events, transients and bulk-run state; backup originals are never touched
 * New: Select all / Select none links above the smart-crop size list
+* New: every API call carries X-HIMG-Site (the site host) — live keys are bound to their website on the API side; the General tab warns when the key belongs to another site
+* Fix: the account panel read the monthly limit as a number and told Free-plan sites they had no limit
 
 = 1.9.1 =
 * Update: the Bulk tab says up front when a run cannot start because the web server answers missing image files itself (disabled button + reason + link to the Tester tab), instead of only after clicking; the refusal notice is scrolled into view

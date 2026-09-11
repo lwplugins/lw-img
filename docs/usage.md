@@ -1,5 +1,9 @@
 # Usage
 
+Your HelloImg API key is issued for one website and only works from that
+site (subdomains included) — every request carries the site's host, and
+the live API rejects calls from anywhere else.
+
 ## The upload pipeline
 
 When a non-WebP image is uploaded, LW Image intercepts it **before**
@@ -163,6 +167,7 @@ Filters:
 | `lw_img_dashboard_url` | Replace the HelloImg dashboard URL shown in the admin (white-labeling) |
 | `lw_img_optimize_request_args` | Filter the API request payload before it is sent: `(array $args, string $file_path)` — runs for uploads and for bulk / on-demand conversions |
 | `lw_img_competitor_plugins` | Extend the list of recognized other-optimizer plugins |
+| `lw_img_site_host` | Override the host sent as the `X-HIMG-Site` header on every API call: `(string $host)` — defaults to `home_url()`'s host; useful for multisite or a reverse proxy that changes what the site looks like from outside |
 
 Actions (fired by the plugin, useful for logging/monitoring):
 

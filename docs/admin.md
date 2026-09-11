@@ -18,10 +18,15 @@ failure).
 With a working key, the **Account** tiles show live data from the API:
 
 - **Plan** — your plan name and monthly limit (or "no monthly limit")
-- **This month** — images optimized and bytes saved via the API for the
-  key's domain this month (with a usage bar on limited plans)
+- **This month** — images used against the account-wide monthly limit
+  (with a usage bar on limited plans), plus bytes saved and this
+  website's own image count via the API this month
 - **Optimized on this site** — this install's own totals (the API counts
-  the whole key, so the two numbers legitimately differ)
+  the whole account, so the two numbers legitimately differ)
+
+Every API call carries the site's host so the key stays bound to its
+website; if the key belongs to a different site, a warning appears below
+the tiles with a link to create a key for this site.
 
 Without a key, the tab shows onboarding steps instead. Below the tiles,
 chips summarize the current defaults and jump to the tab that owns them.
