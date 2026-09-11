@@ -9,17 +9,27 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Uninstall;
 
+use LightweightPlugins\Img\Backup\RetentionCleaner;
+use LightweightPlugins\Img\Bulk\BackgroundWorker;
+use LightweightPlugins\Img\Db\Schema;
+use LightweightPlugins\Img\Options;
+use LightweightPlugins\Img\Upload\SmartCrop\CropScheduler;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Called from uninstall.php (WP_UNINSTALL_PLUGIN context only).
+ *
+ * The volatile cleanup below duplicates what uninstall.php already runs
+ * inline before the autoloader is available; running it again here is a
+ * harmless double-delete and keeps this class usable on its own.
  */
 final class Uninstaller {
 
 	public static function run(): void {
 		self::clear_volatile();
 
-		if ( ! DataPolicy::should_wipe( get_option( 'lw_img_options', [] ) ) ) {
+		if ( ! DataPolicy::should_wipe( get_option( Options::OPTION_NAME, [] ) ) ) {
 			return;
 		}
 
@@ -31,14 +41,13 @@ final class Uninstaller {
 			delete_option( $option );
 		}
 
-		delete_transient( 'lw_img_stats' );
-		delete_transient( 'lw_img_pending_count' );
-		delete_transient( 'lw_img_redirect_probe' );
-		delete_transient( 'lw_img_health_report' );
+		foreach ( DataPolicy::VOLATILE_TRANSIENTS as $transient ) {
+			delete_transient( $transient );
+		}
 
-		wp_clear_scheduled_hook( 'lw_img_backup_cleanup' );
-		wp_clear_scheduled_hook( 'lw_img_bulk_tick' );
-		wp_unschedule_hook( 'lw_img_smart_crop' );
+		wp_clear_scheduled_hook( RetentionCleaner::HOOK );
+		wp_clear_scheduled_hook( BackgroundWorker::HOOK );
+		wp_unschedule_hook( CropScheduler::HOOK );
 	}
 
 	private static function wipe_persistent(): void {
@@ -48,8 +57,8 @@ final class Uninstaller {
 			delete_option( $option );
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the plugin's own table; the name comes from the $wpdb prefix, not from input.
-		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'lw_img_images' );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- the plugin's own table; Schema::table() derives the name from $wpdb->prefix, not from input.
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . Schema::table() );
 
 		// Backup files under uploads/lw-img-backups/ are intentionally kept:
 		// they may hold the only remaining copy of a user's original images.
