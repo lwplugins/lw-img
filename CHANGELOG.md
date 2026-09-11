@@ -9,6 +9,7 @@
 ### Added
 - Deactivation dialog on the Plugins screen (keep everything / delete all data on uninstall), saved via a nonce-protected AJAX call; the same switch on the Backup tab. Without JavaScript the link deactivates as before and nothing is deleted
 - `Uninstall\DataPolicy` (pure, tested) and `Uninstall\Uninstaller` — uninstall.php delegates to them through the Composer autoloader
+- "Select all" / "Select none" links above the smart-crop thumbnail-size list (the cost line updates with them)
 
 ## [1.9.1] - 2026-09-07
 

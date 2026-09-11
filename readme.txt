@@ -79,6 +79,7 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 * Change: deleting the plugin now KEEPS your settings, API key, pattern rules, event log and per-image statistics by default — a delete-and-reinstall no longer wipes them
 * New: the Deactivate link on the Plugins screen asks whether to keep or delete the plugin's data on a later uninstall; the same switch lives on the Backup tab
 * Change: uninstall always clears its cron events, transients and bulk-run state; backup originals are never touched
+* New: Select all / Select none links above the smart-crop size list
 
 = 1.9.1 =
 * Update: the Bulk tab says up front when a run cannot start because the web server answers missing image files itself (disabled button + reason + link to the Tester tab), instead of only after clicking; the refusal notice is scrolled into view

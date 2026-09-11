@@ -279,7 +279,7 @@ final class TabUpload implements TabInterface {
 		$selected   = array_map( 'strval', (array) Options::get( 'smartcrop_sizes' ) );
 		$has_crops  = false;
 
-		echo '<div class="lw-img-sc-sizes" id="lw-img-sc-sizes">';
+		ob_start();
 		foreach ( $registered as $name => $size ) {
 			if ( empty( $size['crop'] ) ) {
 				continue;
@@ -294,7 +294,16 @@ final class TabUpload implements TabInterface {
 				(int) $size['height']
 			);
 		}
-		echo '</div>';
+		$list = (string) ob_get_clean();
+
+		if ( $has_crops ) {
+			printf(
+				'<p class="lw-img-sc-tools"><button type="button" class="button-link" data-sc-select="all">%s</button> · <button type="button" class="button-link" data-sc-select="none">%s</button></p>',
+				esc_html__( 'Select all', 'lw-img' ),
+				esc_html__( 'Select none', 'lw-img' )
+			);
+		}
+		echo '<div class="lw-img-sc-sizes" id="lw-img-sc-sizes">' . $list . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $list is the escaped printf output buffered above.
 
 		if ( ! $has_crops ) {
 			echo '<p class="description">' . esc_html__( 'No hard-cropped thumbnail sizes are registered on this site — smart crop has nothing to work on. Sizes that scale (keep the aspect ratio) never need it.', 'lw-img' ) . '</p>';

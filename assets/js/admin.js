@@ -427,6 +427,16 @@
 
 		list.addEventListener('change', update);
 		update();
+
+		document.querySelectorAll('[data-sc-select]').forEach(function (button) {
+			button.addEventListener('click', function () {
+				var on = this.getAttribute('data-sc-select') === 'all';
+				list.querySelectorAll('input[type="checkbox"]').forEach(function (box) {
+					box.checked = on;
+				});
+				update();
+			});
+		});
 	}
 
 	// Backup tab: master-toggle status + danger card, retention presets.
