@@ -11,7 +11,7 @@ namespace LightweightPlugins\Img\Admin\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
-use LightweightPlugins\Img\Api\Client;
+use LightweightPlugins\Img\Api\SiteHost;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
 use LightweightPlugins\Img\Stats\SiteStats;
 
@@ -117,7 +117,7 @@ final class AccountPanel {
 
 		echo '</div>';
 
-		if ( '' !== $domain && ! self::host_matches( Client::site_host(), $domain ) ) {
+		if ( '' !== $domain && ! self::host_matches( SiteHost::current(), $domain ) ) {
 			printf(
 				'<div class="notice notice-warning inline lw-img-site-mismatch"><p>%s</p></div>',
 				esc_html(
@@ -125,7 +125,7 @@ final class AccountPanel {
 						/* translators: 1: domain the key belongs to, 2: this site's host, 3: dashboard host. */
 						__( 'This API key belongs to %1$s, but this site is %2$s. The API refuses requests from other sites — create a key for this site at %3$s.', 'lw-img' ),
 						$domain,
-						Client::site_host(),
+						SiteHost::current(),
 						$dash_text
 					)
 				)

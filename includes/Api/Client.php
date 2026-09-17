@@ -40,25 +40,9 @@ final class Client {
 		$this->timeout = $timeout ?? (int) Options::get( 'request_timeout' );
 	}
 
-	/**
-	 * The host this site is served from — what the API binds a live key to.
-	 *
-	 * @return string Lowercase host without a trailing dot; '' when unknown.
-	 */
-	public static function site_host(): string {
-		$host = wp_parse_url( home_url(), PHP_URL_HOST );
-		$host = is_string( $host ) ? rtrim( strtolower( $host ), '.' ) : '';
-
-		/**
-		 * Override the host sent as X-HIMG-Site (multisite, reverse proxies).
-		 *
-		 * @param string $host Host derived from home_url().
-		 */
-		return (string) apply_filters( 'lw_img_site_host', $host );
-	}
-
 	public function optimize( OptimizeRequest $request ): OptimizeResult {
 		$this->require_api_key();
+		$site = SiteHost::header_value();
 
 		if ( ! is_readable( $request->file_path ) ) {
 			throw new ApiException( esc_html( 'File not readable: ' . $request->file_path ), 'invalid_request' );
@@ -74,7 +58,7 @@ final class Client {
 				'headers' => [
 					'Authorization' => 'Bearer ' . $this->api_key,
 					'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
-					'X-HIMG-Site'   => self::site_host(),
+					'X-HIMG-Site'   => $site,
 				],
 				'body'    => $body,
 			]
@@ -85,6 +69,7 @@ final class Client {
 
 	public function get_account(): array {
 		$this->require_api_key();
+		$site = SiteHost::header_value();
 
 		$response = wp_remote_get(
 			self::BASE_URL . '/account',
@@ -92,7 +77,7 @@ final class Client {
 				'timeout' => 10,
 				'headers' => [
 					'Authorization' => 'Bearer ' . $this->api_key,
-					'X-HIMG-Site'   => self::site_host(),
+					'X-HIMG-Site'   => $site,
 				],
 			]
 		);
@@ -219,7 +204,7 @@ final class Client {
 					'redirection'         => 0,
 					'limit_response_size' => 256 * KB_IN_BYTES,
 					'headers'             => [
-						'X-HIMG-Site' => self::site_host(),
+						'X-HIMG-Site' => SiteHost::header_value(),
 					],
 				]
 			);
