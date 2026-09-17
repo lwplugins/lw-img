@@ -12,6 +12,7 @@ namespace LightweightPlugins\Img\Tests\Unit\Health;
 use Brain\Monkey\Functions;
 use LightweightPlugins\Img\Health\DatabaseChecks;
 use LightweightPlugins\Img\Health\HealthReport;
+use LightweightPlugins\Img\Health\RedirectProbe;
 use LightweightPlugins\Img\Tests\Unit\MonkeyTestCase;
 
 /**
@@ -133,6 +134,20 @@ final class HealthReportTest extends MonkeyTestCase {
 		Functions\expect( 'delete_transient' )->once()->with( HealthReport::CACHE_KEY );
 
 		HealthReport::invalidate();
+	}
+
+	public function test_invalidate_also_forgets_the_redirect_probe_verdict(): void {
+		$deleted = [];
+		Functions\when( 'delete_transient' )->alias(
+			static function ( string $key ) use ( &$deleted ): bool {
+				$deleted[] = $key;
+				return true;
+			}
+		);
+
+		HealthReport::invalidate();
+
+		$this->assertContains( RedirectProbe::CACHE_KEY, $deleted );
 	}
 
 	public function test_register_invalidates_on_settings_save(): void {
