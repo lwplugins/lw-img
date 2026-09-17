@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.9.3
+Stable tag: 1.9.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,12 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.9.4 =
+* Fix: after a web-server fix, "Run tests again" on the Tester tab showed the old-image redirects as OK while the Bulk tab kept the start button blocked for up to 10 minutes — both now read the same probe result, and the re-run clears it
+* Fix: the nginx block and hint on the Tester tab used /wp-content/uploads/ even on Bedrock and other custom layouts — they now follow the real uploads path (e.g. /app/uploads/)
+* Fix: when the site host could not be derived (empty or scheme-less WP_HOME), the X-HIMG-Site header was silently dropped and the API answered "X-HIMG-Site header required" — the host now falls back to the WordPress address, and an underivable host gives a clear error instead of a doomed request
+* Fix: slow optimize jobs were never polled — the API's relative poll URL was rejected and the poll request carried no API key, so the image was re-uploaded on retry instead
 
 = 1.9.3 =
 * Change: deleting the plugin now KEEPS your settings, API key, pattern rules, event log and per-image statistics by default — a delete-and-reinstall no longer wipes them
