@@ -19,7 +19,7 @@ use LightweightPlugins\Img\Options;
  */
 final class Client {
 
-	private const BASE_URL = 'https://api.helloimg.io/v1';
+	public const BASE_URL = 'https://api.helloimg.io/v1';
 
 	/**
 	 * HelloImg API key.
@@ -108,7 +108,7 @@ final class Client {
 	 * @param int   $status HTTP status code.
 	 * @return array{0: string, 1: string}
 	 */
-	private static function error_parts( mixed $body, int $status ): array {
+	public static function error_parts( mixed $body, int $status ): array {
 		if ( ! is_array( $body ) ) {
 			return [ 'http_' . $status, 'HTTP ' . $status ];
 		}
@@ -147,7 +147,7 @@ final class Client {
 		// Slow job: the API hands back a job id and poll URL — wait for it
 		// instead of failing, the work is already in flight server-side.
 		if ( 408 === $status && is_array( $body ) && ! empty( $body['poll_url'] ) ) {
-			return $this->poll_job( (string) $body['poll_url'] );
+			return ( new JobPoller( $this->api_key ) )->wait_for( (string) $body['poll_url'] );
 		}
 
 		if ( 200 !== $status ) {
@@ -174,62 +174,6 @@ final class Client {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Poll a slow job for a bounded time.
-	 *
-	 * @param string $poll_url Poll URL returned by the 408 response.
-	 * @return OptimizeResult
-	 * @throws ApiException When the job fails or is still processing after the budget.
-	 */
-	private function poll_job( string $poll_url ): OptimizeResult {
-		// The poll URL comes from the API response body — pin it to the API
-		// host over HTTPS so a compromised/spoofed response cannot turn this
-		// into an SSRF against internal hosts or cloud metadata endpoints.
-		$parts    = wp_parse_url( $poll_url );
-		$api_host = (string) wp_parse_url( self::BASE_URL, PHP_URL_HOST );
-
-		if ( 'https' !== ( $parts['scheme'] ?? '' ) || strtolower( (string) ( $parts['host'] ?? '' ) ) !== $api_host ) {
-			throw new ApiException( 'Invalid poll URL from API', 'invalid_response', 408 );
-		}
-
-		for ( $attempt = 0; $attempt < 5; $attempt++ ) {
-			sleep( 3 );
-
-			$response = wp_safe_remote_get(
-				$poll_url,
-				[
-					'timeout'             => 10,
-					'redirection'         => 0,
-					'limit_response_size' => 256 * KB_IN_BYTES,
-					'headers'             => [
-						'X-HIMG-Site' => SiteHost::header_value(),
-					],
-				]
-			);
-			if ( is_wp_error( $response ) ) {
-				continue;
-			}
-
-			$body = json_decode( (string) wp_remote_retrieve_body( $response ), true );
-			if ( ! is_array( $body ) ) {
-				continue;
-			}
-
-			$job_status = (string) ( $body['status'] ?? '' );
-
-			if ( 'completed' === $job_status ) {
-				return OptimizeResult::from_response( $body );
-			}
-
-			if ( 'failed' === $job_status ) {
-				$message = is_string( $body['error'] ?? null ) ? (string) $body['error'] : 'Processing failed';
-				throw new ApiException( esc_html( $message ), 'processing_failed', 422 );
-			}
-		}
-
-		throw new ApiException( 'Optimization still processing after extended wait', 'timeout', 408 );
 	}
 
 	/**
