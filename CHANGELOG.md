@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.4] - 2026-09-17
+
+### Fixed
+- "Run tests again" on the Tester tab cleared only the report cache, not the redirect probe verdict the Bulk tab reads (and the Bulk panel renders first): after a web-server fix the Tester said OK while the bulk start stayed blocked for up to 10 minutes. The re-run now clears both, and the Tester row reads the same cached verdict as the bulk gate
+- The nginx fix and the "could not verify" hint on the Tester tab hardcoded `/wp-content/uploads/`; they now use the uploads URL path (`/app/uploads/` on Bedrock)
+- An underivable site host (empty or scheme-less `WP_HOME`) produced an empty `X-HIMG-Site`, which cURL drops, so the API answered `site_header_required`. `Api\SiteHost` falls back from `home_url()` to `site_url()`, accepts scheme-less and protocol-relative values, and throws a `site_header_required` error (halts a bulk run) instead of sending the request
+- Slow jobs were never polled: the gateway's 408 carries a relative `poll_url` (`/v1/jobs/{id}`) that the client rejected, and the poll request had no `Authorization`. `Api\JobPoller` resolves the path against the API host (still pinned to `/v1/jobs/` over HTTPS), authenticates the poll, and stops on 401/402/403
+
 ## [1.9.3] - 2026-09-11
 
 ### Changed

@@ -23,5 +23,8 @@ if ( ! defined( 'MINUTE_IN_SECONDS' ) ) {
 if ( ! defined( 'DAY_IN_SECONDS' ) ) {
 	define( 'DAY_IN_SECONDS', 86400 );
 }
+if ( ! defined( 'KB_IN_BYTES' ) ) {
+	define( 'KB_IN_BYTES', 1024 );
+}
 
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';

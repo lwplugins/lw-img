@@ -146,7 +146,7 @@ final class HealthReport {
 	}
 
 	/**
-	 * Clear the cache and go back to the Tester tab.
+	 * Clear the cached report and probe verdict, then go back to the Tester tab.
 	 *
 	 * @return void
 	 */
@@ -157,7 +157,10 @@ final class HealthReport {
 
 		check_admin_referer( self::REFRESH_ACTION );
 
-		delete_transient( self::CACHE_KEY );
+		// The probe verdict too: the Bulk tab reads it, and a stale "no"
+		// kept the bulk start blocked for ten minutes after a server fix
+		// the re-run had already confirmed.
+		self::invalidate();
 
 		wp_safe_redirect( admin_url( 'admin.php?page=lw-img#tester' ) );
 		exit;
