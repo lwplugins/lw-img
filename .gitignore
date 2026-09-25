@@ -6,3 +6,10 @@ composer.lock
 .phpunit.cache/
 .phpunit.result.cache
 composer.phar
+
+# React admin tooling (build/ is committed, never ignore it)
+/node_modules/
+
+# Local-only agent planning docs
+/.superpowers/
+/docs/superpowers/
