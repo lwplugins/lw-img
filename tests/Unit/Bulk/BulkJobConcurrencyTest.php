@@ -153,4 +153,42 @@ final class BulkJobConcurrencyTest extends MonkeyTestCase {
 		$this->assertSame( 3, $this->db['failed'] );
 		$this->assertSame( BulkJob::STATE_DONE, $this->db['state'] );
 	}
+
+	/**
+	 * A worker that saw a running job, then drained the queue, must not
+	 * turn a run the user cancelled meanwhile into "done".
+	 */
+	public function test_finish_done_does_not_overwrite_a_cancel_made_meanwhile(): void {
+		$this->assertTrue( BulkJob::is_running() );
+		$this->db['state'] = BulkJob::STATE_CANCELLED;
+
+		BulkJob::finish( BulkJob::STATE_DONE );
+
+		$this->assertSame( BulkJob::STATE_CANCELLED, $this->db['state'] );
+	}
+
+	public function test_finish_done_keeps_a_halt_recorded_meanwhile(): void {
+		$this->assertTrue( BulkJob::is_running() );
+		$this->db['state'] = BulkJob::STATE_HALTED;
+		$this->db['halt']  = [
+			'reason' => 'quota',
+			'detail' => 'Insufficient balance',
+		];
+
+		BulkJob::finish( BulkJob::STATE_DONE );
+
+		$this->assertSame( BulkJob::STATE_HALTED, $this->db['state'] );
+		$this->assertSame( 'quota', $this->db['halt']['reason'] );
+	}
+
+	public function test_mark_retried_leaves_an_ended_run_alone(): void {
+		$this->assertTrue( BulkJob::is_running() );
+		$this->db['state']  = BulkJob::STATE_CANCELLED;
+		$this->db['failed'] = 4;
+
+		BulkJob::mark_retried( 3 );
+
+		$this->assertSame( 4, $this->db['failed'] );
+		$this->assertArrayNotHasKey( 'retried', $this->db );
+	}
 }

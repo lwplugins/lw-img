@@ -162,7 +162,8 @@ final class BulkJob {
 	public static function mark_retried( int $requeued ): void {
 		self::mutate(
 			static function ( array $job ) use ( $requeued ): ?array {
-				if ( [] === $job ) {
+				// A run that ended meanwhile (cancelled, halted) keeps its counters.
+				if ( ( $job['state'] ?? '' ) !== self::STATE_RUNNING ) {
 					return null;
 				}
 
@@ -185,7 +186,7 @@ final class BulkJob {
 	}
 
 	/**
-	 * Move the run to a terminal state.
+	 * Move a running job to a terminal state (no-op once it has ended).
 	 *
 	 * @param string $state STATE_DONE or STATE_CANCELLED.
 	 * @return void
@@ -193,7 +194,10 @@ final class BulkJob {
 	public static function finish( string $state ): void {
 		self::mutate(
 			static function ( array $job ) use ( $state ): ?array {
-				if ( [] === $job ) {
+				// Only a running job ends here. A worker that saw it running
+				// and then drained the queue must not turn a cancel or a halt
+				// recorded meanwhile into "done" (the halt reason would be lost).
+				if ( ( $job['state'] ?? '' ) !== self::STATE_RUNNING ) {
 					return null;
 				}
 
