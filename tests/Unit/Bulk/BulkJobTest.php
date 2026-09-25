@@ -12,6 +12,7 @@ namespace LightweightPlugins\Img\Tests\Unit\Bulk;
 use Brain\Monkey\Functions;
 use LightweightPlugins\Img\Bulk\BulkJob;
 use LightweightPlugins\Img\Tests\Unit\MonkeyTestCase;
+use LightweightPlugins\Img\Tests\Unit\Support\NoLockWpdb;
 
 /**
  * @covers \LightweightPlugins\Img\Bulk\BulkJob
@@ -27,7 +28,10 @@ final class BulkJobTest extends MonkeyTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->stored = [];
+		$this->stored    = [];
+		$GLOBALS['wpdb'] = new NoLockWpdb();
+
+		Functions\when( 'wp_cache_delete' )->justReturn( true );
 
 		Functions\when( 'get_option' )->alias( fn () => $this->stored );
 		Functions\when( 'delete_option' )->justReturn( true );
@@ -37,6 +41,11 @@ final class BulkJobTest extends MonkeyTestCase {
 				return true;
 			}
 		);
+	}
+
+	protected function tearDown(): void {
+		unset( $GLOBALS['wpdb'] );
+		parent::tearDown();
 	}
 
 	public function test_start_initializes_counters_and_running_state(): void {

@@ -80,38 +80,64 @@ final class BulkJob {
 	 * @return void
 	 */
 	public static function record( string $status, string $current = '', int $bytes_in = 0, int $bytes_saved = 0, string $detail = '' ): void {
-		$job = self::get();
+		self::mutate(
+			static function ( array $job ) use ( $status, $current, $bytes_in, $bytes_saved, $detail ): ?array {
+				if ( ( $job['state'] ?? '' ) !== self::STATE_RUNNING ) {
+					return null;
+				}
 
-		if ( ( $job['state'] ?? '' ) !== self::STATE_RUNNING ) {
-			return;
-		}
+				if ( isset( $job[ $status ] ) ) {
+					$job[ $status ] = (int) $job[ $status ] + 1;
+				}
 
-		if ( isset( $job[ $status ] ) ) {
-			$job[ $status ] = (int) $job[ $status ] + 1;
-		}
+				if ( '' !== $current ) {
+					$job['current'] = $current;
+				}
 
-		if ( '' !== $current ) {
-			$job['current'] = $current;
-		}
+				$job['bytes_in']    = (int) ( $job['bytes_in'] ?? 0 ) + $bytes_in;
+				$job['bytes_saved'] = (int) ( $job['bytes_saved'] ?? 0 ) + $bytes_saved;
 
-		$job['bytes_in']    = (int) ( $job['bytes_in'] ?? 0 ) + $bytes_in;
-		$job['bytes_saved'] = (int) ( $job['bytes_saved'] ?? 0 ) + $bytes_saved;
+				$recent = is_array( $job['recent'] ?? null ) ? $job['recent'] : [];
+				array_unshift(
+					$recent,
+					[
+						'ts'     => time(),
+						'label'  => $current,
+						'result' => $status,
+						'detail' => $detail,
+					]
+				);
+				$job['recent'] = array_slice( $recent, 0, 5 );
 
-		$recent = is_array( $job['recent'] ?? null ) ? $job['recent'] : [];
-		array_unshift(
-			$recent,
-			[
-				'ts'     => time(),
-				'label'  => $current,
-				'result' => $status,
-				'detail' => $detail,
-			]
+				$job['updated_at'] = time();
+
+				return $job;
+			}
 		);
-		$job['recent'] = array_slice( $recent, 0, 5 );
+	}
 
-		$job['updated_at'] = time();
+	/**
+	 * Locked read-modify-write of the job record.
+	 *
+	 * The row is re-read from storage under the lock (the in-request copy
+	 * may be stale: another worker can have written since this process
+	 * last looked), so concurrent writers never drop each other's updates.
+	 *
+	 * @param callable $change Receives the current record; returns the new one, or null to leave it alone.
+	 * @return void
+	 */
+	private static function mutate( callable $change ): void {
+		JobLock::run(
+			static function () use ( $change ): void {
+				wp_cache_delete( self::OPTION_NAME, 'options' );
 
-		update_option( self::OPTION_NAME, $job, false );
+				$job = $change( self::get() );
+
+				if ( is_array( $job ) ) {
+					update_option( self::OPTION_NAME, $job, false );
+				}
+			}
+		);
 	}
 
 	/**
@@ -133,17 +159,19 @@ final class BulkJob {
 	 * @return void
 	 */
 	public static function mark_retried( int $requeued ): void {
-		$job = self::get();
+		self::mutate(
+			static function ( array $job ) use ( $requeued ): ?array {
+				if ( [] === $job ) {
+					return null;
+				}
 
-		if ( [] === $job ) {
-			return;
-		}
+				$job['retried']    = 1;
+				$job['failed']     = max( 0, (int) ( $job['failed'] ?? 0 ) - $requeued );
+				$job['updated_at'] = time();
 
-		$job['retried']    = 1;
-		$job['failed']     = max( 0, (int) ( $job['failed'] ?? 0 ) - $requeued );
-		$job['updated_at'] = time();
-
-		update_option( self::OPTION_NAME, $job, false );
+				return $job;
+			}
+		);
 	}
 
 	/**
@@ -162,15 +190,17 @@ final class BulkJob {
 	 * @return void
 	 */
 	public static function finish( string $state ): void {
-		$job = self::get();
+		self::mutate(
+			static function ( array $job ) use ( $state ): ?array {
+				if ( [] === $job ) {
+					return null;
+				}
 
-		if ( [] === $job ) {
-			return;
-		}
+				$job['state']       = $state;
+				$job['finished_at'] = time();
 
-		$job['state']       = $state;
-		$job['finished_at'] = time();
-
-		update_option( self::OPTION_NAME, $job, false );
+				return $job;
+			}
+		);
 	}
 }

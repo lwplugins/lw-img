@@ -122,6 +122,7 @@ final class BackgroundWorkerTest extends MonkeyTestCase {
 			}
 		);
 		Functions\when( 'get_transient' )->justReturn( false );
+		Functions\when( 'wp_cache_delete' )->justReturn( true );
 		Functions\expect( 'set_transient' )->once();
 		Functions\expect( 'delete_transient' )->once();
 
