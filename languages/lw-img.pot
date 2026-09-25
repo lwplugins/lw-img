@@ -1,0 +1,2332 @@
+# Copyright (C) 2026 LW Plugins
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: LW Image 2.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lw-img\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-09-25T08:09:00+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: lw-img\n"
+
+#. Plugin Name of the plugin
+#: lw-img.php
+#: includes/Admin/SettingsPage.php:138
+#: includes/Media/InfoMetabox.php:39
+#: includes/Media/SavingsColumn.php:51
+msgid "LW Image"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: lw-img.php
+msgid "https://github.com/lwplugins/lw-img"
+msgstr ""
+
+#. Description of the plugin
+#: lw-img.php
+msgid "Lightweight image optimization — auto-convert WordPress uploads to WebP via the HelloImg API. No bloat, no upsell."
+msgstr ""
+
+#. Author of the plugin
+#: lw-img.php
+#: includes/Admin/ParentPage.php:80
+#: includes/Admin/ParentPage.php:81
+#: includes/Admin/ParentPage.php:96
+msgid "LW Plugins"
+msgstr ""
+
+#. Author URI of the plugin
+#: lw-img.php
+msgid "https://lwplugins.com"
+msgstr ""
+
+#: includes/Admin/DeactivationDialog.php:65
+msgid "Deactivate LW Image"
+msgstr ""
+
+#: includes/Admin/DeactivationDialog.php:66
+msgid "If you later delete the plugin, what should happen to its data?"
+msgstr ""
+
+#: includes/Admin/DeactivationDialog.php:69
+msgid "Keep everything (recommended)"
+msgstr ""
+
+#: includes/Admin/DeactivationDialog.php:70
+msgid "Settings, API key, pattern rules, event log and per-image statistics survive a delete and reinstall."
+msgstr ""
+
+#: includes/Admin/DeactivationDialog.php:74
+msgid "Delete all LW Image data on uninstall"
+msgstr ""
+
+#: includes/Admin/DeactivationDialog.php:75
+msgid "Removes the settings, the API key, the log and the statistics table when the plugin is deleted."
+msgstr ""
+
+#: includes/Admin/DeactivationDialog.php:77
+msgid "Converted images and the backup originals in uploads/lw-img-backups/ are kept either way. You can change this later on the Backup tab."
+msgstr ""
+
+#: includes/Admin/DeactivationDialog.php:79
+msgid "Deactivate"
+msgstr ""
+
+#: includes/Admin/DeactivationDialog.php:80
+msgid "Cancel"
+msgstr ""
+
+#: includes/Admin/DeactivationDialog.php:91
+msgid "Insufficient permissions."
+msgstr ""
+
+#: includes/Admin/ParentPage.php:97
+msgid "Lightweight plugins for WordPress - minimal footprint, maximum impact."
+msgstr ""
+
+#: includes/Admin/ParentPage.php:146
+msgid "Active"
+msgstr ""
+
+#: includes/Admin/ParentPage.php:153
+msgid "Settings"
+msgstr ""
+
+#: includes/Admin/ParentPage.php:157
+msgid "Get Plugin"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:66
+#: includes/Admin/SettingsPage.php:67
+msgid "Image"
+msgstr ""
+
+#: includes/Admin/SettingsPage.php:139
+msgid "The settings screen files are missing. Re-install the plugin from a release ZIP, or run \"npm install && npm run build\" in the plugin directory."
+msgstr ""
+
+#: includes/Backup/RestoreHandler.php:57
+#: includes/Bulk/OptimizeHandler.php:59
+#: includes/Bulk/ReoptimizeHandler.php:63
+#: includes/Compat/CompetitorNotice.php:82
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: includes/Backup/RestoreHandler.php:86
+msgid "Original image restored. Thumbnails were regenerated."
+msgstr ""
+
+#: includes/Backup/RestoreHandler.php:93
+msgid "Could not restore the original image — the backup file is missing."
+msgstr ""
+
+#. translators: %s: number of images
+#: includes/Bulk/BulkActions.php:64
+#, php-format
+msgid "Bulk optimization started: %s image queued."
+msgid_plural "Bulk optimization started: %s images queued."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Bulk/BulkActions.php:84
+msgid "The run was cancelled. Images converted so far stay converted."
+msgstr ""
+
+#: includes/Bulk/BulkActions.php:85
+msgid "No run is in progress."
+msgstr ""
+
+#: includes/Bulk/BulkActions.php:99
+msgid "There are no failed images to retry."
+msgstr ""
+
+#: includes/Bulk/BulkActions.php:100
+msgid "There are no skipped images to re-scan."
+msgstr ""
+
+#. translators: %s: number of images
+#: includes/Bulk/BulkActions.php:107
+#, php-format
+msgid "%s image queued — the current run picks it up."
+msgid_plural "%s images queued — the current run picks them up."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: number of images
+#: includes/Bulk/BulkActions.php:109
+#, php-format
+msgid "%s image queued — press Start to optimize it."
+msgid_plural "%s images queued — press Start to optimize them."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Bulk/BulkActions.php:126
+msgid "Choose gentle, normal or fast."
+msgstr ""
+
+#: includes/Bulk/BulkActions.php:134
+msgid "Processing speed saved."
+msgstr ""
+
+#. translators: %s: error message from the API
+#: includes/Bulk/BulkActions.php:158
+#, php-format
+msgid "The bulk run was not started: the API rejected the key or could not be reached (%s)."
+msgstr ""
+
+#: includes/Bulk/BulkGate.php:84
+msgid "A run is already in progress."
+msgstr ""
+
+#: includes/Bulk/BulkGate.php:86
+msgid "Set your API key on the General tab first."
+msgstr ""
+
+#: includes/Bulk/BulkGate.php:88
+msgid "This server answers missing image files itself, so old URLs of converted images would return 404 instead of redirecting — external links and search results would break. Fix the web server first (see the Tester tab)."
+msgstr ""
+
+#: includes/Bulk/BulkGate.php:90
+msgid "Nothing to optimize: every image in the Media Library has been processed. Retry failed or re-scan skipped images to queue them again."
+msgstr ""
+
+#: includes/Bulk/HaltReason.php:56
+msgid "The run stopped because no API key is configured. Add the key on the General tab, then start again."
+msgstr ""
+
+#: includes/Bulk/HaltReason.php:58
+msgid "The run stopped because your HelloImg account has no credit left. Top up or change your plan, then start again — the remaining images are still queued."
+msgstr ""
+
+#: includes/Bulk/HaltReason.php:60
+msgid "The run stopped because the API rejected the key (revoked, replaced, or issued for another site). Check the key on the General tab, then start again."
+msgstr ""
+
+#: includes/Bulk/HaltReason.php:62
+msgid "The run stopped because of an API error. The remaining images are still queued."
+msgstr ""
+
+#: includes/Bulk/OptimizeHandler.php:91
+msgid "Image optimized and converted to WebP."
+msgstr ""
+
+#: includes/Bulk/OptimizeHandler.php:92
+msgid "Image was skipped — see the LW Img log for the reason."
+msgstr ""
+
+#: includes/Bulk/OptimizeHandler.php:93
+msgid "Optimization failed — see the LW Img log for details."
+msgstr ""
+
+#: includes/Compat/CompetitorNotice.php:61
+msgid "LW Image:"
+msgstr ""
+
+#. translators: %s: comma-separated plugin names.
+#: includes/Compat/CompetitorNotice.php:65
+#, php-format
+msgid "another image optimizer is active (%s). Running two optimizers on the same library leads to double conversions and wasted credits — please deactivate one of them."
+msgstr ""
+
+#: includes/Compat/CompetitorNotice.php:69
+msgid "Images already optimized by them are left untouched by LW Image."
+msgstr ""
+
+#: includes/Compat/CompetitorNotice.php:71
+msgid "Dismiss this notice"
+msgstr ""
+
+#: includes/Health/ApiChecks.php:35
+#: includes/Health/ApiChecks.php:43
+#: includes/Health/ApiChecks.php:49
+#: build/index.js:38
+msgid "HelloImg API"
+msgstr ""
+
+#: includes/Health/ApiChecks.php:37
+msgid "no API key configured"
+msgstr ""
+
+#: includes/Health/ApiChecks.php:45
+msgid "reachable"
+msgstr ""
+
+#: includes/Health/ApiChecks.php:59
+msgid "Other optimizer plugins"
+msgstr ""
+
+#. translators: %s: plugin name list.
+#: includes/Health/ApiChecks.php:63
+#, php-format
+msgid "active: %s — consider keeping only one optimizer enabled"
+msgstr ""
+
+#: includes/Health/CronChecks.php:31
+msgid "WP-Cron"
+msgstr ""
+
+#: includes/Health/CronChecks.php:34
+msgid "DISABLE_WP_CRON is set — a system cron runner is expected to trigger background work"
+msgstr ""
+
+#: includes/Health/CronChecks.php:35
+msgid "built-in (triggered by site visits)"
+msgstr ""
+
+#: includes/Health/CronChecks.php:48
+msgid "Cron loopback"
+msgstr ""
+
+#: includes/Health/CronChecks.php:51
+msgid "the server can reach its own site"
+msgstr ""
+
+#: includes/Health/CronChecks.php:52
+msgid "the server cannot reach its own site — background runs progress only while the Bulk tab is open, via site traffic, or via WP-CLI"
+msgstr ""
+
+#: includes/Health/DatabaseChecks.php:36
+msgid "Database server"
+msgstr ""
+
+#: includes/Health/DatabaseChecks.php:67
+msgid "table-level locking can freeze the site during bulk runs"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:31
+msgid "PHP version"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:38
+msgid "PHP memory limit"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:44
+msgid "cURL extension"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:46
+msgid "loaded"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:46
+msgid "missing — API requests cannot be made"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:51
+msgid "Image editor"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:53
+msgid "neither Imagick nor GD is available"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:58
+msgid "WebP thumbnail support"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:60
+#: includes/Health/EnvironmentChecks.php:68
+msgid "supported"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:60
+msgid "not supported — thumbnails cannot be generated from converted WebP files"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:66
+msgid "AVIF thumbnail support"
+msgstr ""
+
+#: includes/Health/EnvironmentChecks.php:68
+msgid "not supported — switch the output format to WebP or upgrade the image editor"
+msgstr ""
+
+#: includes/Health/FilesystemChecks.php:34
+msgid "Uploads directory"
+msgstr ""
+
+#: includes/Health/FilesystemChecks.php:36
+#: includes/Health/FilesystemChecks.php:44
+msgid "writable"
+msgstr ""
+
+#: includes/Health/FilesystemChecks.php:36
+msgid "not writable — converted files cannot be saved"
+msgstr ""
+
+#: includes/Health/FilesystemChecks.php:42
+msgid "Backup directory"
+msgstr ""
+
+#: includes/Health/FilesystemChecks.php:44
+msgid "not writable — originals cannot be backed up before conversion"
+msgstr ""
+
+#: includes/Health/FilesystemChecks.php:57
+msgid "Free disk space"
+msgstr ""
+
+#: includes/Health/RedirectChecks.php:86
+msgid "Old-image redirects"
+msgstr ""
+
+#: includes/Health/RedirectChecks.php:92
+msgid "Missing-image requests reach WordPress — old URLs of converted images 301-redirect to the new files."
+msgstr ""
+
+#: includes/Health/RedirectChecks.php:100
+msgid "Your web server answers missing image files itself, so WordPress never sees those requests and old URLs of bulk-converted images return 404 instead of redirecting. Bulk optimize will not start until this is fixed. For nginx, add the block below to the site config (a prefix location — a plain regex location would lose to earlier static-asset rules)."
+msgstr ""
+
+#. translators: %s: uploads URL path, e.g. /wp-content/uploads/.
+#: includes/Health/RedirectChecks.php:110
+#, php-format
+msgid "Could not verify — the site was unable to request itself. Check manually that a missing image URL under %s shows a WordPress 404 page, not the web server's own."
+msgstr ""
+
+#: includes/Health/TesterView.php:63
+msgid "Database"
+msgstr ""
+
+#: includes/Health/TesterView.php:64
+msgid "PHP & image processing"
+msgstr ""
+
+#: includes/Health/TesterView.php:65
+msgid "Filesystem"
+msgstr ""
+
+#: includes/Health/TesterView.php:66
+msgid "Background processing"
+msgstr ""
+
+#: includes/Health/TesterView.php:67
+msgid "Old-URL redirects"
+msgstr ""
+
+#: includes/Health/TesterView.php:68
+msgid "API & plugins"
+msgstr ""
+
+#: includes/Media/ComparePage.php:32
+#: includes/Media/InfoMetabox.php:95
+msgid "Compare"
+msgstr ""
+
+#: includes/Media/ComparePage.php:65
+msgid "Compare — original vs. optimized"
+msgstr ""
+
+#: includes/Media/ComparePage.php:68
+msgid "No backup available for this attachment."
+msgstr ""
+
+#: includes/Media/ComparePage.php:80
+msgid "Original (backup)"
+msgstr ""
+
+#: includes/Media/ComparePage.php:81
+#: build/index.js:21
+#: build/index.js:25
+msgid "Optimized"
+msgstr ""
+
+#: includes/Media/ComparePage.php:84
+msgid "Back to attachment"
+msgstr ""
+
+#. translators: %s: number of thumbnails.
+#: includes/Media/InfoMetabox.php:79
+#, php-format
+msgid "%s thumbnails generated from the optimized image"
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:80
+msgid "EXIF: kept"
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:80
+msgid "EXIF: removed"
+msgstr ""
+
+#. translators: %s: date and time.
+#: includes/Media/InfoMetabox.php:83
+#, php-format
+msgid "Optimized on %s"
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:91
+msgid "No backup available — Compare, Re-optimize, and Restore need one."
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:96
+msgid "Restore backup"
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:98
+msgid "Re-optimize from the backup at another level:"
+msgstr ""
+
+#. translators: %s: competitor plugin name.
+#: includes/Media/InfoMetabox.php:122
+#, php-format
+msgid "Already optimized by %s — LW Image leaves this image untouched."
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:129
+msgid "This file type is not converted by LW Img."
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:138
+msgid "Not optimized yet."
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:145
+#: includes/Media/RowActions.php:66
+#: build/index.js:1
+#: build/index.js:46
+msgid "Try again"
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:145
+#: includes/Media/RowActions.php:66
+msgid "Optimize now"
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:149
+msgid "Try again at a specific level:"
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:167
+msgid "Optimization failed"
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:179
+msgid "A stronger level may still shrink it — try one below."
+msgstr ""
+
+#. translators: %s: reason the image was skipped, e.g. "file missing".
+#: includes/Media/InfoMetabox.php:186
+#: includes/Media/SavingsColumn.php:146
+#, php-format
+msgid "Skipped — %s"
+msgstr ""
+
+#: includes/Media/InfoMetabox.php:188
+#: includes/Media/SavingsColumn.php:148
+#: build/index.js:21
+#: build/index.js:25
+#: build/index.js:43
+msgid "Skipped"
+msgstr ""
+
+#: includes/Media/RowActions.php:89
+msgid "Restore original"
+msgstr ""
+
+#: includes/Media/SavingsColumn.php:124
+#: build/index.js:21
+#: build/index.js:25
+#: build/index.js:43
+msgid "Failed"
+msgstr ""
+
+#: includes/Media/SavingsColumn.php:164
+msgid "Skipped — already as small as it gets"
+msgstr ""
+
+#. translators: 1: size the converted file would have had, 2: original file size.
+#: includes/Media/SavingsColumn.php:169
+#, php-format
+msgid "Skipped — converted would be %1$s vs %2$s original"
+msgstr ""
+
+#: includes/Media/StatusFilter.php:82
+msgid "LW Image: all"
+msgstr ""
+
+#: includes/Media/StatusFilter.php:83
+msgid "LW Image: optimized"
+msgstr ""
+
+#: includes/Media/StatusFilter.php:84
+msgid "LW Image: skipped"
+msgstr ""
+
+#: includes/Media/StatusFilter.php:85
+msgid "LW Image: failed"
+msgstr ""
+
+#: includes/Media/StatusFilter.php:86
+msgid "LW Image: not yet processed"
+msgstr ""
+
+#: includes/Media/StatusFilter.php:89
+msgid "Filter by LW Image status"
+msgstr ""
+
+#: includes/Rest/Admin/LogController.php:85
+#: build/index.js:46
+msgid "Log cleared."
+msgstr ""
+
+#: includes/Rest/Admin/SettingsController.php:64
+msgid "The request is too large."
+msgstr ""
+
+#: includes/Rest/Admin/SettingsController.php:78
+msgid "Some settings are not valid. Nothing was saved."
+msgstr ""
+
+#: includes/Settings/Input/ApiKeyParser.php:31
+msgid "The API key must be text."
+msgstr ""
+
+#: includes/Settings/Input/ApiKeyParser.php:41
+msgid "This does not look like an API key: paste the key alone, without spaces."
+msgstr ""
+
+#: includes/Settings/Input/BoolParser.php:50
+msgid "Must be on or off (true or false)."
+msgstr ""
+
+#. translators: %s: comma-separated list of allowed values
+#: includes/Settings/Input/EnumParser.php:36
+#, php-format
+msgid "Must be one of: %s."
+msgstr ""
+
+#: includes/Settings/Input/IntParser.php:32
+msgid "Must be a whole number."
+msgstr ""
+
+#. translators: 1: lowest allowed number, 2: highest allowed number
+#: includes/Settings/Input/IntParser.php:39
+#, php-format
+msgid "Must be between %1$d and %2$d."
+msgstr ""
+
+#: includes/Settings/Input/NameListParser.php:58
+msgid "Must be a list of names."
+msgstr ""
+
+#. translators: %s: comma-separated list of refused entries
+#: includes/Settings/Input/NameListParser.php:77
+#, php-format
+msgid "Not valid: %s."
+msgstr ""
+
+#: includes/Settings/Input/NameListParser.php:81
+msgid "At least one entry is required."
+msgstr ""
+
+#. translators: %s: constant name
+#: includes/Settings/Input/OptionInput.php:51
+#, php-format
+msgid "The API key is set by %s in wp-config.php and cannot be changed here."
+msgstr ""
+
+#. translators: %s: setting key
+#: includes/Settings/Input/OptionInput.php:108
+#, php-format
+msgid "Unknown setting: %s."
+msgstr ""
+
+#: includes/Settings/Input/RuleListParser.php:42
+msgid "Must be a list of rules."
+msgstr ""
+
+#. translators: %d: maximum number of rules
+#: includes/Settings/Input/RuleListParser.php:47
+#, php-format
+msgid "Too many rules: at most %d are allowed."
+msgstr ""
+
+#: includes/Settings/Input/RuleListParser.php:66
+msgid "Some pattern rules are not valid."
+msgstr ""
+
+#: includes/Settings/Input/RuleListParser.php:80
+msgid "Each rule needs a pattern and an action."
+msgstr ""
+
+#: includes/Settings/Input/RuleListParser.php:88
+msgid "Enter a pattern, e.g. *-logo.png."
+msgstr ""
+
+#. translators: %d: maximum pattern length
+#: includes/Settings/Input/RuleListParser.php:91
+#, php-format
+msgid "The pattern is too long (at most %d characters)."
+msgstr ""
+
+#: includes/Settings/Input/RuleListParser.php:95
+msgid "Choose what the rule does."
+msgstr ""
+
+#: includes/Settings/Input/RuleListParser.php:97
+#: includes/Settings/Input/RuleListParser.php:101
+msgid "Choose an optimization level."
+msgstr ""
+
+#: lw-img.php:40
+msgid "Autoloader not found. Please run \"composer install\" in the plugin directory, or re-install the plugin from a release ZIP."
+msgstr ""
+
+#: build/index.js:1
+#: build/index.js:46
+msgid "Loading…"
+msgstr ""
+
+#: build/index.js:1
+msgid "That did not work. Please reload the page and try again."
+msgstr ""
+
+#: build/index.js:1
+msgid "Settings saved."
+msgstr ""
+
+#: build/index.js:1
+msgid "Nothing was saved. Fix the highlighted fields and save again."
+msgstr ""
+
+#: build/index.js:1
+msgid "LW Plugins (opens in a new tab)"
+msgstr ""
+
+#. translators: %s: size in gigabytes.
+#: build/index.js:2
+#, js-format
+msgid "%s GB"
+msgstr ""
+
+#. translators: %s: size in megabytes.
+#: build/index.js:3
+#, js-format
+msgid "%s MB"
+msgstr ""
+
+#. translators: %s: size in kilobytes.
+#: build/index.js:4
+#, js-format
+msgid "%s KB"
+msgstr ""
+
+#. translators: %s: size in bytes.
+#: build/index.js:5
+#, js-format
+msgid "%s B"
+msgstr ""
+
+#. translators: 1: days, 2: hours (short duration, e.g. "2d 3h").
+#: build/index.js:6
+#, js-format
+msgid "%1$dd %2$dh"
+msgstr ""
+
+#. translators: 1: hours, 2: minutes (short duration, e.g. "1h 20m").
+#: build/index.js:7
+#, js-format
+msgid "%1$dh %2$dm"
+msgstr ""
+
+#. translators: 1: minutes, 2: seconds (short duration, e.g. "4m 5s").
+#: build/index.js:8
+#, js-format
+msgid "%1$dm %2$ds"
+msgstr ""
+
+#. translators: %d: seconds (short duration, e.g. "12s").
+#: build/index.js:9
+#, js-format
+msgid "%ds"
+msgstr ""
+
+#. translators: %s: images per minute.
+#: build/index.js:10
+#, js-format
+msgid "%s / min"
+msgstr ""
+
+#. translators: %s: images per hour.
+#: build/index.js:11
+#, js-format
+msgid "%s / h"
+msgstr ""
+
+#: build/index.js:11
+msgid "unknown"
+msgstr ""
+
+#. translators: %d: number of days.
+#: build/index.js:12
+#, js-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:12
+msgid "General"
+msgstr ""
+
+#: build/index.js:12
+msgid "General Settings"
+msgstr ""
+
+#: build/index.js:12
+#: build/index.js:35
+#: build/index.js:63
+msgid "Stats"
+msgstr ""
+
+#: build/index.js:12
+msgid "Statistics"
+msgstr ""
+
+#: build/index.js:12
+#: build/index.js:68
+msgid "Upload"
+msgstr ""
+
+#: build/index.js:12
+msgid "Upload Settings"
+msgstr ""
+
+#: build/index.js:12
+msgid "Bulk"
+msgstr ""
+
+#: build/index.js:12
+msgid "Bulk Optimization"
+msgstr ""
+
+#: build/index.js:12
+#: build/index.js:30
+#: build/index.js:67
+#: build/index.js:68
+msgid "Backup"
+msgstr ""
+
+#: build/index.js:12
+msgid "Backup Settings"
+msgstr ""
+
+#: build/index.js:12
+#: build/index.js:69
+msgid "Tester"
+msgstr ""
+
+#: build/index.js:12
+msgid "Environment Tester"
+msgstr ""
+
+#: build/index.js:12
+#: build/index.js:70
+msgid "Log"
+msgstr ""
+
+#: build/index.js:12
+msgid "Event Log"
+msgstr ""
+
+#: build/index.js:12
+#: build/index.js:36
+msgid "Connected"
+msgstr ""
+
+#: build/index.js:12
+msgid "Connection error"
+msgstr ""
+
+#. translators: %s: percentage of the bulk run done.
+#. translators: %s: percentage of the run done.
+#: build/index.js:13
+#: build/index.js:26
+#, js-format
+msgid "%s%%"
+msgstr ""
+
+#. translators: %d: number of failed environment checks.
+#: build/index.js:14
+#, js-format
+msgid "%d problem"
+msgid_plural "%d problems"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:14
+msgid "Has invalid fields"
+msgstr ""
+
+#: build/index.js:14
+msgid "LW Image home"
+msgstr ""
+
+#: build/index.js:14
+msgid "LW Image sections"
+msgstr ""
+
+#: build/index.js:14
+msgid "Documentation"
+msgstr ""
+
+#: build/index.js:14
+msgid "(opens in a new tab)"
+msgstr ""
+
+#: build/index.js:14
+msgid "Unsaved changes"
+msgstr ""
+
+#: build/index.js:14
+msgid "Discard"
+msgstr ""
+
+#: build/index.js:14
+msgid "Save changes"
+msgstr ""
+
+#: build/index.js:14
+msgid "Set in wp-config.php"
+msgstr ""
+
+#: build/index.js:14
+msgid "backups are kept forever"
+msgstr ""
+
+#. translators: %d: number of days.
+#: build/index.js:15
+#, js-format
+msgid "removes backups older than %d days"
+msgstr ""
+
+#. translators: %s: "removes backups older than N days".
+#: build/index.js:16
+#, js-format
+msgid "%s · runs when the system cron triggers WP-Cron"
+msgstr ""
+
+#. translators: 1: "removes backups older than N days", 2: date and time.
+#: build/index.js:17
+#, js-format
+msgid "%1$s · next run %2$s"
+msgstr ""
+
+#: build/index.js:17
+#: build/index.js:65
+msgid "Backup folder"
+msgstr ""
+
+#: build/index.js:17
+msgid "Backed-up originals"
+msgstr ""
+
+#: build/index.js:17
+msgid "files"
+msgstr ""
+
+#: build/index.js:17
+msgid "one per optimized image"
+msgstr ""
+
+#: build/index.js:17
+msgid "Cleanup"
+msgstr ""
+
+#: build/index.js:17
+msgid "Daily"
+msgstr ""
+
+#: build/index.js:17
+msgid "Never"
+msgstr ""
+
+#: build/index.js:17
+#: build/index.js:21
+msgid "Media Library"
+msgstr ""
+
+#: build/index.js:17
+msgid "Hover an optimized image and click \"Restore original\" — the original comes back and thumbnails are regenerated. A side-by-side Compare view is on the image's edit screen."
+msgstr ""
+
+#: build/index.js:17
+msgid "WP-CLI"
+msgstr ""
+
+#: build/index.js:17
+msgid "wp lw-img restore 123 456 — restore any number of attachments from the command line."
+msgstr ""
+
+#: build/index.js:17
+msgid "Kept on uninstall"
+msgstr ""
+
+#: build/index.js:17
+msgid "Backups are never deleted when the plugin is removed — your originals stay safe in the uploads folder."
+msgstr ""
+
+#: build/index.js:17
+msgid "How to restore"
+msgstr ""
+
+#: build/index.js:17
+msgid "7 days"
+msgstr ""
+
+#: build/index.js:17
+msgid "30 days"
+msgstr ""
+
+#: build/index.js:17
+msgid "90 days"
+msgstr ""
+
+#: build/index.js:17
+msgid "1 year"
+msgstr ""
+
+#: build/index.js:17
+msgid "Forever"
+msgstr ""
+
+#: build/index.js:17
+msgid "WebP — widest support. If the converted file would not be smaller than the original, the original is kept."
+msgstr ""
+
+#: build/index.js:17
+msgid "AVIF — smaller files, modern browsers. If the converted file would not be smaller than the original, the original is kept."
+msgstr ""
+
+#: build/index.js:17
+msgid "Lossless"
+msgstr ""
+
+#: build/index.js:17
+msgid "Lossless — pixel-perfect, larger files."
+msgstr ""
+
+#: build/index.js:17
+msgid "Normal"
+msgstr ""
+
+#: build/index.js:17
+msgid "Normal — balanced quality and size."
+msgstr ""
+
+#: build/index.js:17
+msgid "Aggressive"
+msgstr ""
+
+#: build/index.js:17
+msgid "Aggressive — smaller files, slight compression may show."
+msgstr ""
+
+#: build/index.js:17
+msgid "Ultra"
+msgstr ""
+
+#: build/index.js:17
+msgid "Ultra — maximum compression, visible on detailed images."
+msgstr ""
+
+#: build/index.js:17
+msgid "Gentle"
+msgstr ""
+
+#: build/index.js:17
+msgid "Gentle — lightest server load"
+msgstr ""
+
+#: build/index.js:17
+msgid "Fast"
+msgstr ""
+
+#: build/index.js:17
+msgid "Fast — highest server load"
+msgstr ""
+
+#: build/index.js:17
+msgid "Skip entirely (never sent to the API)"
+msgstr ""
+
+#: build/index.js:17
+msgid "Keep original dimensions"
+msgstr ""
+
+#: build/index.js:17
+msgid "Use optimization level…"
+msgstr ""
+
+#: build/index.js:17
+#: build/index.js:68
+msgid "Keep EXIF metadata"
+msgstr ""
+
+#: build/index.js:17
+msgid "General tab"
+msgstr ""
+
+#: build/index.js:17
+msgid "see the fix on the Tester tab"
+msgstr ""
+
+#: build/index.js:17
+msgid "Cancel the run? Images converted so far stay converted; the rest waits for the next run."
+msgstr ""
+
+#: build/index.js:17
+msgid "Cancel run"
+msgstr ""
+
+#: build/index.js:17
+msgid "Optimize all in background"
+msgstr ""
+
+#. translators: %s: number of failed images.
+#: build/index.js:18
+#, js-format
+msgid "Put all %s failed images back in the queue? They are processed by the next run."
+msgstr ""
+
+#: build/index.js:18
+msgid "Retry all"
+msgstr ""
+
+#. translators: %s: number of failed images.
+#: build/index.js:19
+#, js-format
+msgid "Retry %s failed"
+msgstr ""
+
+#. translators: %s: number of skipped images.
+#: build/index.js:20
+#, js-format
+msgid "Put all %s skipped images back in the queue? The next run checks them again against the current settings."
+msgstr ""
+
+#: build/index.js:20
+msgid "Re-scan all"
+msgstr ""
+
+#. translators: %s: number of skipped images.
+#: build/index.js:21
+#, js-format
+msgid "Re-scan %s skipped"
+msgstr ""
+
+#: build/index.js:21
+msgid "Checking API key and redirects, counting images…"
+msgstr ""
+
+#: build/index.js:21
+msgid "Processing speed"
+msgstr ""
+
+#: build/index.js:21
+#: build/index.js:25
+msgid "Pending"
+msgstr ""
+
+#: build/index.js:21
+msgid "All-time totals, independent of the current run."
+msgstr ""
+
+#: build/index.js:21
+msgid "Show these images in the Media Library"
+msgstr ""
+
+#: build/index.js:21
+msgid "Skip reasons"
+msgstr ""
+
+#. translators: 1: skip reason, 2: number of images.
+#: build/index.js:22
+#, js-format
+msgid "%1$s · %2$s"
+msgstr ""
+
+#. translators: 1: images optimized, 2: duration, 3: bytes saved, 4: percentage saved.
+#: build/index.js:23
+#, js-format
+msgid "Run finished — %1$s images optimized in %2$s, %3$s saved (−%4$s%%)."
+msgstr ""
+
+#. translators: %s: number of skipped images.
+#: build/index.js:24
+#, js-format
+msgid "See the %s skipped images in the Media Library"
+msgstr ""
+
+#. translators: 1: images processed, 2: images in the run.
+#: build/index.js:25
+#, js-format
+msgid "Run cancelled — %1$s of %2$s images processed. Converted images stay converted; press Start to continue with the rest."
+msgstr ""
+
+#: build/index.js:25
+msgid "Check the key on the General tab"
+msgstr ""
+
+#: build/index.js:25
+msgid "Manage your plan in the HelloImg dashboard"
+msgstr ""
+
+#: build/index.js:25
+msgid "The run was stopped."
+msgstr ""
+
+#: build/index.js:25
+msgid "Recent activity"
+msgstr ""
+
+#: build/index.js:25
+msgid "Waiting for the first background tick… WP-Cron starts within a minute on most hosts."
+msgstr ""
+
+#: build/index.js:25
+msgid "Ready"
+msgstr ""
+
+#: build/index.js:25
+msgid "Running"
+msgstr ""
+
+#: build/index.js:25
+msgid "Finished"
+msgstr ""
+
+#: build/index.js:25
+msgid "Cancelled"
+msgstr ""
+
+#: build/index.js:25
+msgid "Stopped"
+msgstr ""
+
+#. translators: 1: images processed, 2: images in the run.
+#: build/index.js:27
+#, js-format
+msgid "%1$s / %2$s processed"
+msgstr ""
+
+#: build/index.js:27
+msgid "Bulk run progress"
+msgstr ""
+
+#: build/index.js:27
+msgid "Elapsed"
+msgstr ""
+
+#: build/index.js:27
+msgid "Speed"
+msgstr ""
+
+#: build/index.js:27
+msgid "Est. remaining"
+msgstr ""
+
+#. translators: %s: estimated remaining time, e.g. "12m 30s".
+#: build/index.js:28
+#, js-format
+msgid "~%s"
+msgstr ""
+
+#: build/index.js:28
+msgid "Saved so far"
+msgstr ""
+
+#: build/index.js:28
+msgid "The background worker has not reported for a while. While this page is open it keeps the run moving; WP-CLI (wp lw-img optimize --all) is the reliable path on sites without traffic."
+msgstr ""
+
+#: build/index.js:28
+msgid "Now processing"
+msgstr ""
+
+#. translators: 1: max width, 2: max height (∞ = no limit).
+#: build/index.js:29
+#, js-format
+msgid "fit inside %1$s × %2$s px"
+msgstr ""
+
+#: build/index.js:29
+msgid "original dimensions kept"
+msgstr ""
+
+#: build/index.js:29
+msgid "This run uses your Upload settings"
+msgstr ""
+
+#: build/index.js:29
+#: build/index.js:58
+msgid "Level"
+msgstr ""
+
+#: build/index.js:29
+msgid "Output"
+msgstr ""
+
+#: build/index.js:29
+msgid "Resize"
+msgstr ""
+
+#: build/index.js:29
+#: build/index.js:58
+msgid "Pattern rules"
+msgstr ""
+
+#. translators: %s: number of pattern rules.
+#: build/index.js:30
+#, js-format
+msgid "%s rule"
+msgid_plural "%s rules"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:30
+msgid "EXIF"
+msgstr ""
+
+#: build/index.js:30
+msgid "kept"
+msgstr ""
+
+#: build/index.js:30
+msgid "removed"
+msgstr ""
+
+#: build/index.js:30
+msgid "on"
+msgstr ""
+
+#: build/index.js:30
+msgid "off"
+msgstr ""
+
+#: build/index.js:30
+msgid "Thumbnails are regenerated from the converted file after every conversion — no separate regeneration needed."
+msgstr ""
+
+#: build/index.js:30
+msgid "Change on the Upload tab"
+msgstr ""
+
+#. translators: 1: monthly image limit, 2: HelloImg dashboard host.
+#: build/index.js:31
+#, js-format
+msgid "%1$s images/month · manage your plan at %2$s"
+msgstr ""
+
+#. translators: %s: HelloImg dashboard host.
+#: build/index.js:32
+#, js-format
+msgid "no monthly limit · manage your plan at %s"
+msgstr ""
+
+#. translators: %s: bytes saved through the API.
+#: build/index.js:33
+#, js-format
+msgid "%s saved via the API"
+msgstr ""
+
+#. translators: 1: number of images, 2: domain.
+#: build/index.js:34
+#, js-format
+msgid "%1$s from %2$s"
+msgstr ""
+
+#: build/index.js:34
+msgid "Plan"
+msgstr ""
+
+#: build/index.js:34
+msgid "This month"
+msgstr ""
+
+#: build/index.js:34
+msgid "Optimized on this site"
+msgstr ""
+
+#. translators: %s: bytes saved on this site.
+#: build/index.js:35
+#, js-format
+msgid "%s saved"
+msgstr ""
+
+#: build/index.js:35
+#: build/index.js:36
+msgid "API key"
+msgstr ""
+
+#. translators: %s: PHP constant name.
+#: build/index.js:36
+#, js-format
+msgid "Set in wp-config.php (%s)"
+msgstr ""
+
+#: build/index.js:36
+msgid "No key saved yet."
+msgstr ""
+
+#: build/index.js:36
+msgid "The saved key will be removed when you save."
+msgstr ""
+
+#: build/index.js:36
+msgid "Saved key: <hint />"
+msgstr ""
+
+#: build/index.js:36
+msgid "Stored in wp_options and never shown again after saving."
+msgstr ""
+
+#: build/index.js:36
+msgid "HelloImg API key"
+msgstr ""
+
+#: build/index.js:36
+msgid "Paste a new key to replace it"
+msgstr ""
+
+#: build/index.js:36
+msgid "Hide key"
+msgstr ""
+
+#: build/index.js:36
+msgid "Show key"
+msgstr ""
+
+#: build/index.js:36
+msgid "Remove key"
+msgstr ""
+
+#: build/index.js:36
+msgid "Keep the key"
+msgstr ""
+
+#: build/index.js:36
+msgid "New uploads are converted automatically. The key is set in wp-config.php."
+msgstr ""
+
+#: build/index.js:36
+msgid "New uploads are converted automatically. The key is stored in wp_options."
+msgstr ""
+
+#: build/index.js:36
+msgid "Error"
+msgstr ""
+
+#: build/index.js:36
+msgid "Checking…"
+msgstr ""
+
+#: build/index.js:36
+msgid "Not connected"
+msgstr ""
+
+#: build/index.js:36
+msgid "Paste an API key to enable conversion. Free tier: 1,000 images / month."
+msgstr ""
+
+#. translators: %s: HelloImg plan name.
+#: build/index.js:37
+#, js-format
+msgid "Connection test passed — the API key works (plan: %s)."
+msgstr ""
+
+#: build/index.js:37
+msgid "Connection test passed — the API key works."
+msgstr ""
+
+#. translators: %s: error message.
+#: build/index.js:38
+#, js-format
+msgid "Connection test failed: %s"
+msgstr ""
+
+#: build/index.js:38
+msgid "Save and test"
+msgstr ""
+
+#: build/index.js:38
+msgid "Test connection"
+msgstr ""
+
+#. translators: %s: HelloImg dashboard host name.
+#: build/index.js:39
+#, js-format
+msgid "Get your API key at %s"
+msgstr ""
+
+#: build/index.js:39
+msgid "Full environment checks on the Tester tab"
+msgstr ""
+
+#. translators: 1: domain the key belongs to, 2: this site's host, 3: HelloImg dashboard host.
+#: build/index.js:40
+#, js-format
+msgid "This API key belongs to %1$s, but this site is %2$s. The API refuses requests from other sites — create a key for this site at %3$s."
+msgstr ""
+
+#: build/index.js:40
+msgid "forever"
+msgstr ""
+
+#. translators: %s: optimization level name.
+#: build/index.js:41
+#, js-format
+msgid "%s level"
+msgstr ""
+
+#: build/index.js:41
+msgid "EXIF kept"
+msgstr ""
+
+#: build/index.js:41
+msgid "EXIF stripped"
+msgstr ""
+
+#. translators: %s: retention, e.g. "30 days" or "forever".
+#: build/index.js:42
+#, js-format
+msgid "backups on · %s"
+msgstr ""
+
+#: build/index.js:42
+msgid "backups off"
+msgstr ""
+
+#. translators: %s: bulk speed name.
+#: build/index.js:43
+#, js-format
+msgid "bulk speed: %s"
+msgstr ""
+
+#: build/index.js:43
+msgid "New uploads:"
+msgstr ""
+
+#: build/index.js:43
+msgid "Add your API key"
+msgstr ""
+
+#: build/index.js:43
+msgid "Grab your key from the HelloImg dashboard and paste it here — Test connection verifies it instantly."
+msgstr ""
+
+#: build/index.js:43
+msgid "Upload as usual"
+msgstr ""
+
+#: build/index.js:43
+msgid "New JPEG / PNG / HEIC / TIFF / BMP / GIF uploads become WebP automatically — originals are backed up first, and nothing ever fails because of LW Img."
+msgstr ""
+
+#: build/index.js:43
+msgid "Optimize the existing library"
+msgstr ""
+
+#: build/index.js:43
+msgid "The Bulk tab converts everything already in the Media Library, in the background. The Tester tab checks your server first."
+msgstr ""
+
+#: build/index.js:43
+msgid "Getting started"
+msgstr ""
+
+#: build/index.js:43
+msgid "Everything is reversible: originals live in uploads/lw-img-backups/ and can be restored per image from the Media Library."
+msgstr ""
+
+#: build/index.js:43
+msgid "Converted"
+msgstr ""
+
+#: build/index.js:43
+msgid "Restored"
+msgstr ""
+
+#. translators: %s: percentage saved.
+#: build/index.js:44
+#: build/index.js:64
+#: build/index.js:68
+#, js-format
+msgid "−%s%%"
+msgstr ""
+
+#: build/index.js:44
+msgid "original restored from backup"
+msgstr ""
+
+#. translators: 1: skip reason, 2: original size, 3: converted size.
+#: build/index.js:45
+#, js-format
+msgid "%1$s — %2$s original, converted would be %3$s"
+msgstr ""
+
+#. translators: 1: event type, 2: number of events.
+#: build/index.js:46
+#, js-format
+msgid "%1$s %2$s"
+msgstr ""
+
+#: build/index.js:46
+msgid "Events"
+msgstr ""
+
+#: build/index.js:46
+msgid "Refresh"
+msgstr ""
+
+#: build/index.js:46
+msgid "Clear all log entries?"
+msgstr ""
+
+#: build/index.js:46
+msgid "Clear log"
+msgstr ""
+
+#: build/index.js:46
+msgid "Logging is off, so no new events are recorded. Turn on \"Logging enabled\" above and save."
+msgstr ""
+
+#: build/index.js:46
+msgid "Time"
+msgstr ""
+
+#: build/index.js:46
+msgid "Event"
+msgstr ""
+
+#: build/index.js:46
+msgid "File"
+msgstr ""
+
+#: build/index.js:46
+msgid "Details"
+msgstr ""
+
+#: build/index.js:46
+msgid "Event log"
+msgstr ""
+
+#: build/index.js:46
+msgid "Search"
+msgstr ""
+
+#: build/index.js:46
+msgid "Filter"
+msgstr ""
+
+#: build/index.js:46
+msgid "Clear"
+msgstr ""
+
+#: build/index.js:46
+msgid "Clear all filters"
+msgstr ""
+
+#: build/index.js:46
+msgid "All"
+msgstr ""
+
+#: build/index.js:46
+msgid "No entries match these filters."
+msgstr ""
+
+#: build/index.js:46
+msgid "Nothing here yet."
+msgstr ""
+
+#: build/index.js:46
+msgid "Previous page"
+msgstr ""
+
+#: build/index.js:46
+msgid "Next page"
+msgstr ""
+
+#: build/index.js:46
+msgid "Rows per page"
+msgstr ""
+
+#: build/index.js:46
+msgid "Select all rows on this page"
+msgstr ""
+
+#: build/index.js:46
+msgid "Clear selection"
+msgstr ""
+
+#: build/index.js:46
+msgid "Bulk actions"
+msgstr ""
+
+#. translators: %d: number of rows.
+#: build/index.js:46
+#, js-format
+msgid "%d entry"
+msgid_plural "%d entries"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of results.
+#: build/index.js:46
+#, js-format
+msgid "%d result"
+msgid_plural "%d results"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: current page, 2: total pages.
+#: build/index.js:46
+#, js-format
+msgid "Page %1$d of %2$d"
+msgstr ""
+
+#. translators: %s: row name.
+#: build/index.js:46
+#, js-format
+msgid "Select: %s"
+msgstr ""
+
+#. translators: %d: number of selected rows.
+#: build/index.js:47
+#, js-format
+msgid "%d selected"
+msgid_plural "%d selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: selected rows, 2: of those, on this page.
+#: build/index.js:48
+#, js-format
+msgid "%1$d selected, %2$d on this page"
+msgstr ""
+
+#. translators: 1: rows the action applies to, 2: selected rows on this page.
+#: build/index.js:48
+#, js-format
+msgid "applies to %1$d of %2$d"
+msgstr ""
+
+#: build/index.js:48
+msgid "Filter by filename…"
+msgstr ""
+
+#: build/index.js:48
+msgid "No matching events"
+msgstr ""
+
+#: build/index.js:48
+msgid "No events yet. Upload an image or run a bulk optimization — every conversion, skip, and failure lands here with its reason."
+msgstr ""
+
+#. translators: %s: relative time, e.g. "3 days ago".
+#: build/index.js:49
+#, js-format
+msgid "Scanned %s — never runs on its own."
+msgstr ""
+
+#: build/index.js:49
+msgid "Not scanned yet."
+msgstr ""
+
+#: build/index.js:49
+msgid "Scan again"
+msgstr ""
+
+#: build/index.js:49
+msgid "Leftovers from other optimizers"
+msgstr ""
+
+#: build/index.js:49
+msgid "No leftovers found"
+msgstr ""
+
+#. translators: %s: comma-separated list of other optimizer plugins.
+#: build/index.js:50
+#, js-format
+msgid "Checked %s — nothing of theirs is taking up space."
+msgstr ""
+
+#. translators: %s: size, e.g. "1.2 GB".
+#: build/index.js:51
+#, js-format
+msgid "at least %s"
+msgstr ""
+
+#: build/index.js:51
+msgid "of originals from optimizers you no longer use — <b>safe to delete</b> once you are sure you will not restore them."
+msgstr ""
+
+#: build/index.js:51
+msgid "beside each image"
+msgstr ""
+
+#: build/index.js:51
+msgid "backup folder"
+msgstr ""
+
+#. translators: %s: number of files.
+#: build/index.js:52
+#, js-format
+msgid "%s files"
+msgstr ""
+
+#: build/index.js:52
+msgid "The scan stopped early on this very large uploads folder, so the real total is higher than shown."
+msgstr ""
+
+#: build/index.js:52
+msgid "LW Image never touches these files: it only measures them. To reclaim the space, delete the folder or the files with your file manager, over SFTP, or from that plugin's own settings if it is still installed."
+msgstr ""
+
+#: build/index.js:52
+msgid "OK"
+msgstr ""
+
+#: build/index.js:52
+msgid "Warning"
+msgstr ""
+
+#: build/index.js:52
+msgid "Critical"
+msgstr ""
+
+#: build/index.js:52
+msgid "Info"
+msgstr ""
+
+#. translators: %d: number of issues.
+#: build/index.js:53
+#, js-format
+msgid "%d issue"
+msgid_plural "%d issues"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of warnings.
+#. translators: %d: count.
+#: build/index.js:54
+#: build/index.js:57
+#: build/index.js:58
+#, js-format
+msgid "%d warning"
+msgid_plural "%d warnings"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:54
+msgid "Copied"
+msgstr ""
+
+#: build/index.js:54
+msgid "Copy"
+msgstr ""
+
+#: build/index.js:54
+msgid "Needs attention"
+msgstr ""
+
+#. translators: 1: critical issues, 2: warnings.
+#: build/index.js:55
+#, js-format
+msgid "%1$s, %2$s"
+msgstr ""
+
+#. translators: %d: number of critical issues.
+#: build/index.js:56
+#, js-format
+msgid "%d critical issue"
+msgid_plural "%d critical issues"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of warnings.
+#: build/index.js:58
+#, js-format
+msgid "%d warning found"
+msgid_plural "%d warnings found"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:58
+msgid "All checks passed — ready for bulk optimization"
+msgstr ""
+
+#. translators: %d: count.
+#: build/index.js:58
+#, js-format
+msgid "%d critical"
+msgid_plural "%d critical"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: count.
+#: build/index.js:58
+#, js-format
+msgid "%d OK"
+msgstr ""
+
+#. translators: %d: count.
+#: build/index.js:58
+#, js-format
+msgid "%d info"
+msgstr ""
+
+#: build/index.js:58
+msgid "Pattern"
+msgstr ""
+
+#: build/index.js:58
+msgid "Action"
+msgstr ""
+
+#: build/index.js:58
+msgid "Remove rule"
+msgstr ""
+
+#: build/index.js:58
+msgid "Add rule"
+msgstr ""
+
+#. translators: %d: maximum number of pattern rules.
+#: build/index.js:59
+#, js-format
+msgid "At most %d rules."
+msgstr ""
+
+#: build/index.js:59
+msgid "Examples:"
+msgstr ""
+
+#: build/index.js:59
+msgid "* matches anything. A pattern without / matches the file name; with / it matches anywhere in the path. Every matching rule applies to uploads and bulk runs alike (\"Skip entirely\" also keeps the file out of smart crop). \"Skip entirely\" wins over the others; if two level rules match, the first one listed wins."
+msgstr ""
+
+#: build/index.js:59
+msgid "Smart crop"
+msgstr ""
+
+#: build/index.js:59
+msgid "Smart crop runs only on converted uploads — turn on Auto-convert uploads to use it. The command line (wp lw-img smartcrop) works either way."
+msgstr ""
+
+#: build/index.js:59
+msgid "Smart-crop thumbnails"
+msgstr ""
+
+#: build/index.js:59
+msgid "Re-crop the selected thumbnail sizes around the subject instead of the centre. Each selected size costs one extra API call per upload. Runs in the background right after the upload; on system-cron sites the cropped thumbnails appear within the cron interval."
+msgstr ""
+
+#: build/index.js:59
+msgid "Thumbnail sizes"
+msgstr ""
+
+#: build/index.js:59
+msgid "No hard-cropped thumbnail sizes are registered on this site — smart crop has nothing to work on. Sizes that scale (keep the aspect ratio) never need it."
+msgstr ""
+
+#. translators: 1: image size name, 2: width, 3: height.
+#: build/index.js:60
+#, js-format
+msgid "%1$s %2$s × %3$s"
+msgstr ""
+
+#. translators: %s: image size name.
+#: build/index.js:61
+#, js-format
+msgid "%s (not registered on this site)"
+msgstr ""
+
+#: build/index.js:61
+msgid "Select all"
+msgstr ""
+
+#: build/index.js:61
+msgid "Select none"
+msgstr ""
+
+#. translators: 1: selected sizes, 2: API calls per upload (1 + selected).
+#: build/index.js:62
+#, js-format
+msgid "Cost per upload: 1 + %1$s = %2$s API calls."
+msgstr ""
+
+#: build/index.js:62
+msgid "Account"
+msgstr ""
+
+#: build/index.js:62
+msgid "Current defaults"
+msgstr ""
+
+#: build/index.js:62
+msgid "Advanced"
+msgstr ""
+
+#: build/index.js:62
+msgid "Request timeout (s)"
+msgstr ""
+
+#: build/index.js:62
+msgid "How long to wait for the API per image. Slow jobs past the API's own 30 s window are polled automatically before giving up."
+msgstr ""
+
+#: build/index.js:62
+msgid "seconds"
+msgstr ""
+
+#. translators: %s: relative time, e.g. "12 minutes ago".
+#: build/index.js:63
+#, js-format
+msgid "Updated %s, refreshes hourly on its own."
+msgstr ""
+
+#: build/index.js:63
+msgid "Refresh figures"
+msgstr ""
+
+#: build/index.js:63
+msgid "What optimization has saved on this site so far."
+msgstr ""
+
+#: build/index.js:63
+msgid "No optimized images yet"
+msgstr ""
+
+#: build/index.js:63
+msgid "Stats appear here after the first conversion. New uploads convert automatically — for everything already in the Media Library, run a bulk optimization."
+msgstr ""
+
+#: build/index.js:63
+msgid "Open the Bulk tab"
+msgstr ""
+
+#: build/index.js:63
+msgid "saved"
+msgstr ""
+
+#: build/index.js:64
+msgid "After:"
+msgstr ""
+
+#: build/index.js:64
+msgid "Before:"
+msgstr ""
+
+#: build/index.js:64
+msgid "Optimized images"
+msgstr ""
+
+#. translators: %s: share of the Media Library.
+#: build/index.js:65
+#, js-format
+msgid "%s%% of the Media Library"
+msgstr ""
+
+#: build/index.js:65
+msgid "optimize the rest"
+msgstr ""
+
+#: build/index.js:65
+msgid "Average saving"
+msgstr ""
+
+#: build/index.js:65
+msgid "image"
+msgstr ""
+
+#: build/index.js:65
+msgid "across all optimized images"
+msgstr ""
+
+#. translators: 1: number of files, 2: retention ("kept forever" or "30-day retention").
+#: build/index.js:66
+#, js-format
+msgid "%1$s files · %2$s"
+msgstr ""
+
+#. translators: %d: number of days.
+#: build/index.js:67
+#, js-format
+msgid "%d-day retention"
+msgstr ""
+
+#: build/index.js:67
+msgid "kept forever"
+msgstr ""
+
+#: build/index.js:67
+msgid "Biggest wins"
+msgstr ""
+
+#: build/index.js:67
+msgid "to"
+msgstr ""
+
+#: build/index.js:68
+msgid "What happens to every new image upload."
+msgstr ""
+
+#: build/index.js:68
+msgid "Auto-convert uploads"
+msgstr ""
+
+#: build/index.js:68
+msgid "On"
+msgstr ""
+
+#: build/index.js:68
+msgid "Off — uploads are left untouched"
+msgstr ""
+
+#: build/index.js:68
+msgid "Convert"
+msgstr ""
+
+#: build/index.js:68
+msgid "Back up original"
+msgstr ""
+
+#: build/index.js:68
+msgid "Thumbnails"
+msgstr ""
+
+#: build/index.js:68
+msgid "New uploads are left untouched. The settings below still apply to bulk runs and to \"Optimize now\" in the Media Library, and old-URL redirects keep working."
+msgstr ""
+
+#: build/index.js:68
+msgid "Conversion"
+msgstr ""
+
+#: build/index.js:68
+msgid "Output format"
+msgstr ""
+
+#: build/index.js:68
+msgid "Optimization level"
+msgstr ""
+
+#: build/index.js:68
+msgid "Camera info, GPS, copyright. Off by default — smaller files and removes potentially sensitive data."
+msgstr ""
+
+#: build/index.js:68
+msgid "Size limits"
+msgstr ""
+
+#: build/index.js:68
+msgid "Resize large images"
+msgstr ""
+
+#: build/index.js:68
+msgid "Images are scaled down proportionally to fit; small images are never upscaled. 0 = no limit."
+msgstr ""
+
+#: build/index.js:68
+msgid "Maximum width in pixels"
+msgstr ""
+
+#: build/index.js:68
+msgid "Maximum height in pixels"
+msgstr ""
+
+#: build/index.js:68
+msgid "px"
+msgstr ""
+
+#: build/index.js:68
+msgid "File size range"
+msgstr ""
+
+#: build/index.js:68
+msgid "Files outside the range are skipped (original kept). Tiny files rarely benefit; the API rejects images over 10 MB."
+msgstr ""
+
+#: build/index.js:68
+msgid "Minimum file size in kilobytes"
+msgstr ""
+
+#: build/index.js:68
+msgid "KB min"
+msgstr ""
+
+#: build/index.js:68
+msgid "Maximum file size in megabytes"
+msgstr ""
+
+#: build/index.js:68
+msgid "MB max"
+msgstr ""
+
+#: build/index.js:68
+msgid "Skip & exclude"
+msgstr ""
+
+#: build/index.js:68
+msgid "Skip already-WebP / AVIF uploads"
+msgstr ""
+
+#: build/index.js:68
+msgid "Recommended — no API call, no credit usage."
+msgstr ""
+
+#: build/index.js:68
+msgid "Skip animated GIFs"
+msgstr ""
+
+#: build/index.js:68
+msgid "Off by default: animated GIFs become animated WebP with frames and timing preserved. If the WebP would be larger, the original is kept automatically."
+msgstr ""
+
+#: build/index.js:68
+msgid "After conversion"
+msgstr ""
+
+#: build/index.js:68
+msgid "Redirect old image URLs to the converted file"
+msgstr ""
+
+#: build/index.js:68
+msgid "Recommended. Nothing is stored: when a request for photo.jpg 404s, the plugin matches the path to its converted attachment and answers with a 301 to photo.webp — external links, sent newsletters and search results keep working. The Tester tab checks that the server lets these requests through."
+msgstr ""
+
+#: build/index.js:68
+msgid "Bulk optimize"
+msgstr ""
+
+#: build/index.js:68
+msgid "Runs in the background — you can close this tab. References to converted files in post content and page-builder data are rewritten automatically."
+msgstr ""
+
+#: build/index.js:68
+msgid "The last status update failed; retrying in a few seconds."
+msgstr ""
+
+#: build/index.js:68
+msgid "WP-Cron only runs while the site receives traffic. For very large libraries the command line is the guaranteed path:"
+msgstr ""
+
+#: build/index.js:68
+msgid "Every conversion keeps the original, so nothing is ever lost."
+msgstr ""
+
+#: build/index.js:68
+msgid "Back up originals"
+msgstr ""
+
+#: build/index.js:68
+msgid "On — every conversion is reversible"
+msgstr ""
+
+#: build/index.js:68
+msgid "Off — conversions cannot be undone"
+msgstr ""
+
+#: build/index.js:68
+msgid "Original saved"
+msgstr ""
+
+#: build/index.js:68
+msgid "Restorable any time"
+msgstr ""
+
+#. translators: %d: number of days.
+#: build/index.js:69
+#, js-format
+msgid "Cleaned up after %d days"
+msgstr ""
+
+#: build/index.js:69
+msgid "Kept forever"
+msgstr ""
+
+#: build/index.js:69
+msgid "Originals are deleted after conversion"
+msgstr ""
+
+#: build/index.js:69
+msgid "With backups off there is no way to restore an image once it has been converted — Restore original disappears from the Media Library, and re-optimizing at another level becomes impossible. Existing backups are kept and still restorable."
+msgstr ""
+
+#: build/index.js:69
+msgid "Retention"
+msgstr ""
+
+#: build/index.js:69
+msgid "Keep backups for"
+msgstr ""
+
+#: build/index.js:69
+msgid "Backups older than this are deleted by a daily cleanup task. Forever keeps everything — watch the folder size on large sites."
+msgstr ""
+
+#: build/index.js:69
+msgid "or"
+msgstr ""
+
+#: build/index.js:69
+msgid "Backup retention in days"
+msgstr ""
+
+#: build/index.js:69
+msgid "days"
+msgstr ""
+
+#: build/index.js:69
+msgid "On uninstall"
+msgstr ""
+
+#: build/index.js:69
+msgid "Delete all LW Image data when the plugin is deleted"
+msgstr ""
+
+#: build/index.js:69
+msgid "Off (default): settings, API key, pattern rules, event log and per-image statistics survive a delete and reinstall. On: they are removed on uninstall. Backup originals are kept either way. The Deactivate link on the Plugins screen asks the same question."
+msgstr ""
+
+#: build/index.js:69
+msgid "Running environment checks…"
+msgstr ""
+
+#: build/index.js:69
+msgid "Environment checks — hosting problems surface here before a bulk run trips over them."
+msgstr ""
+
+#: build/index.js:69
+msgid "Run tests again"
+msgstr ""
+
+#. translators: %s: relative time, e.g. "3 minutes ago".
+#: build/index.js:70
+#, js-format
+msgid "last run %s · cached for 10 minutes"
+msgstr ""
+
+#: build/index.js:70
+msgid "All checks"
+msgstr ""
+
+#: build/index.js:70
+msgid "The last 200 events — uploads, bulk runs, Media Library actions and restores: what converted, what was skipped, and why."
+msgstr ""
+
+#: build/index.js:70
+msgid "Logging enabled"
+msgstr ""
+
+#: build/index.js:70
+msgid "existing entries remain until cleared"
+msgstr ""
