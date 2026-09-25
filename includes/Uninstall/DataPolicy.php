@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Uninstall;
 
+use LightweightPlugins\Img\Account\AccountCache;
 use LightweightPlugins\Img\Bulk\BulkJob;
 use LightweightPlugins\Img\Bulk\UnoptimizedQuery;
 use LightweightPlugins\Img\Compat\CompetitorNotice;
@@ -48,7 +49,8 @@ final class DataPolicy {
 	 * @var array<int, string>
 	 */
 	public const VOLATILE_TRANSIENTS = [
-		'lw_img_stats', // SiteStats::CACHE_KEY is private; kept as a literal here.
+		SiteStats::CACHE_KEY,
+		AccountCache::TRANSIENT,
 		UnoptimizedQuery::COUNT_TRANSIENT,
 		RedirectProbe::CACHE_KEY,
 		HealthReport::CACHE_KEY,
