@@ -1,10 +1,10 @@
 === LW Image ===
 Contributors: lwplugins
 Tags: image optimization, webp, image compression, performance, helloimg
-Requires at least: 6.0
+Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,9 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 2.0.2 =
+* Fix: "Requires at least" raised to WordPress 6.6 - the React settings screen needs the react-jsx-runtime script core registers from 6.6; on older versions the page stayed blank.
 
 = 2.0.1 =
 * Fix: The lw_img_upload_converted action now passes attachment_id in $context on bulk and on-demand runs, so a listener can tell which attachment a conversion belongs to.

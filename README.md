@@ -85,7 +85,7 @@ Full guides live in [`docs/`](docs/README.md): [usage](docs/usage.md)
 
 ## Requirements
 
-- WordPress 6.0+
+- WordPress 6.6+
 - PHP 8.0+
 - An image editor (Imagick or GD) with WebP support — the Tester tab checks this for you
 

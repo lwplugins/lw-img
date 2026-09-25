@@ -20,5 +20,5 @@ no tracking.
 3. New uploads convert automatically. For the existing Media Library,
    run a bulk optimize from the **Bulk** tab or `wp lw-img optimize --all`.
 
-Requirements: WordPress 6.0+, PHP 8.0+, and an image editor (Imagick or
+Requirements: WordPress 6.6+, PHP 8.0+, and an image editor (Imagick or
 GD) with WebP support — the **Tester** tab checks all of this for you.
