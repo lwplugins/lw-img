@@ -13,21 +13,18 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * The report includes live probes (API, cron loopback), so it is cached
- * for ten minutes; the Tester tab's re-run button clears the cache.
+ * for ten minutes; the Tester's refresh (REST ?refresh=1) clears the cache.
  */
 final class HealthReport {
 
 	public const CACHE_KEY = 'lw_img_health_report';
 
-	public const REFRESH_ACTION = 'lw_img_health_refresh';
-
 	/**
-	 * Hook the re-run action and the settings-save invalidation.
+	 * Hook the settings-save invalidation.
 	 *
 	 * @return void
 	 */
 	public static function register(): void {
-		add_action( 'admin_post_' . self::REFRESH_ACTION, [ self::class, 'refresh' ] );
 		add_action( 'update_option_lw_img_options', [ self::class, 'invalidate' ] );
 		add_action( 'add_option_lw_img_options', [ self::class, 'invalidate' ] );
 	}
@@ -143,26 +140,5 @@ final class HealthReport {
 		}
 
 		return array_merge( $critical, $warning );
-	}
-
-	/**
-	 * Clear the cached report and probe verdict, then go back to the Tester tab.
-	 *
-	 * @return void
-	 */
-	public static function refresh(): void {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'lw-img' ), '', [ 'response' => 403 ] );
-		}
-
-		check_admin_referer( self::REFRESH_ACTION );
-
-		// The probe verdict too: the Bulk tab reads it, and a stale "no"
-		// kept the bulk start blocked for ten minutes after a server fix
-		// the re-run had already confirmed.
-		self::invalidate();
-
-		wp_safe_redirect( admin_url( 'admin.php?page=lw-img#tester' ) );
-		exit;
 	}
 }

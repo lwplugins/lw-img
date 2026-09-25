@@ -31,15 +31,6 @@ use RecursiveIteratorIterator;
  */
 final class SiteStats {
 
-	public const REFRESH_ACTION = 'lw_img_refresh_stats';
-
-	/**
-	 * Rescanning the uploads tree is a separate, deliberately explicit
-	 * action: it is the expensive one, and it is the only thing on this tab
-	 * that never happens on its own.
-	 */
-	public const RESCAN_ACTION = 'lw_img_rescan_leftovers';
-
 	public const CACHE_KEY = 'lw_img_stats';
 
 	/**
@@ -67,16 +58,6 @@ final class SiteStats {
 	 */
 	private const SCAN_MAX_ENTRIES = 2000000;
 	private const SCAN_MAX_SECONDS = 10;
-
-	/**
-	 * Hook the refresh action.
-	 *
-	 * @return void
-	 */
-	public static function register(): void {
-		add_action( 'admin_post_' . self::REFRESH_ACTION, [ self::class, 'refresh' ] );
-		add_action( 'admin_post_' . self::RESCAN_ACTION, [ self::class, 'rescan' ] );
-	}
 
 	/**
 	 * Collect (or serve cached) statistics.
@@ -135,45 +116,6 @@ final class SiteStats {
 		update_option( self::LEFTOVERS_OPTION, $scan, false );
 
 		return $scan;
-	}
-
-	/**
-	 * Clear the cache and go back to the Stats tab.
-	 *
-	 * @return void
-	 */
-	public static function refresh(): void {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'lw-img' ), '', [ 'response' => 403 ] );
-		}
-
-		check_admin_referer( self::REFRESH_ACTION );
-
-		// Only the savings figures: the leftover scan has its own action so
-		// this stays cheap and the expensive one is never triggered by
-		// accident.
-		delete_transient( self::CACHE_KEY );
-
-		wp_safe_redirect( admin_url( 'admin.php?page=lw-img#stats' ) );
-		exit;
-	}
-
-	/**
-	 * Re-walk the uploads tree for leftovers, then go back to the Stats tab.
-	 *
-	 * @return void
-	 */
-	public static function rescan(): void {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'lw-img' ), '', [ 'response' => 403 ] );
-		}
-
-		check_admin_referer( self::RESCAN_ACTION );
-
-		self::stored_leftovers( true );
-
-		wp_safe_redirect( admin_url( 'admin.php?page=lw-img#stats' ) );
-		exit;
 	}
 
 	/**

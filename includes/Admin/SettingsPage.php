@@ -11,51 +11,57 @@ namespace LightweightPlugins\Img\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
-use LightweightPlugins\Img\Admin\Settings\TabBackup;
-use LightweightPlugins\Img\Admin\Settings\TabBulk;
-use LightweightPlugins\Img\Admin\Settings\TabGeneral;
-use LightweightPlugins\Img\Admin\Settings\TabLog;
-use LightweightPlugins\Img\Admin\Settings\TabStats;
-use LightweightPlugins\Img\Admin\Settings\TabTester;
-use LightweightPlugins\Img\Admin\Settings\TabUpload;
-use LightweightPlugins\Img\Options;
+use LightweightPlugins\Img\Rest\Admin\Routes;
+use LightweightPlugins\Img\Rest\Admin\SettingsMeta;
+
+use function LightweightPlugins\Img\lw_img_dashboard_url;
 
 /**
- * Registers the settings submenu page, settings group, and admin assets.
+ * The LW Image screen: a mount point for the React admin (build/index),
+ * which reads and writes through the lw-img/v1 REST routes.
  */
 final class SettingsPage {
 
+	/**
+	 * Settings page slug.
+	 */
 	public const SLUG = 'lw-img';
 
-	public const SETTINGS_GROUP = 'lw_img_settings';
+	/**
+	 * Script and style handle.
+	 */
+	private const HANDLE = 'lw-img-admin-app';
 
 	/**
-	 * Settings tabs in render order.
+	 * Hook suffix returned by add_submenu_page().
 	 *
-	 * @var array<int, Settings\TabInterface>
+	 * Assets are keyed on it rather than on a hard-coded
+	 * "lw-plugins_page_lw-img": WordPress derives that prefix from the
+	 * translated parent menu title, so a locale that translates "LW Plugins"
+	 * would silently stop the screen from loading.
+	 *
+	 * @var string
 	 */
-	private array $tabs;
+	private string $hook_suffix = '';
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
-		$this->tabs = [
-			new TabGeneral(),
-			new TabStats(),
-			new TabUpload(),
-			new TabBulk(),
-			new TabBackup(),
-			new TabTester(),
-			new TabLog(),
-		];
-
 		add_action( 'admin_menu', [ $this, 'add_menu_page' ] );
-		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		add_filter( 'admin_body_class', [ $this, 'body_class' ] );
 	}
 
+	/**
+	 * Add menu page.
+	 *
+	 * @return void
+	 */
 	public function add_menu_page(): void {
 		ParentPage::maybe_register();
 
-		add_submenu_page(
+		$hook = add_submenu_page(
 			ParentPage::SLUG,
 			__( 'Image', 'lw-img' ),
 			__( 'Image', 'lw-img' ),
@@ -63,68 +69,78 @@ final class SettingsPage {
 			self::SLUG,
 			[ $this, 'render' ]
 		);
+
+		$this->hook_suffix = is_string( $hook ) ? $hook : '';
 	}
 
+	/**
+	 * Enqueue the React app on the settings screen.
+	 *
+	 * @param string $hook Current admin page.
+	 * @return void
+	 */
 	public function enqueue_assets( string $hook ): void {
-		$valid_hooks = [
-			'toplevel_page_' . ParentPage::SLUG,
-			ParentPage::SLUG . '_page_' . self::SLUG,
-		];
-
-		if ( ! in_array( $hook, $valid_hooks, true ) ) {
+		if ( '' === $this->hook_suffix || $hook !== $this->hook_suffix ) {
 			return;
 		}
 
-		wp_enqueue_style(
-			'lw-img-admin',
-			LW_IMG_URL . 'assets/css/admin.css',
-			[],
-			$this->asset_version( 'assets/css/admin.css' )
-		);
+		if ( ! BuildAssets::enqueue( 'index', self::HANDLE ) ) {
+			return;
+		}
 
-		wp_enqueue_script(
-			'lw-img-admin',
-			LW_IMG_URL . 'assets/js/admin.js',
-			[],
-			$this->asset_version( 'assets/js/admin.js' ),
-			true
+		wp_add_inline_script(
+			self::HANDLE,
+			'window.lwImg = ' . wp_json_encode(
+				[
+					'version'      => LW_IMG_VERSION,
+					'namespace'    => Routes::NAMESPACE,
+					'docsUrl'      => SettingsMeta::DOCS_URL,
+					'dashboardUrl' => lw_img_dashboard_url(),
+				]
+			) . ';',
+			'before'
 		);
 	}
 
 	/**
-	 * Cache-busting asset version based on the file's modification time,
-	 * so edge/browser caches refresh whenever the asset actually changes.
+	 * Mark the settings screen body for the app's styles.
 	 *
-	 * @param string $relative Plugin-relative asset path.
+	 * @param string $classes Space-separated body classes.
 	 * @return string
 	 */
-	private function asset_version( string $relative ): string {
-		$mtime = @filemtime( LW_IMG_PATH . $relative ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- missing file falls back to the plugin version below.
+	public function body_class( string $classes ): string {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
-		return false !== $mtime ? (string) $mtime : LW_IMG_VERSION;
+		if ( '' === $this->hook_suffix || ! $screen || $screen->id !== $this->hook_suffix ) {
+			return $classes;
+		}
+
+		return $classes . ' lw-img-screen';
 	}
 
-	public function register_settings(): void {
-		register_setting(
-			self::SETTINGS_GROUP,
-			Options::OPTION_NAME,
-			[
-				'type'              => 'array',
-				'sanitize_callback' => [ $this, 'sanitize_settings' ],
-				'default'           => Options::get_defaults(),
-			]
-		);
-	}
-
-	public function sanitize_settings( mixed $input ): array {
-		return SettingsSanitizer::sanitize( $input );
-	}
-
+	/**
+	 * Render the mount point (or a notice when the build is missing).
+	 *
+	 * The mount point sits outside .wrap so NoticeManager's direct-child
+	 * notice rules never reach the app; the missing-build notice carries
+	 * `lw-notice` so it is not hidden.
+	 *
+	 * @return void
+	 */
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
-		( new SettingsRenderer( $this->tabs ) )->render_page( self::SETTINGS_GROUP );
+		if ( ! BuildAssets::exists( 'index' ) ) {
+			printf(
+				'<div class="wrap"><h1>%s</h1><div class="notice notice-error lw-notice"><p>%s</p></div></div>',
+				esc_html__( 'LW Image', 'lw-img' ),
+				esc_html__( 'The settings screen files are missing. Re-install the plugin from a release ZIP, or run "npm install && npm run build" in the plugin directory.', 'lw-img' )
+			);
+			return;
+		}
+
+		echo '<div id="lw-img-root" class="lw-img-root"></div>';
 	}
 }

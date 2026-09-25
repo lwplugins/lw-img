@@ -36,13 +36,34 @@ final class NoticeManager {
 	private const BODY_CLASS = 'lw-plugins-admin-page';
 
 	/**
+	 * Whether the hooks are already registered.
+	 *
+	 * @var bool
+	 */
+	private static bool $registered = false;
+
+	/**
 	 * Hooked from `Plugin::init_components()` on admin requests only.
+	 * Safe to call more than once: the hooks are added only the first time.
 	 */
 	public static function register(): void {
+		if ( self::$registered ) {
+			return;
+		}
+
+		self::$registered = true;
+
 		// in_admin_header runs in admin-header.php right before the notice hooks.
 		add_action( 'in_admin_header', [ self::class, 'isolate' ], PHP_INT_MAX );
 		add_action( 'admin_head', [ self::class, 'print_styles' ] );
 		add_filter( 'admin_body_class', [ self::class, 'body_class' ] );
+	}
+
+	/**
+	 * Kept for older callers (`ParentPage::maybe_register()`); same as register().
+	 */
+	public static function init(): void {
+		self::register();
 	}
 
 	/**

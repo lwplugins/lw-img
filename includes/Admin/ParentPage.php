@@ -59,7 +59,7 @@ final class ParentPage {
 				'name'          => 'LW Image',
 				'description'   => 'Lightweight image optimization — auto-convert uploads to WebP via HelloImg.',
 				'icon'          => 'dashicons-format-image',
-				'icon_color'    => '#00a876',
+				'icon_color'    => '#00875f',
 				'constant'      => 'LW_IMG_VERSION',
 				'settings_page' => 'lw-img',
 				'github'        => 'https://github.com/lwplugins/lw-img',
@@ -69,6 +69,8 @@ final class ParentPage {
 
 	public static function maybe_register(): void {
 		global $admin_page_hooks;
+
+		NoticeManager::init();
 
 		if ( ! empty( $admin_page_hooks[ self::SLUG ] ) ) {
 			return;
@@ -124,7 +126,7 @@ final class ParentPage {
 			[
 				'constant'      => '',
 				'icon'          => 'dashicons-admin-plugins',
-				'icon_color'    => '#00a876',
+				'icon_color'    => '#00875f',
 				'name'          => '',
 				'description'   => '',
 				'github'        => '',

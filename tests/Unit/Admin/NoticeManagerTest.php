@@ -103,4 +103,12 @@ final class NoticeManagerTest extends MonkeyTestCase {
 final class NoticeManagerTestOwn {
 
 	public function render(): void {}
+
+	public function test_registering_twice_adds_the_hooks_once(): void {
+		Functions\expect( 'add_action' )->twice();
+		Functions\expect( 'add_filter' )->once();
+
+		NoticeManager::register();
+		NoticeManager::init();
+	}
 }
