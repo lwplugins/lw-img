@@ -48,22 +48,31 @@ final class EventLog {
 		);
 	}
 
-	public static function on_converted( string $original_path, string $new_path, array $result ): void {
+	/**
+	 * @param string               $original_path Absolute path of the original.
+	 * @param string               $new_path      Absolute path of the converted file.
+	 * @param array<string, mixed> $context       Conversion result; attachment_id on bulk / on-demand runs.
+	 * @return void
+	 */
+	public static function on_converted( string $original_path, string $new_path, array $context ): void {
 		if ( ! self::enabled() ) {
 			return;
 		}
 
 		self::record(
-			[
-				'status'   => self::STATUS_CONVERTED,
-				'file'     => basename( $original_path ),
-				'mime'     => (string) ( $result['mime'] ?? self::guess_mime( $original_path ) ?? '' ),
-				'mime_to'  => (string) ( $result['mime_to'] ?? self::guess_mime( $new_path ) ?? 'image/webp' ),
-				'size_in'  => (int) ( $result['original_size'] ?? 0 ),
-				'size_out' => (int) ( $result['new_size'] ?? 0 ),
-				'percent'  => (float) ( $result['percent'] ?? 0 ),
-				'job_id'   => (string) ( $result['job_id'] ?? '' ),
-			]
+			array_merge(
+				[
+					'status'   => self::STATUS_CONVERTED,
+					'file'     => basename( $original_path ),
+					'mime'     => (string) ( $context['mime'] ?? self::guess_mime( $original_path ) ?? '' ),
+					'mime_to'  => (string) ( $context['mime_to'] ?? self::guess_mime( $new_path ) ?? 'image/webp' ),
+					'size_in'  => (int) ( $context['original_size'] ?? 0 ),
+					'size_out' => (int) ( $context['new_size'] ?? 0 ),
+					'percent'  => (float) ( $context['percent'] ?? 0 ),
+					'job_id'   => (string) ( $context['job_id'] ?? '' ),
+				],
+				self::context_fields( $context )
+			)
 		);
 	}
 

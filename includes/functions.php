@@ -34,6 +34,8 @@ if ( ! function_exists( __NAMESPACE__ . '\\lw_img_dashboard_url' ) ) {
 		/**
 		 * Filters the HelloImg dashboard URL the plugin links to.
 		 *
+		 * @since 1.8.1
+		 *
 		 * @param string $url Dashboard URL.
 		 */
 		return (string) apply_filters( 'lw_img_dashboard_url', 'https://app.helloimg.io/' );

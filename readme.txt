@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,12 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 2.0.1 =
+* Fix: The lw_img_upload_converted action now passes attachment_id in $context on bulk and on-demand runs, so a listener can tell which attachment a conversion belongs to.
+* Fix: The Log tab links bulk and on-demand conversions to their attachment, like skipped and failed entries.
+* Fix: lw_img_upload_failed always passes a file path first: the bulk "API key missing" halt passed the literal 'bulk run', and smart crop passed only the size file's name.
+* Update: Every public hook is documented at its call site with @since and its arguments, including the $context keys of the lw_img_upload_* actions (GitHub #1). The hook list in docs/usage.md now includes lw_img_upload_converted.
 
 = 2.0.0 =
 * New: New settings screen built with WordPress components on a new lw-img/v1 admin REST API: side navigation, a top bar with Save/Discard and a Cmd/Ctrl+S shortcut, loading skeletons and a mobile layout. Tabs load their data only when opened, and an invalid value is shown next to its field (pattern rules per row) with nothing saved.

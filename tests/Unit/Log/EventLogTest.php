@@ -176,4 +176,31 @@ final class EventLogTest extends MonkeyTestCase {
 		$this->assertArrayNotHasKey( 'attachment_id', $captured[0] );
 		$this->assertArrayNotHasKey( 'size_in', $captured[0] );
 	}
+
+	/**
+	 * Bulk / on-demand conversions pass attachment_id, so the log can link
+	 * the entry to its attachment like skipped/failed entries.
+	 */
+	public function test_conversion_attachment_id_is_stored(): void {
+		$this->stub_options( [] );
+		$captured = null;
+		Functions\expect( 'update_option' )->once()->andReturnUsing(
+			static function ( string $name, array $log ) use ( &$captured ): bool {
+				$captured = $log;
+				return true;
+			}
+		);
+
+		EventLog::on_converted(
+			'/up/a.jpg',
+			'/up/a.webp',
+			[
+				'attachment_id' => 12,
+				'original_size' => 1000,
+				'new_size'      => 400,
+			]
+		);
+
+		$this->assertSame( 12, $captured[0]['attachment_id'] ?? null );
+	}
 }

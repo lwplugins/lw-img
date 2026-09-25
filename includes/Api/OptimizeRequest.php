@@ -83,7 +83,21 @@ final class OptimizeRequest {
 	 */
 	public static function filtered( string $file_path, ?string $convert_override = null, ?string $level_override = null ): self {
 		$request = self::from_options( $file_path, $convert_override, $level_override );
-		$args    = (array) apply_filters( 'lw_img_optimize_request_args', $request->to_data_payload(), $file_path );
+		/**
+		 * Filters the conversion parameters sent to HelloImg. Runs for uploads
+		 * and for bulk / on-demand runs, after pattern rules and overrides.
+		 *
+		 * Recognised keys: level (an OptimizeRequest::LEVEL_* value), keep_exif
+		 * (bool), convert ('webp'|'avif'), max_width, max_height (px; only
+		 * present when a limit is set, 0 = no limit). A missing key keeps the
+		 * unfiltered value; other keys are ignored.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array<string, mixed> $args      Request parameters.
+		 * @param string               $file_path Absolute path of the file to optimize.
+		 */
+		$args = (array) apply_filters( 'lw_img_optimize_request_args', $request->to_data_payload(), $file_path );
 
 		return new self(
 			$file_path,

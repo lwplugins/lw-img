@@ -115,6 +115,20 @@ final class ConvertibleDetector {
 			return $this->skip( $file_path, 'animated gif', $attachment_id );
 		}
 
+		/**
+		 * Filters whether a file is sent to HelloImg for conversion.
+		 *
+		 * Runs on upload and on bulk / on-demand runs, but only after the
+		 * built-in skip checks (API key, mime scope, pattern rules, file size,
+		 * animated GIF) have passed — it can veto a conversion, not force one.
+		 * A veto does not fire lw_img_upload_skipped.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param bool   $should_convert Whether to convert. Always true when the filter runs.
+		 * @param string $file_path      Absolute path of the file.
+		 * @param string $mime_type      The file's mime type.
+		 */
 		return (bool) apply_filters( 'lw_img_should_convert', true, $file_path, $mime_type );
 	}
 
@@ -151,6 +165,7 @@ final class ConvertibleDetector {
 	}
 
 	private function skip( string $file_path, string $reason, int $attachment_id = 0 ): bool {
+		/** This action is documented in includes/Upload/UploadInterceptor.php */
 		do_action(
 			'lw_img_upload_skipped',
 			$file_path,

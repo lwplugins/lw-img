@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.1] - 2026-09-25
+
+### Fixed
+- The `lw_img_upload_converted` action now passes `attachment_id` in `$context` on bulk and on-demand runs, so a listener can tell which attachment a conversion belongs to.
+- The Log tab links bulk and on-demand conversions to their attachment, like skipped and failed entries.
+- `lw_img_upload_failed` always passes a file path first: the bulk "API key missing" halt passed the literal `'bulk run'`, and smart crop passed only the size file's name.
+
+### Changed
+- Every public hook is documented at its call site with `@since` and its arguments, including the `$context` keys of the `lw_img_upload_*` actions (GitHub #1). The hook list in docs/usage.md now includes `lw_img_upload_converted`.
+
 ## [2.0.0] - 2026-09-25
 
 ### Added

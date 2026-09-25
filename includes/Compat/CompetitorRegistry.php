@@ -58,6 +58,18 @@ final class CompetitorRegistry {
 	 * @return array<string, array{name?: string, plugin?: string, meta_keys?: array<int, string>}>
 	 */
 	public static function competitors(): array {
+		/**
+		 * Filters the known competitor image optimizers.
+		 *
+		 * Keyed by a slug; each entry may hold name (display name), plugin
+		 * (plugin basename, for the "another optimizer is active" notice) and
+		 * meta_keys (postmeta keys that mark an attachment as optimized by it —
+		 * such attachments are skipped by bulk runs).
+		 *
+		 * @since 1.2.0
+		 *
+		 * @param array<string, array{name?: string, plugin?: string, meta_keys?: array<int, string>}> $competitors Competitor list.
+		 */
 		return (array) apply_filters( 'lw_img_competitor_plugins', self::COMPETITORS );
 	}
 

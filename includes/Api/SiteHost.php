@@ -34,6 +34,8 @@ final class SiteHost {
 		/**
 		 * Override the host sent as X-HIMG-Site (multisite, reverse proxies).
 		 *
+		 * @since 1.9.3
+		 *
 		 * @param string $host Host derived from home_url() (site_url() as a fallback).
 		 */
 		return trim( (string) apply_filters( 'lw_img_site_host', $host ) );

@@ -101,7 +101,8 @@ final class AttachmentOptimizer {
 			// No key (rotated away mid-run, or never set): halt like a quota
 			// error, before any stamping — otherwise the worker would march
 			// through the queue marking every clean image "skipped".
-			do_action( 'lw_img_upload_failed', 'bulk run', 'API key missing — run halted', [ 'attachment_id' => $attachment_id ] );
+			/** This action is documented in includes/Upload/UploadInterceptor.php */
+			do_action( 'lw_img_upload_failed', (string) get_attached_file( $attachment_id ), 'API key missing — run halted', [ 'attachment_id' => $attachment_id ] );
 
 			return [
 				'result'      => self::RESULT_FAILED,
@@ -134,6 +135,7 @@ final class AttachmentOptimizer {
 		try {
 			return $this->convert( $attachment_id, $file, $mime );
 		} catch ( ApiException $e ) {
+			/** This action is documented in includes/Upload/UploadInterceptor.php */
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage(), [ 'attachment_id' => $attachment_id ] );
 
 			$halt_reason = HaltReason::from_exception( $e );
@@ -151,6 +153,7 @@ final class AttachmentOptimizer {
 
 			return $this->finish( $attachment_id, self::RESULT_FAILED, $e->getMessage(), $e->is_transient() );
 		} catch ( Throwable $e ) {
+			/** This action is documented in includes/Upload/UploadInterceptor.php */
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage(), [ 'attachment_id' => $attachment_id ] );
 			return $this->finish( $attachment_id, self::RESULT_FAILED, $e->getMessage() );
 		}
@@ -192,6 +195,7 @@ final class AttachmentOptimizer {
 		$result  = ( new Client() )->optimize( $request );
 
 		if ( ! $result->is_smaller() ) {
+			/** This action is documented in includes/Upload/UploadInterceptor.php */
 			do_action(
 				'lw_img_upload_skipped',
 				$file,
@@ -246,11 +250,13 @@ final class AttachmentOptimizer {
 			$request->keep_exif
 		);
 
+		/** This action is documented in includes/Upload/UploadInterceptor.php */
 		do_action(
 			'lw_img_upload_converted',
 			$file,
 			(string) $swapped['file'],
 			[
+				'attachment_id' => $attachment_id,
 				'original_size' => $result->original_size,
 				'new_size'      => $result->new_size,
 				'percent'       => $result->percent,

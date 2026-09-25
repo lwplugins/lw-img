@@ -163,16 +163,21 @@ Filters:
 
 | Hook | Purpose |
 |---|---|
-| `lw_img_should_convert` | Final veto on converting a file: `(bool $convert, string $file_path, string $mime_type)` |
-| `lw_img_dashboard_url` | Replace the HelloImg dashboard URL shown in the admin (white-labeling) |
-| `lw_img_optimize_request_args` | Filter the API request payload before it is sent: `(array $args, string $file_path)` — runs for uploads and for bulk / on-demand conversions |
-| `lw_img_competitor_plugins` | Extend the list of recognized other-optimizer plugins |
+| `lw_img_should_convert` | Veto converting a file: `(bool $convert, string $file_path, string $mime_type)` — runs only after the built-in skip checks (API key, mime type, pattern rules, file size, animated GIF) passed, so it can stop a conversion but not force one |
+| `lw_img_dashboard_url` | Replace the HelloImg dashboard URL shown in the admin (white-labeling): `(string $url)` |
+| `lw_img_optimize_request_args` | Filter the API request payload before it is sent: `(array $args, string $file_path)` — keys `level`, `keep_exif`, `convert`, `max_width`, `max_height`; runs for uploads and for bulk / on-demand conversions |
+| `lw_img_competitor_plugins` | Extend the list of recognized other-optimizer plugins: `(array $competitors)` — `slug => [ 'name' => …, 'plugin' => 'dir/file.php', 'meta_keys' => [ … ] ]`, every key optional; attachments carrying one of the `meta_keys` are left alone by bulk runs |
 | `lw_img_site_host` | Override the host sent as the `X-HIMG-Site` header on every API call: `(string $host)` — defaults to `home_url()`'s host (`site_url()`'s when home has none); useful for multisite or a reverse proxy that changes what the site looks like from outside |
 
-Actions (fired by the plugin, useful for logging/monitoring):
+Actions (fired by the plugin, useful for logging/monitoring). Despite the
+`lw_img_upload_` prefix, these also fire for bulk / on-demand runs, and
+`failed` also for smart crop. `$context` is always an array; it holds
+`attachment_id` everywhere except the upload path, where no attachment
+exists yet.
 
 | Hook | Fires when |
 |---|---|
-| `lw_img_upload_skipped` | A file was deliberately not converted: `(string $file, string $reason, array $context)` — `$context` is always passed (may be an empty array); may hold `attachment_id`, `original_size`, `new_size` |
-| `lw_img_upload_failed` | A conversion or crop attempt failed: `(string $file, string $reason, array $context)` — `$context` is always passed (may be an empty array); may hold `attachment_id` |
+| `lw_img_upload_converted` | A file was converted: `(string $original_path, string $new_path, array $context)` — `$context`: `original_size`, `new_size`, `percent`, `job_id`, `mime`, `mime_to`, and `attachment_id` (not on upload) |
+| `lw_img_upload_skipped` | A file was deliberately not converted: `(string $file, string $reason, array $context)` — `$context`: `attachment_id` (not on upload); `original_size`, `new_size` when the result was not smaller |
+| `lw_img_upload_failed` | A conversion or crop attempt failed: `(string $file, string $error, array $context)` — `$context`: `attachment_id` (not on upload); smart crop passes the size file's path and a `smart crop: ` error prefix |
 | `lw_img_restored` | An attachment was restored from backup: `(int $attachment_id, string $file)` |

@@ -79,6 +79,15 @@ final class Restorer {
 
 		$this->clear_meta( $attachment_id );
 
+		/**
+		 * Fires after an attachment's original was restored from backup and
+		 * its sizes, content URLs and plugin data were rewired.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param int    $attachment_id Attachment post ID.
+		 * @param string $target        Absolute path of the restored original file.
+		 */
 		do_action( 'lw_img_restored', $attachment_id, $target );
 
 		return true;

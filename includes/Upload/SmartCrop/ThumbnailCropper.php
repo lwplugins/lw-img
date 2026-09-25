@@ -77,17 +77,19 @@ final class ThumbnailCropper {
 		$updated   = false;
 
 		foreach ( $jobs as $job ) {
+			// Guard: metadata file values are basenames, but enforce at filesystem use.
+			$size_path   = $directory . '/' . wp_basename( $job['file'] );
 			$job_convert = self::convert_target_for( $job['file'] );
 			if ( null === $job_convert ) {
-				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: unsupported size format', [ 'attachment_id' => $attachment_id ] );
+				/** This action is documented in includes/Upload/UploadInterceptor.php */
+				do_action( 'lw_img_upload_failed', $size_path, 'smart crop: unsupported size format', [ 'attachment_id' => $attachment_id ] );
 				++$summary['failed'];
 				continue;
 			}
 
 			try {
 				$bytes = $this->cropped_bytes( $main, $job, $job_convert, $level, $keep_exif );
-				// Guard: metadata file values are basenames, but enforce at filesystem use.
-				$this->swap_file( $directory . '/' . wp_basename( $job['file'] ), $bytes );
+				$this->swap_file( $size_path, $bytes );
 
 				if ( isset( $metadata['sizes'][ $job['name'] ]['filesize'] ) ) {
 					$metadata['sizes'][ $job['name'] ]['filesize'] = strlen( $bytes );
@@ -95,14 +97,16 @@ final class ThumbnailCropper {
 				$updated = true;
 				++$summary['cropped'];
 			} catch ( ApiException $e ) {
-				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: ' . $e->getMessage(), [ 'attachment_id' => $attachment_id ] );
+				/** This action is documented in includes/Upload/UploadInterceptor.php */
+				do_action( 'lw_img_upload_failed', $size_path, 'smart crop: ' . $e->getMessage(), [ 'attachment_id' => $attachment_id ] );
 				++$summary['failed'];
 				if ( $e->is_quota() ) {
 					$summary['halted'] = true;
 					break;
 				}
 			} catch ( Throwable $e ) {
-				do_action( 'lw_img_upload_failed', $job['file'], 'smart crop: ' . $e->getMessage(), [ 'attachment_id' => $attachment_id ] );
+				/** This action is documented in includes/Upload/UploadInterceptor.php */
+				do_action( 'lw_img_upload_failed', $size_path, 'smart crop: ' . $e->getMessage(), [ 'attachment_id' => $attachment_id ] );
 				++$summary['failed'];
 			}
 		}

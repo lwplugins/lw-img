@@ -98,7 +98,15 @@ final class ParentPage {
 
 			<div class="lw-plugins-cards" style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
 				<?php self::render_all_plugin_cards(); ?>
-				<?php do_action( 'lw_plugins_overview_cards' ); ?>
+				<?php
+				/**
+				 * Fires inside the LW Plugins overview card grid, after the
+				 * registry cards. Shared by every LW plugin.
+				 *
+				 * @since 1.0.0
+				 */
+				do_action( 'lw_plugins_overview_cards' );
+				?>
 			</div>
 
 			<div class="lw-plugins-footer" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ccd0d4;">

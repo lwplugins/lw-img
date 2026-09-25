@@ -9,15 +9,26 @@ declare(strict_types=1);
 
 namespace LightweightPlugins\Img\Tests\Unit\Bulk;
 
+use Brain\Monkey\Actions;
 use Brain\Monkey\Functions;
 use LightweightPlugins\Img\Bulk\AttachmentOptimizer;
 use LightweightPlugins\Img\Bulk\HaltReason;
 use LightweightPlugins\Img\Tests\Unit\MonkeyTestCase;
+use Mockery;
 
 /**
  * @covers \LightweightPlugins\Img\Bulk\AttachmentOptimizer
  */
 final class AttachmentOptimizerTest extends MonkeyTestCase {
+
+	protected function setUp(): void {
+		parent::setUp();
+		Functions\when( 'get_option' )->justReturn( [ 'api_key' => '' ] );
+		Functions\when( 'wp_parse_args' )->alias(
+			static fn ( array $args, array $defaults ): array => array_merge( $defaults, $args )
+		);
+		Functions\when( 'get_attached_file' )->justReturn( '/uploads/2026/09/photo.jpg' );
+	}
 
 	/**
 	 * A missing API key must halt the run like a quota error — without
@@ -29,11 +40,6 @@ final class AttachmentOptimizerTest extends MonkeyTestCase {
 	 * environment has no $wpdb, so reaching the repository fails loudly.
 	 */
 	public function test_halts_without_stamping_when_api_key_is_missing(): void {
-		Functions\when( 'get_option' )->justReturn( [ 'api_key' => '' ] );
-		Functions\when( 'wp_parse_args' )->alias(
-			static fn ( array $args, array $defaults ): array => array_merge( $defaults, $args )
-		);
-
 		$result = ( new AttachmentOptimizer() )->optimize( 123 );
 
 		$this->assertSame( AttachmentOptimizer::RESULT_FAILED, $result['result'] );
@@ -41,13 +47,20 @@ final class AttachmentOptimizerTest extends MonkeyTestCase {
 	}
 
 	public function test_a_missing_key_halt_names_its_reason(): void {
-		Functions\when( 'get_option' )->justReturn( [ 'api_key' => '' ] );
-		Functions\when( 'wp_parse_args' )->alias(
-			static fn ( array $args, array $defaults ): array => array_merge( $defaults, $args )
-		);
-
 		$result = ( new AttachmentOptimizer() )->optimize( 123 );
 
 		$this->assertSame( HaltReason::NO_KEY, $result['halt_reason'] ?? null );
+	}
+
+	/**
+	 * Every lw_img_upload_failed call site passes a file path first; the
+	 * missing-key halt used to pass the literal 'bulk run'.
+	 */
+	public function test_a_missing_key_halt_reports_the_attachments_file_path(): void {
+		Actions\expectDone( 'lw_img_upload_failed' )
+			->once()
+			->with( '/uploads/2026/09/photo.jpg', Mockery::type( 'string' ), [ 'attachment_id' => 123 ] );
+
+		( new AttachmentOptimizer() )->optimize( 123 );
 	}
 }
