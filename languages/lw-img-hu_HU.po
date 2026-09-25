@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LW Image 2.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lw-img\n"
-"POT-Creation-Date: 2026-09-25T08:19:03+00:00\n"
+"POT-Creation-Date: 2026-09-25T08:23:58+00:00\n"
 "PO-Revision-Date: 2026-09-25 12:00+0000\n"
 "Last-Translator: LW Plugins <hello@lwplugins.com>\n"
 "Language-Team: Hungarian <hu@lwplugins.com>\n"
@@ -304,7 +304,7 @@ msgid "Dismiss this notice"
 msgstr "Értesítés elrejtése"
 
 #: includes/Health/ApiChecks.php:35 includes/Health/ApiChecks.php:43
-#: includes/Health/ApiChecks.php:49 build/index.js:38
+#: includes/Health/ApiChecks.php:49 build/index.js:40
 msgid "HelloImg API"
 msgstr "HelloImg API"
 
@@ -526,7 +526,7 @@ msgstr "Ehhez a csatolmányhoz nincs biztonsági mentés."
 msgid "Original (backup)"
 msgstr "Eredeti (biztonsági mentés)"
 
-#: includes/Media/ComparePage.php:81 build/index.js:21 build/index.js:25
+#: includes/Media/ComparePage.php:81 build/index.js:23 build/index.js:27
 msgid "Optimized"
 msgstr "Optimalizált"
 
@@ -583,7 +583,7 @@ msgid "Not optimized yet."
 msgstr "Még nincs optimalizálva."
 
 #: includes/Media/InfoMetabox.php:145 includes/Media/RowActions.php:66
-#: build/index.js:1 build/index.js:46
+#: build/index.js:1 build/index.js:48
 msgid "Try again"
 msgstr "Újrapróbálás"
 
@@ -611,7 +611,7 @@ msgid "Skipped — %s"
 msgstr "Kihagyva — %s"
 
 #: includes/Media/InfoMetabox.php:188 includes/Media/SavingsColumn.php:148
-#: build/index.js:21 build/index.js:25 build/index.js:43
+#: build/index.js:23 build/index.js:27 build/index.js:45
 msgid "Skipped"
 msgstr "Kihagyva"
 
@@ -619,8 +619,8 @@ msgstr "Kihagyva"
 msgid "Restore original"
 msgstr "Eredeti visszaállítása"
 
-#: includes/Media/SavingsColumn.php:124 build/index.js:21 build/index.js:25
-#: build/index.js:43
+#: includes/Media/SavingsColumn.php:124 build/index.js:23 build/index.js:27
+#: build/index.js:45
 msgid "Failed"
 msgstr "Sikertelen"
 
@@ -658,7 +658,7 @@ msgstr "LW Image: még nem feldolgozott"
 msgid "Filter by LW Image status"
 msgstr "Szűrés LW Image-állapot szerint"
 
-#: includes/Rest/Admin/LogController.php:85 build/index.js:46
+#: includes/Rest/Admin/LogController.php:85 build/index.js:48
 msgid "Log cleared."
 msgstr "Napló törölve."
 
@@ -771,7 +771,7 @@ msgstr ""
 "Az autoloader nem található. Futtasd a „composer install” parancsot a "
 "bővítmény mappájában, vagy telepítsd újra a bővítményt egy kiadási ZIP-ből."
 
-#: build/index.js:1 build/index.js:46
+#: build/index.js:1 build/index.js:48
 msgid "Loading…"
 msgstr "Betöltés…"
 
@@ -860,7 +860,7 @@ msgstr "Általános"
 msgid "General Settings"
 msgstr "Általános beállítások"
 
-#: build/index.js:12 build/index.js:35 build/index.js:63
+#: build/index.js:12 build/index.js:37 build/index.js:65
 msgid "Stats"
 msgstr "Statisztika"
 
@@ -868,7 +868,7 @@ msgstr "Statisztika"
 msgid "Statistics"
 msgstr "Statisztika"
 
-#: build/index.js:12 build/index.js:68
+#: build/index.js:12 build/index.js:70
 msgid "Upload"
 msgstr "Feltöltés"
 
@@ -884,7 +884,7 @@ msgstr "Bulk"
 msgid "Bulk Optimization"
 msgstr "Tömeges optimalizálás"
 
-#: build/index.js:12 build/index.js:30 build/index.js:67 build/index.js:68
+#: build/index.js:12 build/index.js:32 build/index.js:69
 msgid "Backup"
 msgstr "Backup"
 
@@ -892,7 +892,7 @@ msgstr "Backup"
 msgid "Backup Settings"
 msgstr "Biztonsági mentés beállításai"
 
-#: build/index.js:12 build/index.js:69
+#: build/index.js:12 build/index.js:70
 msgid "Tester"
 msgstr "Tester"
 
@@ -900,7 +900,7 @@ msgstr "Tester"
 msgid "Environment Tester"
 msgstr "Környezetellenőrzés"
 
-#: build/index.js:12 build/index.js:70
+#: build/index.js:12 build/index.js:71
 msgid "Log"
 msgstr "Napló"
 
@@ -908,7 +908,7 @@ msgstr "Napló"
 msgid "Event Log"
 msgstr "Eseménynapló"
 
-#: build/index.js:12 build/index.js:36
+#: build/index.js:12 build/index.js:38
 msgid "Connected"
 msgstr "Csatlakoztatva"
 
@@ -918,7 +918,7 @@ msgstr "Kapcsolódási hiba"
 
 #. translators: %s: percentage of the bulk run done.
 #. translators: %s: percentage of the run done.
-#: build/index.js:13 build/index.js:26
+#: build/index.js:13 build/index.js:28
 msgid "%s%%"
 msgstr "%s%%"
 
@@ -966,57 +966,123 @@ msgid "Set in wp-config.php"
 msgstr "A wp-config.php-ban beállítva"
 
 #: build/index.js:14
+msgid "Location"
+msgstr "Hely"
+
+#: build/index.js:14
+msgid "Restore"
+msgstr "Visszaállítás"
+
+#: build/index.js:14
+msgid "Any time, from the Media Library"
+msgstr "Bármikor, a Médiatárból"
+
+#: build/index.js:14 build/index.js:70
+msgid "Retention"
+msgstr "Megőrzés"
+
+#. translators: %d: number of days.
+#: build/index.js:15
+msgid "%d days"
+msgstr "%d nap"
+
+#: build/index.js:15 build/index.js:19
+msgid "Forever"
+msgstr "Örökre"
+
+#: build/index.js:15
+msgid "Backing up originals is on"
+msgstr "Az eredetik mentése be van kapcsolva"
+
+#: build/index.js:15
+msgid "Backing up originals is off"
+msgstr "Az eredetik mentése ki van kapcsolva"
+
+#: build/index.js:15
+msgid "Every conversion is reversible."
+msgstr "Minden konvertálás visszafordítható."
+
+#: build/index.js:15
+msgid "New conversions cannot be undone."
+msgstr "Az új konvertálások nem vonhatók vissza."
+
+#. translators: %s: PHP constant name.
+#: build/index.js:16 build/index.js:38
+msgid "Set in wp-config.php (%s)"
+msgstr "A wp-config.php-ban beállítva (%s)"
+
+#: build/index.js:16 build/index.js:70
+msgid "On"
+msgstr "Be"
+
+#: build/index.js:16
+msgid "Off"
+msgstr "Ki"
+
+#: build/index.js:16
+msgid ""
+"With backups off there is no way to restore an image once it has been "
+"converted — Restore original disappears from the Media Library, and re-"
+"optimizing at another level becomes impossible. Existing backups are kept "
+"and still restorable."
+msgstr ""
+"Kikapcsolt biztonsági mentéssel egy kép konvertálása után nincs mód a "
+"visszaállításra — az „Eredeti visszaállítása” eltűnik a Médiatárból, és a "
+"másik szinten történő újraoptimalizálás sem lehetséges. A meglévő biztonsági "
+"mentések megmaradnak és továbbra is visszaállíthatók."
+
+#: build/index.js:16
 msgid "backups are kept forever"
 msgstr "a biztonsági mentések örökre megmaradnak"
 
 #. translators: %d: number of days.
-#: build/index.js:15
+#: build/index.js:17
 msgid "removes backups older than %d days"
 msgstr "törli a %d napnál régebbi biztonsági mentéseket"
 
 #. translators: %s: "removes backups older than N days".
-#: build/index.js:16
+#: build/index.js:18
 msgid "%s · runs when the system cron triggers WP-Cron"
 msgstr "%s · akkor fut, amikor a rendszer-cron elindítja a WP-Cront"
 
 #. translators: 1: "removes backups older than N days", 2: date and time.
-#: build/index.js:17
+#: build/index.js:19
 msgid "%1$s · next run %2$s"
 msgstr "%1$s · következő futás: %2$s"
 
-#: build/index.js:17 build/index.js:65
+#: build/index.js:19 build/index.js:67
 msgid "Backup folder"
 msgstr "Biztonsági mentések mappája"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Backed-up originals"
 msgstr "Mentett eredetik"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "files"
 msgstr "fájl"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "one per optimized image"
 msgstr "optimalizált képenként egy"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Cleanup"
 msgstr "Takarítás"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Daily"
 msgstr "Naponta"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Never"
 msgstr "Soha"
 
-#: build/index.js:17 build/index.js:21
+#: build/index.js:19 build/index.js:23
 msgid "Media Library"
 msgstr "Médiatár"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid ""
 "Hover an optimized image and click \"Restore original\" — the original comes "
 "back and thumbnails are regenerated. A side-by-side Compare view is on the "
@@ -1027,11 +1093,11 @@ msgstr ""
 "újragenerálódnak. Az egymás melletti összehasonlító nézet a kép "
 "szerkesztőoldalán található."
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "WP-CLI"
 msgstr "WP-CLI"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid ""
 "wp lw-img restore 123 456 — restore any number of attachments from the "
 "command line."
@@ -1039,11 +1105,11 @@ msgstr ""
 "wp lw-img restore 123 456 — tetszőleges számú csatolmány visszaállítása "
 "parancssorból."
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Kept on uninstall"
 msgstr "Eltávolításkor megmarad"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid ""
 "Backups are never deleted when the plugin is removed — your originals stay "
 "safe in the uploads folder."
@@ -1051,31 +1117,27 @@ msgstr ""
 "A biztonsági mentések a bővítmény eltávolításakor sem törlődnek — az "
 "eredetik biztonságban maradnak a feltöltési mappában."
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "How to restore"
 msgstr "Visszaállítás módja"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "7 days"
 msgstr "7 nap"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "30 days"
 msgstr "30 nap"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "90 days"
 msgstr "90 nap"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "1 year"
 msgstr "1 év"
 
-#: build/index.js:17
-msgid "Forever"
-msgstr "Örökre"
-
-#: build/index.js:17
+#: build/index.js:19
 msgid ""
 "WebP — widest support. If the converted file would not be smaller than the "
 "original, the original is kept."
@@ -1083,7 +1145,7 @@ msgstr ""
 "WebP — a legszélesebb támogatottság. Ha a konvertált fájl nem lenne kisebb "
 "az eredetinél, az eredeti marad meg."
 
-#: build/index.js:17
+#: build/index.js:19
 msgid ""
 "AVIF — smaller files, modern browsers. If the converted file would not be "
 "smaller than the original, the original is kept."
@@ -1091,79 +1153,79 @@ msgstr ""
 "AVIF — kisebb fájlok, modern böngészőkhöz. Ha a konvertált fájl nem lenne "
 "kisebb az eredetinél, az eredeti marad meg."
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Lossless"
 msgstr "Veszteségmentes"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Lossless — pixel-perfect, larger files."
 msgstr "Veszteségmentes — pixelpontos, nagyobb fájlok."
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Normal"
 msgstr "Normál"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Normal — balanced quality and size."
 msgstr "Normál — kiegyensúlyozott minőség és méret."
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Aggressive"
 msgstr "Agresszív"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Aggressive — smaller files, slight compression may show."
 msgstr "Agresszív — kisebb fájlok, enyhe tömörítési nyomok előfordulhatnak."
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Ultra"
 msgstr "Ultra"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Ultra — maximum compression, visible on detailed images."
 msgstr "Ultra — maximális tömörítés, részletgazdag képeken látható."
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Gentle"
 msgstr "Kíméletes"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Gentle — lightest server load"
 msgstr "Kíméletes — a legkisebb szerverterhelés"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Fast"
 msgstr "Gyors"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Fast — highest server load"
 msgstr "Gyors — a legnagyobb szerverterhelés"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Skip entirely (never sent to the API)"
 msgstr "Teljes kihagyás (sosem kerül az API-hoz)"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Keep original dimensions"
 msgstr "Eredeti méretek megtartása"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Use optimization level…"
 msgstr "Optimalizálási szint használata…"
 
-#: build/index.js:17 build/index.js:68
+#: build/index.js:19 build/index.js:70
 msgid "Keep EXIF metadata"
 msgstr "EXIF-metaadatok megtartása"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "General tab"
 msgstr "Általános fül"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "see the fix on the Tester tab"
 msgstr "a javítást lásd a Tester fülön"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid ""
 "Cancel the run? Images converted so far stay converted; the rest waits for "
 "the next run."
@@ -1171,16 +1233,16 @@ msgstr ""
 "Megszakítod a futást? Az eddig konvertált képek konvertálva maradnak, a "
 "többi a következő futásra vár."
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Cancel run"
 msgstr "Futás megszakítása"
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Optimize all in background"
 msgstr "Összes optimalizálása a háttérben"
 
 #. translators: %s: number of failed images.
-#: build/index.js:18
+#: build/index.js:20
 msgid ""
 "Put all %s failed images back in the queue? They are processed by the next "
 "run."
@@ -1188,17 +1250,17 @@ msgstr ""
 "Mind a(z) %s sikertelen képet visszateszed a sorba? A következő futás "
 "dolgozza fel őket."
 
-#: build/index.js:18
+#: build/index.js:20
 msgid "Retry all"
 msgstr "Összes újrapróbálása"
 
 #. translators: %s: number of failed images.
-#: build/index.js:19
+#: build/index.js:21
 msgid "Retry %s failed"
 msgstr "%s sikertelen újrapróbálása"
 
 #. translators: %s: number of skipped images.
-#: build/index.js:20
+#: build/index.js:22
 msgid ""
 "Put all %s skipped images back in the queue? The next run checks them again "
 "against the current settings."
@@ -1206,58 +1268,58 @@ msgstr ""
 "Mind a(z) %s kihagyott képet visszateszed a sorba? A következő futás újra "
 "ellenőrzi őket a jelenlegi beállítások szerint."
 
-#: build/index.js:20
+#: build/index.js:22
 msgid "Re-scan all"
 msgstr "Összes újraellenőrzése"
 
 #. translators: %s: number of skipped images.
-#: build/index.js:21
+#: build/index.js:23
 msgid "Re-scan %s skipped"
 msgstr "%s kihagyott újraellenőrzése"
 
-#: build/index.js:21
+#: build/index.js:23
 msgid "Checking API key and redirects, counting images…"
 msgstr "API-kulcs és átirányítások ellenőrzése, képek számlálása…"
 
-#: build/index.js:21
+#: build/index.js:23
 msgid "Processing speed"
 msgstr "Feldolgozási sebesség"
 
-#: build/index.js:21 build/index.js:25
+#: build/index.js:23 build/index.js:27
 msgid "Pending"
 msgstr "Függőben"
 
-#: build/index.js:21
+#: build/index.js:23
 msgid "All-time totals, independent of the current run."
 msgstr "Összesített adatok, függetlenül a jelenlegi futástól."
 
-#: build/index.js:21
+#: build/index.js:23
 msgid "Show these images in the Media Library"
 msgstr "Ezen képek megjelenítése a Médiatárban"
 
-#: build/index.js:21
+#: build/index.js:23
 msgid "Skip reasons"
 msgstr "Kihagyás okai"
 
 #. translators: 1: skip reason, 2: number of images.
-#: build/index.js:22
+#: build/index.js:24
 msgid "%1$s · %2$s"
 msgstr "%1$s · %2$s"
 
 #. translators: 1: images optimized, 2: duration, 3: bytes saved, 4: percentage saved.
-#: build/index.js:23
+#: build/index.js:25
 msgid "Run finished — %1$s images optimized in %2$s, %3$s saved (−%4$s%%)."
 msgstr ""
 "A futás befejeződött — %1$s kép optimalizálva %2$s alatt, %3$s megtakarítás "
 "(−%4$s%%)."
 
 #. translators: %s: number of skipped images.
-#: build/index.js:24
+#: build/index.js:26
 msgid "See the %s skipped images in the Media Library"
 msgstr "A(z) %s kihagyott kép megtekintése a Médiatárban"
 
 #. translators: 1: images processed, 2: images in the run.
-#: build/index.js:25
+#: build/index.js:27
 msgid ""
 "Run cancelled — %1$s of %2$s images processed. Converted images stay "
 "converted; press Start to continue with the rest."
@@ -1265,23 +1327,23 @@ msgstr ""
 "Futás megszakítva — %2$s képből %1$s feldolgozva. A konvertált képek "
 "konvertálva maradnak; a többi folytatásához nyomd meg az Indítás gombot."
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Check the key on the General tab"
 msgstr "Ellenőrizd a kulcsot az Általános fülön"
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Manage your plan in the HelloImg dashboard"
 msgstr "Csomagod kezelése a HelloImg vezérlőpulton"
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "The run was stopped."
 msgstr "A futás leállt."
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Recent activity"
 msgstr "Legutóbbi tevékenység"
 
-#: build/index.js:25
+#: build/index.js:27
 msgid ""
 "Waiting for the first background tick… WP-Cron starts within a minute on "
 "most hosts."
@@ -1289,57 +1351,57 @@ msgstr ""
 "Várakozás az első háttérlépésre… A WP-Cron a legtöbb tárhelyen egy percen "
 "belül elindul."
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Ready"
 msgstr "Kész"
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Running"
 msgstr "Fut"
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Finished"
 msgstr "Befejeződött"
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Cancelled"
 msgstr "Megszakítva"
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Stopped"
 msgstr "Leállítva"
 
 #. translators: 1: images processed, 2: images in the run.
-#: build/index.js:27
+#: build/index.js:29
 msgid "%1$s / %2$s processed"
 msgstr "%1$s / %2$s feldolgozva"
 
-#: build/index.js:27
+#: build/index.js:29
 msgid "Bulk run progress"
 msgstr "Tömeges futás előrehaladása"
 
-#: build/index.js:27
+#: build/index.js:29
 msgid "Elapsed"
 msgstr "Eltelt idő"
 
-#: build/index.js:27
+#: build/index.js:29
 msgid "Speed"
 msgstr "Sebesség"
 
-#: build/index.js:27
+#: build/index.js:29
 msgid "Est. remaining"
 msgstr "Becsült hátralévő idő"
 
 #. translators: %s: estimated remaining time, e.g. "12m 30s".
-#: build/index.js:28
+#: build/index.js:30
 msgid "~%s"
 msgstr "~%s"
 
-#: build/index.js:28
+#: build/index.js:30
 msgid "Saved so far"
 msgstr "Eddigi megtakarítás"
 
-#: build/index.js:28
+#: build/index.js:30
 msgid ""
 "The background worker has not reported for a while. While this page is open "
 "it keeps the run moving; WP-CLI (wp lw-img optimize --all) is the reliable "
@@ -1349,67 +1411,67 @@ msgstr ""
 "futás folytatódik; forgalom nélküli oldalakon a WP-CLI (wp lw-img optimize --"
 "all) a megbízható megoldás."
 
-#: build/index.js:28
+#: build/index.js:30
 msgid "Now processing"
 msgstr "Feldolgozás alatt"
 
 #. translators: 1: max width, 2: max height (∞ = no limit).
-#: build/index.js:29
+#: build/index.js:31
 msgid "fit inside %1$s × %2$s px"
 msgstr "%1$s × %2$s px méretbe illesztve"
 
-#: build/index.js:29
+#: build/index.js:31
 msgid "original dimensions kept"
 msgstr "eredeti méretek megtartva"
 
-#: build/index.js:29
+#: build/index.js:31
 msgid "This run uses your Upload settings"
 msgstr "Ez a futás a Feltöltés fül beállításait használja"
 
-#: build/index.js:29 build/index.js:58
+#: build/index.js:31 build/index.js:60
 msgid "Level"
 msgstr "Szint"
 
-#: build/index.js:29
+#: build/index.js:31
 msgid "Output"
 msgstr "Kimenet"
 
-#: build/index.js:29
+#: build/index.js:31
 msgid "Resize"
 msgstr "Átméretezés"
 
-#: build/index.js:29 build/index.js:58
+#: build/index.js:31 build/index.js:60
 msgid "Pattern rules"
 msgstr "Mintaszabályok"
 
 #. translators: %s: number of pattern rules.
-#: build/index.js:30
+#: build/index.js:32
 msgid "%s rule"
 msgid_plural "%s rules"
 msgstr[0] "%s szabály"
 msgstr[1] "%s szabály"
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "EXIF"
 msgstr "EXIF"
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "kept"
 msgstr "megtartva"
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "removed"
 msgstr "eltávolítva"
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "on"
 msgstr "be"
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "off"
 msgstr "ki"
 
-#: build/index.js:30
+#: build/index.js:32
 msgid ""
 "Thumbnails are regenerated from the converted file after every conversion — "
 "no separate regeneration needed."
@@ -1417,158 +1479,153 @@ msgstr ""
 "A bélyegképek minden konvertálás után a konvertált fájlból generálódnak újra "
 "— külön újragenerálás nem szükséges."
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "Change on the Upload tab"
 msgstr "Módosítás a Feltöltés fülön"
 
 #. translators: 1: monthly image limit, 2: HelloImg dashboard host.
-#: build/index.js:31
+#: build/index.js:33
 msgid "%1$s images/month · manage your plan at %2$s"
 msgstr "%1$s kép/hó · csomagod kezelése: %2$s"
 
 #. translators: %s: HelloImg dashboard host.
-#: build/index.js:32
+#: build/index.js:34
 msgid "no monthly limit · manage your plan at %s"
 msgstr "nincs havi korlát · csomagod kezelése: %s"
 
 #. translators: %s: bytes saved through the API.
-#: build/index.js:33
+#: build/index.js:35
 msgid "%s saved via the API"
 msgstr "%s megtakarítás az API-n keresztül"
 
 #. translators: 1: number of images, 2: domain.
-#: build/index.js:34
+#: build/index.js:36
 msgid "%1$s from %2$s"
 msgstr "%1$s innen: %2$s"
 
-#: build/index.js:34
+#: build/index.js:36
 msgid "Plan"
 msgstr "Csomag"
 
-#: build/index.js:34
+#: build/index.js:36
 msgid "This month"
 msgstr "Ebben a hónapban"
 
-#: build/index.js:34
+#: build/index.js:36
 msgid "Optimized on this site"
 msgstr "Ezen az oldalon optimalizálva"
 
 #. translators: %s: bytes saved on this site.
-#: build/index.js:35
+#: build/index.js:37
 msgid "%s saved"
 msgstr "%s megtakarítás"
 
-#: build/index.js:35 build/index.js:36
+#: build/index.js:37 build/index.js:38
 msgid "API key"
 msgstr "API-kulcs"
 
-#. translators: %s: PHP constant name.
-#: build/index.js:36
-msgid "Set in wp-config.php (%s)"
-msgstr "A wp-config.php-ban beállítva (%s)"
-
-#: build/index.js:36
+#: build/index.js:38
 msgid "No key saved yet."
 msgstr "Még nincs mentett kulcs."
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "The saved key will be removed when you save."
 msgstr "A mentett kulcs mentéskor törlődik."
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Saved key: <hint />"
 msgstr "Mentett kulcs: <hint />"
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Stored in wp_options and never shown again after saving."
 msgstr "A wp_options táblában tárolódik, mentés után többé nem jelenik meg."
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "HelloImg API key"
 msgstr "HelloImg API-kulcs"
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Paste a new key to replace it"
 msgstr "Illessz be egy új kulcsot a cseréhez"
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Hide key"
 msgstr "Kulcs elrejtése"
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Show key"
 msgstr "Kulcs megjelenítése"
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Remove key"
 msgstr "Kulcs eltávolítása"
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Keep the key"
 msgstr "Kulcs megtartása"
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "New uploads are converted automatically."
 msgstr "Az új feltöltések automatikusan konvertálódnak."
 
-#: build/index.js:36
+#: build/index.js:38
 msgid ""
 "New uploads are converted automatically. The key is stored in wp_options."
 msgstr ""
 "Az új feltöltések automatikusan konvertálódnak. A kulcs a wp_options "
 "táblában tárolódik."
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Error"
 msgstr "Hiba"
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Checking…"
 msgstr "Ellenőrzés…"
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Not connected"
 msgstr "Nincs csatlakoztatva"
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Paste an API key to enable conversion. Free tier: 1,000 images / month."
 msgstr ""
 "A konvertálás bekapcsolásához illessz be egy API-kulcsot. Ingyenes csomag: "
 "1000 kép / hó."
 
 #. translators: %s: HelloImg plan name.
-#: build/index.js:37
+#: build/index.js:39
 msgid "Connection test passed — the API key works (plan: %s)."
 msgstr "A kapcsolatteszt sikeres — az API-kulcs működik (csomag: %s)."
 
-#: build/index.js:37
+#: build/index.js:39
 msgid "Connection test passed — the API key works."
 msgstr "A kapcsolatteszt sikeres — az API-kulcs működik."
 
 #. translators: %s: error message.
-#: build/index.js:38
+#: build/index.js:40
 msgid "Connection test failed: %s"
 msgstr "A kapcsolatteszt sikertelen: %s"
 
-#: build/index.js:38
+#: build/index.js:40
 msgid "Save and test"
 msgstr "Mentés és tesztelés"
 
-#: build/index.js:38
+#: build/index.js:40
 msgid "Test connection"
 msgstr "Kapcsolat tesztelése"
 
 #. translators: %s: HelloImg dashboard host name.
-#: build/index.js:39
+#: build/index.js:41
 msgid "Get your API key at %s"
 msgstr "API-kulcsot itt szerezhetsz: %s"
 
-#: build/index.js:39
+#: build/index.js:41
 msgid "Full environment checks on the Tester tab"
 msgstr "Teljes környezetellenőrzés a Tester fülön"
 
 #. translators: 1: domain the key belongs to, 2: this site's host, 3: HelloImg dashboard host.
-#: build/index.js:40
+#: build/index.js:42
 msgid ""
 "This API key belongs to %1$s, but this site is %2$s. The API refuses "
 "requests from other sites — create a key for this site at %3$s."
@@ -1577,46 +1634,46 @@ msgstr ""
 "API elutasítja más oldalak kéréseit — hozz létre kulcsot ehhez az oldalhoz "
 "itt: %3$s."
 
-#: build/index.js:40
+#: build/index.js:42
 msgid "forever"
 msgstr "örökre"
 
 #. translators: %s: optimization level name.
-#: build/index.js:41
+#: build/index.js:43
 msgid "%s level"
 msgstr "%s szint"
 
-#: build/index.js:41
+#: build/index.js:43
 msgid "EXIF kept"
 msgstr "EXIF megtartva"
 
-#: build/index.js:41
+#: build/index.js:43
 msgid "EXIF stripped"
 msgstr "EXIF eltávolítva"
 
 #. translators: %s: retention, e.g. "30 days" or "forever".
-#: build/index.js:42
+#: build/index.js:44
 msgid "backups on · %s"
 msgstr "biztonsági mentés be · %s"
 
-#: build/index.js:42
+#: build/index.js:44
 msgid "backups off"
 msgstr "biztonsági mentés ki"
 
 #. translators: %s: bulk speed name.
-#: build/index.js:43
+#: build/index.js:45
 msgid "bulk speed: %s"
 msgstr "tömeges sebesség: %s"
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "New uploads:"
 msgstr "Új feltöltések:"
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Add your API key"
 msgstr "Add meg az API-kulcsot"
 
-#: build/index.js:43
+#: build/index.js:45
 msgid ""
 "Grab your key from the HelloImg dashboard and paste it here — Test "
 "connection verifies it instantly."
@@ -1624,11 +1681,11 @@ msgstr ""
 "Másold ki a kulcsot a HelloImg vezérlőpultjáról, és illeszd be ide — a "
 "Kapcsolat tesztelése azonnal ellenőrzi."
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Upload as usual"
 msgstr "Tölts fel a megszokott módon"
 
-#: build/index.js:43
+#: build/index.js:45
 msgid ""
 "New JPEG / PNG / HEIC / TIFF / BMP / GIF uploads become WebP automatically — "
 "originals are backed up first, and nothing ever fails because of LW Img."
@@ -1637,11 +1694,11 @@ msgstr ""
 "válnak — előtte biztonsági mentés készül az eredetiről, és az LW Img miatt "
 "soha semmi nem hiúsul meg."
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Optimize the existing library"
 msgstr "A meglévő médiatár optimalizálása"
 
-#: build/index.js:43
+#: build/index.js:45
 msgid ""
 "The Bulk tab converts everything already in the Media Library, in the "
 "background. The Tester tab checks your server first."
@@ -1649,11 +1706,11 @@ msgstr ""
 "A Bulk fül a háttérben konvertál mindent, ami már a Médiatárban van. A "
 "Tester fül előbb ellenőrzi a szervert."
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Getting started"
 msgstr "Első lépések"
 
-#: build/index.js:43
+#: build/index.js:45
 msgid ""
 "Everything is reversible: originals live in uploads/lw-img-backups/ and can "
 "be restored per image from the Media Library."
@@ -1661,50 +1718,50 @@ msgstr ""
 "Minden visszafordítható: az eredetik az uploads/lw-img-backups/ mappában "
 "vannak, és képenként visszaállíthatók a Médiatárból."
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Converted"
 msgstr "Konvertálva"
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Restored"
 msgstr "Visszaállítva"
 
 #. translators: %s: percentage saved.
-#: build/index.js:44 build/index.js:64 build/index.js:68
+#: build/index.js:46 build/index.js:66 build/index.js:70
 msgid "−%s%%"
 msgstr "−%s%%"
 
-#: build/index.js:44
+#: build/index.js:46
 msgid "original restored from backup"
 msgstr "eredeti visszaállítva a biztonsági mentésből"
 
 #. translators: 1: skip reason, 2: original size, 3: converted size.
-#: build/index.js:45
+#: build/index.js:47
 msgid "%1$s — %2$s original, converted would be %3$s"
 msgstr "%1$s — eredeti: %2$s, konvertálva: %3$s lenne"
 
 #. translators: 1: event type, 2: number of events.
-#: build/index.js:46
+#: build/index.js:48
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Events"
 msgstr "Események"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Refresh"
 msgstr "Frissítés"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Clear all log entries?"
 msgstr "Törlöd az összes naplóbejegyzést?"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Clear log"
 msgstr "Napló törlése"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid ""
 "Logging is off, so no new events are recorded. Turn on \"Logging enabled\" "
 "above and save."
@@ -1712,128 +1769,128 @@ msgstr ""
 "A naplózás ki van kapcsolva, így új események nem kerülnek rögzítésre. "
 "Kapcsold be fent a „Naplózás bekapcsolva” opciót, és ments."
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Time"
 msgstr "Idő"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Event"
 msgstr "Esemény"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "File"
 msgstr "Fájl"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Details"
 msgstr "Részletek"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Event log"
 msgstr "Eseménynapló"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Search"
 msgstr "Keresés"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Filter"
 msgstr "Szűrő"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Clear"
 msgstr "Törlés"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Clear all filters"
 msgstr "Összes szűrő törlése"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "All"
 msgstr "Mind"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "No entries match these filters."
 msgstr "Egy bejegyzés sem felel meg ezeknek a szűrőknek."
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Nothing here yet."
 msgstr "Itt még nincs semmi."
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Previous page"
 msgstr "Előző oldal"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Next page"
 msgstr "Következő oldal"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Rows per page"
 msgstr "Sorok oldalanként"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Select all rows on this page"
 msgstr "Az oldal összes sorának kijelölése"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Clear selection"
 msgstr "Kijelölés törlése"
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Bulk actions"
 msgstr "Csoportos műveletek"
 
 #. translators: %d: number of rows.
-#: build/index.js:46
+#: build/index.js:48
 msgid "%d entry"
 msgid_plural "%d entries"
 msgstr[0] "%d bejegyzés"
 msgstr[1] "%d bejegyzés"
 
 #. translators: %d: number of results.
-#: build/index.js:46
+#: build/index.js:48
 msgid "%d result"
 msgid_plural "%d results"
 msgstr[0] "%d találat"
 msgstr[1] "%d találat"
 
 #. translators: 1: current page, 2: total pages.
-#: build/index.js:46
+#: build/index.js:48
 msgid "Page %1$d of %2$d"
 msgstr "%1$d. oldal / %2$d"
 
 #. translators: %s: row name.
-#: build/index.js:46
+#: build/index.js:48
 msgid "Select: %s"
 msgstr "Kijelölés: %s"
 
 #. translators: %d: number of selected rows.
-#: build/index.js:47
+#: build/index.js:49
 msgid "%d selected"
 msgid_plural "%d selected"
 msgstr[0] "%d kijelölve"
 msgstr[1] "%d kijelölve"
 
 #. translators: 1: selected rows, 2: of those, on this page.
-#: build/index.js:48
+#: build/index.js:50
 msgid "%1$d selected, %2$d on this page"
 msgstr "%1$d kijelölve, ebből %2$d ezen az oldalon"
 
 #. translators: 1: rows the action applies to, 2: selected rows on this page.
-#: build/index.js:48
+#: build/index.js:50
 msgid "applies to %1$d of %2$d"
 msgstr "%2$d közül %1$d elemre vonatkozik"
 
-#: build/index.js:48
+#: build/index.js:50
 msgid "Filter by filename…"
 msgstr "Szűrés fájlnév szerint…"
 
-#: build/index.js:48
+#: build/index.js:50
 msgid "No matching events"
 msgstr "Nincs egyező esemény"
 
-#: build/index.js:48
+#: build/index.js:50
 msgid ""
 "No events yet. Upload an image or run a bulk optimization — every "
 "conversion, skip, and failure lands here with its reason."
@@ -1843,37 +1900,37 @@ msgstr ""
 "okával együtt."
 
 #. translators: %s: relative time, e.g. "3 days ago".
-#: build/index.js:49
+#: build/index.js:51
 msgid "Scanned %s — never runs on its own."
 msgstr "Utolsó ellenőrzés: %s — magától sosem fut."
 
-#: build/index.js:49
+#: build/index.js:51
 msgid "Not scanned yet."
 msgstr "Még nincs ellenőrizve."
 
-#: build/index.js:49
+#: build/index.js:51
 msgid "Scan again"
 msgstr "Újraellenőrzés"
 
-#: build/index.js:49
+#: build/index.js:51
 msgid "Leftovers from other optimizers"
 msgstr "Más optimalizálók maradványai"
 
-#: build/index.js:49
+#: build/index.js:51
 msgid "No leftovers found"
 msgstr "Nem található maradvány"
 
 #. translators: %s: comma-separated list of other optimizer plugins.
-#: build/index.js:50
+#: build/index.js:52
 msgid "Checked %s — nothing of theirs is taking up space."
 msgstr "Ellenőrizve: %s — egyikük sem foglal helyet."
 
 #. translators: %s: size, e.g. "1.2 GB".
-#: build/index.js:51
+#: build/index.js:53
 msgid "at least %s"
 msgstr "legalább %s"
 
-#: build/index.js:51
+#: build/index.js:53
 msgid ""
 "of originals from optimizers you no longer use — <b>safe to delete</b> once "
 "you are sure you will not restore them."
@@ -1882,20 +1939,20 @@ msgstr ""
 "<b>nyugodtan törölhető</b>, ha biztos vagy benne, hogy nem akarod "
 "visszaállítani őket."
 
-#: build/index.js:51
+#: build/index.js:53
 msgid "beside each image"
 msgstr "az egyes képek mellett"
 
-#: build/index.js:51
+#: build/index.js:53
 msgid "backup folder"
 msgstr "biztonsági mentések mappája"
 
 #. translators: %s: number of files.
-#: build/index.js:52
+#: build/index.js:54
 msgid "%s files"
 msgstr "%s fájl"
 
-#: build/index.js:52
+#: build/index.js:54
 msgid ""
 "The scan stopped early on this very large uploads folder, so the real total "
 "is higher than shown."
@@ -1903,7 +1960,7 @@ msgstr ""
 "Az ellenőrzés idő előtt leállt ennél a nagyon nagy feltöltési mappánál, "
 "ezért a valós összeg nagyobb a látottnál."
 
-#: build/index.js:52
+#: build/index.js:54
 msgid ""
 "LW Image never touches these files: it only measures them. To reclaim the "
 "space, delete the folder or the files with your file manager, over SFTP, or "
@@ -1913,24 +1970,24 @@ msgstr ""
 "felszabadításához töröld a mappát vagy a fájlokat fájlkezelővel, SFTP-n, "
 "vagy az adott bővítmény saját beállításaiból, ha még telepítve van."
 
-#: build/index.js:52
+#: build/index.js:54
 msgid "OK"
 msgstr "OK"
 
-#: build/index.js:52
+#: build/index.js:54
 msgid "Warning"
 msgstr "Figyelmeztetés"
 
-#: build/index.js:52
+#: build/index.js:54
 msgid "Critical"
 msgstr "Kritikus"
 
-#: build/index.js:52
+#: build/index.js:54
 msgid "Info"
 msgstr "Infó"
 
 #. translators: %d: number of issues.
-#: build/index.js:53
+#: build/index.js:55
 msgid "%d issue"
 msgid_plural "%d issues"
 msgstr[0] "%d probléma"
@@ -1938,90 +1995,90 @@ msgstr[1] "%d probléma"
 
 #. translators: %d: number of warnings.
 #. translators: %d: count.
-#: build/index.js:54 build/index.js:57 build/index.js:58
+#: build/index.js:56 build/index.js:59 build/index.js:60
 msgid "%d warning"
 msgid_plural "%d warnings"
 msgstr[0] "%d figyelmeztetés"
 msgstr[1] "%d figyelmeztetés"
 
-#: build/index.js:54
+#: build/index.js:56
 msgid "Copied"
 msgstr "Másolva"
 
-#: build/index.js:54
+#: build/index.js:56
 msgid "Copy"
 msgstr "Másolás"
 
-#: build/index.js:54
+#: build/index.js:56
 msgid "Needs attention"
 msgstr "Beavatkozást igényel"
 
 #. translators: 1: critical issues, 2: warnings.
-#: build/index.js:55
+#: build/index.js:57
 msgid "%1$s, %2$s"
 msgstr "%1$s, %2$s"
 
 #. translators: %d: number of critical issues.
-#: build/index.js:56
+#: build/index.js:58
 msgid "%d critical issue"
 msgid_plural "%d critical issues"
 msgstr[0] "%d kritikus probléma"
 msgstr[1] "%d kritikus probléma"
 
 #. translators: %d: number of warnings.
-#: build/index.js:58
+#: build/index.js:60
 msgid "%d warning found"
 msgid_plural "%d warnings found"
 msgstr[0] "%d figyelmeztetés található"
 msgstr[1] "%d figyelmeztetés található"
 
-#: build/index.js:58
+#: build/index.js:60
 msgid "All checks passed — ready for bulk optimization"
 msgstr "Minden ellenőrzés sikeres — készen áll a tömeges optimalizálásra"
 
 #. translators: %d: count.
-#: build/index.js:58
+#: build/index.js:60
 msgid "%d critical"
 msgid_plural "%d critical"
 msgstr[0] "%d kritikus"
 msgstr[1] "%d kritikus"
 
 #. translators: %d: count.
-#: build/index.js:58
+#: build/index.js:60
 msgid "%d OK"
 msgstr "%d OK"
 
 #. translators: %d: count.
-#: build/index.js:58
+#: build/index.js:60
 msgid "%d info"
 msgstr "%d infó"
 
-#: build/index.js:58
+#: build/index.js:60
 msgid "Pattern"
 msgstr "Minta"
 
-#: build/index.js:58
+#: build/index.js:60
 msgid "Action"
 msgstr "Művelet"
 
-#: build/index.js:58
+#: build/index.js:60
 msgid "Remove rule"
 msgstr "Szabály eltávolítása"
 
-#: build/index.js:58
+#: build/index.js:60
 msgid "Add rule"
 msgstr "Szabály hozzáadása"
 
 #. translators: %d: maximum number of pattern rules.
-#: build/index.js:59
+#: build/index.js:61
 msgid "At most %d rules."
 msgstr "Legfeljebb %d szabály."
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "Examples:"
 msgstr "Példák:"
 
-#: build/index.js:59
+#: build/index.js:61
 msgid ""
 "* matches anything. A pattern without / matches the file name; with / it "
 "matches anywhere in the path. Every matching rule applies to uploads and "
@@ -2036,11 +2093,11 @@ msgstr ""
 "többinél; ha két szint-szabály illeszkedik, a listában előbb szereplő "
 "érvényesül."
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "Smart crop"
 msgstr "Intelligens vágás"
 
-#: build/index.js:59
+#: build/index.js:61
 msgid ""
 "Smart crop runs only on converted uploads — turn on Auto-convert uploads to "
 "use it. The command line (wp lw-img smartcrop) works either way."
@@ -2049,11 +2106,11 @@ msgstr ""
 "kapcsold be a Feltöltések automatikus konvertálása opciót. A parancssor (wp "
 "lw-img smartcrop) mindkét esetben működik."
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "Smart-crop thumbnails"
 msgstr "Bélyegképek intelligens vágása"
 
-#: build/index.js:59
+#: build/index.js:61
 msgid ""
 "Re-crop the selected thumbnail sizes around the subject instead of the "
 "centre. Each selected size costs one extra API call per upload. Runs in the "
@@ -2066,11 +2123,11 @@ msgstr ""
 "használó oldalakon a vágott bélyegképek a cron-intervallumon belül jelennek "
 "meg."
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "Thumbnail sizes"
 msgstr "Bélyegképméretek"
 
-#: build/index.js:59
+#: build/index.js:61
 msgid ""
 "No hard-cropped thumbnail sizes are registered on this site — smart crop has "
 "nothing to work on. Sizes that scale (keep the aspect ratio) never need it."
@@ -2080,45 +2137,45 @@ msgstr ""
 "megtartó) méreteknek sosem kell."
 
 #. translators: 1: image size name, 2: width, 3: height.
-#: build/index.js:60
+#: build/index.js:62
 msgid "%1$s %2$s × %3$s"
 msgstr "%1$s %2$s × %3$s"
 
 #. translators: %s: image size name.
-#: build/index.js:61
+#: build/index.js:63
 msgid "%s (not registered on this site)"
 msgstr "%s (ezen az oldalon nincs regisztrálva)"
 
-#: build/index.js:61
+#: build/index.js:63
 msgid "Select all"
 msgstr "Összes kijelölése"
 
-#: build/index.js:61
+#: build/index.js:63
 msgid "Select none"
 msgstr "Kijelölés megszüntetése"
 
 #. translators: 1: selected sizes, 2: API calls per upload (1 + selected).
-#: build/index.js:62
+#: build/index.js:64
 msgid "Cost per upload: 1 + %1$s = %2$s API calls."
 msgstr "Költség feltöltésenként: 1 + %1$s = %2$s API-hívás."
 
-#: build/index.js:62
+#: build/index.js:64
 msgid "Account"
 msgstr "Fiók"
 
-#: build/index.js:62
+#: build/index.js:64
 msgid "Current defaults"
 msgstr "Jelenlegi alapértékek"
 
-#: build/index.js:62
+#: build/index.js:64
 msgid "Advanced"
 msgstr "Speciális"
 
-#: build/index.js:62
+#: build/index.js:64
 msgid "Request timeout (s)"
 msgstr "Kérés időkorlátja (mp)"
 
-#: build/index.js:62
+#: build/index.js:64
 msgid ""
 "How long to wait for the API per image. Slow jobs past the API's own 30 s "
 "window are polled automatically before giving up."
@@ -2126,28 +2183,28 @@ msgstr ""
 "Mennyi ideig várjon képenként az API-ra. Az API saját 30 mp-es ablakán "
 "túlnyúló lassú feladatokat feladás előtt automatikusan lekérdezi."
 
-#: build/index.js:62
+#: build/index.js:64
 msgid "seconds"
 msgstr "másodperc"
 
 #. translators: %s: relative time, e.g. "12 minutes ago".
-#: build/index.js:63
+#: build/index.js:65
 msgid "Updated %s, refreshes hourly on its own."
 msgstr "Frissítve: %s, óránként magától frissül."
 
-#: build/index.js:63
+#: build/index.js:65
 msgid "Refresh figures"
 msgstr "Adatok frissítése"
 
-#: build/index.js:63
+#: build/index.js:65
 msgid "What optimization has saved on this site so far."
 msgstr "Mennyit takarított meg eddig az optimalizálás ezen az oldalon."
 
-#: build/index.js:63
+#: build/index.js:65
 msgid "No optimized images yet"
 msgstr "Még nincs optimalizált kép"
 
-#: build/index.js:63
+#: build/index.js:65
 msgid ""
 "Stats appear here after the first conversion. New uploads convert "
 "automatically — for everything already in the Media Library, run a bulk "
@@ -2157,98 +2214,94 @@ msgstr ""
 "automatikusan konvertálódnak — a Médiatárban már meglévő képekhez indíts "
 "tömeges optimalizálást."
 
-#: build/index.js:63
+#: build/index.js:65
 msgid "Open the Bulk tab"
 msgstr "A Bulk fül megnyitása"
 
-#: build/index.js:63
+#: build/index.js:65
 msgid "saved"
 msgstr "megtakarítás"
 
-#: build/index.js:64
+#: build/index.js:66
 msgid "After:"
 msgstr "Utána:"
 
-#: build/index.js:64
+#: build/index.js:66
 msgid "Before:"
 msgstr "Előtte:"
 
-#: build/index.js:64
+#: build/index.js:66
 msgid "Optimized images"
 msgstr "Optimalizált képek"
 
 #. translators: %s: share of the Media Library.
-#: build/index.js:65
+#: build/index.js:67
 msgid "%s%% of the Media Library"
 msgstr "a Médiatár %s%%-a"
 
-#: build/index.js:65
+#: build/index.js:67
 msgid "optimize the rest"
 msgstr "a többi optimalizálása"
 
-#: build/index.js:65
+#: build/index.js:67
 msgid "Average saving"
 msgstr "Átlagos megtakarítás"
 
-#: build/index.js:65
+#: build/index.js:67
 msgid "image"
 msgstr "kép"
 
-#: build/index.js:65
+#: build/index.js:67
 msgid "across all optimized images"
 msgstr "az összes optimalizált képre vetítve"
 
 #. translators: 1: number of files, 2: retention ("kept forever" or "30-day retention").
-#: build/index.js:66
+#: build/index.js:68
 msgid "%1$s files · %2$s"
 msgstr "%1$s fájl · %2$s"
 
 #. translators: %d: number of days.
-#: build/index.js:67
+#: build/index.js:69
 msgid "%d-day retention"
 msgstr "%d napos megőrzés"
 
-#: build/index.js:67
+#: build/index.js:69
 msgid "kept forever"
 msgstr "örökre megőrizve"
 
-#: build/index.js:67
+#: build/index.js:69
 msgid "Biggest wins"
 msgstr "Legnagyobb nyereségek"
 
-#: build/index.js:67
+#: build/index.js:69
 msgid "to"
 msgstr "helyett most:"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "What happens to every new image upload."
 msgstr "Mi történik minden új képfeltöltéssel."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Auto-convert uploads"
 msgstr "Feltöltések automatikus konvertálása"
 
-#: build/index.js:68
-msgid "On"
-msgstr "Be"
-
-#: build/index.js:68
+#: build/index.js:70
 msgid "Off — uploads are left untouched"
 msgstr "Ki — a feltöltések érintetlenek maradnak"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Convert"
 msgstr "Konvertálás"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Back up original"
 msgstr "Eredeti mentése"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Thumbnails"
 msgstr "Bélyegképek"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid ""
 "New uploads are left untouched. The settings below still apply to bulk runs "
 "and to \"Optimize now\" in the Media Library, and old-URL redirects keep "
@@ -2258,19 +2311,19 @@ msgstr ""
 "érvényesek a tömeges futásokra és a Médiatár „Optimalizálás most” "
 "műveletére, a régi URL-ek átirányítása pedig továbbra is működik."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Conversion"
 msgstr "Konvertálás"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Output format"
 msgstr "Kimeneti formátum"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Optimization level"
 msgstr "Optimalizálási szint"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid ""
 "Camera info, GPS, copyright. Off by default — smaller files and removes "
 "potentially sensitive data."
@@ -2278,15 +2331,15 @@ msgstr ""
 "Kamerainformációk, GPS, szerzői jog. Alapértelmezetten ki — kisebb fájlok, "
 "és eltávolítja a potenciálisan érzékeny adatokat."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Size limits"
 msgstr "Méretkorlátok"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Resize large images"
 msgstr "Nagy képek átméretezése"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid ""
 "Images are scaled down proportionally to fit; small images are never "
 "upscaled. 0 = no limit."
@@ -2294,23 +2347,23 @@ msgstr ""
 "A képek arányosan kicsinyítve illeszkednek; a kis képek sosem lesznek "
 "felnagyítva. 0 = nincs korlát."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Maximum width in pixels"
 msgstr "Maximális szélesség pixelben"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Maximum height in pixels"
 msgstr "Maximális magasság pixelben"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "px"
 msgstr "px"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "File size range"
 msgstr "Fájlméret-tartomány"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid ""
 "Files outside the range are skipped (original kept). Tiny files rarely "
 "benefit; the API rejects images over 10 MB."
@@ -2318,39 +2371,39 @@ msgstr ""
 "A tartományon kívüli fájlok kimaradnak (az eredeti megmarad). Az apró fájlok "
 "ritkán nyernek vele; az API a 10 MB feletti képeket elutasítja."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Minimum file size in kilobytes"
 msgstr "Minimális fájlméret kilobájtban"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "KB min"
 msgstr "KB min."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Maximum file size in megabytes"
 msgstr "Maximális fájlméret megabájtban"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "MB max"
 msgstr "MB max."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Skip & exclude"
 msgstr "Kihagyás és kizárás"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Skip already-WebP / AVIF uploads"
 msgstr "Már WebP / AVIF feltöltések kihagyása"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Recommended — no API call, no credit usage."
 msgstr "Ajánlott — nincs API-hívás, nincs kreditfelhasználás."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Skip animated GIFs"
 msgstr "Animált GIF-ek kihagyása"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid ""
 "Off by default: animated GIFs become animated WebP with frames and timing "
 "preserved. If the WebP would be larger, the original is kept automatically."
@@ -2359,15 +2412,15 @@ msgstr ""
 "az időzítés megmarad. Ha a WebP nagyobb lenne, automatikusan az eredeti "
 "marad meg."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "After conversion"
 msgstr "Konvertálás után"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Redirect old image URLs to the converted file"
 msgstr "Régi kép-URL-ek átirányítása a konvertált fájlra"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid ""
 "Recommended. Nothing is stored: when a request for photo.jpg 404s, the "
 "plugin matches the path to its converted attachment and answers with a 301 "
@@ -2380,11 +2433,11 @@ msgstr ""
 "keresési találatok továbbra is működnek. A Tester fül ellenőrzi, hogy a "
 "szerver átengedi-e ezeket a kéréseket."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Bulk optimize"
 msgstr "Tömeges optimalizálás"
 
-#: build/index.js:68
+#: build/index.js:70
 msgid ""
 "Runs in the background — you can close this tab. References to converted "
 "files in post content and page-builder data are rewritten automatically."
@@ -2393,12 +2446,12 @@ msgstr ""
 "hivatkozások a bejegyzések tartalmában és az oldalépítők adataiban "
 "automatikusan frissülnek."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "The last status update failed; retrying in a few seconds."
 msgstr ""
 "Az utolsó állapotfrissítés sikertelen; néhány másodperc múlva újrapróbáljuk."
 
-#: build/index.js:68
+#: build/index.js:70
 msgid ""
 "WP-Cron only runs while the site receives traffic. For very large libraries "
 "the command line is the guaranteed path:"
@@ -2406,64 +2459,11 @@ msgstr ""
 "A WP-Cron csak akkor fut, ha az oldal forgalmat kap. Nagyon nagy médiatárnál "
 "a parancssor a biztos megoldás:"
 
-#: build/index.js:68
-msgid "Every conversion keeps the original, so nothing is ever lost."
-msgstr "Minden konvertálás megőrzi az eredetit, így soha semmi nem vész el."
-
-#: build/index.js:68
-msgid "Back up originals"
-msgstr "Eredetik mentése"
-
-#: build/index.js:68
-msgid "On — every conversion is reversible"
-msgstr "Be — minden konvertálás visszafordítható"
-
-#: build/index.js:68
-msgid "Off — conversions cannot be undone"
-msgstr "Ki — a konvertálások nem vonhatók vissza"
-
-#: build/index.js:68
-msgid "Original saved"
-msgstr "Eredeti mentve"
-
-#: build/index.js:68
-msgid "Restorable any time"
-msgstr "Bármikor visszaállítható"
-
-#. translators: %d: number of days.
-#: build/index.js:69
-msgid "Cleaned up after %d days"
-msgstr "%d nap után törlődik"
-
-#: build/index.js:69
-msgid "Kept forever"
-msgstr "Örökre megőrizve"
-
-#: build/index.js:69
-msgid "Originals are deleted after conversion"
-msgstr "Az eredetik konvertálás után törlődnek"
-
-#: build/index.js:69
-msgid ""
-"With backups off there is no way to restore an image once it has been "
-"converted — Restore original disappears from the Media Library, and re-"
-"optimizing at another level becomes impossible. Existing backups are kept "
-"and still restorable."
-msgstr ""
-"Kikapcsolt biztonsági mentéssel egy kép konvertálása után nincs mód a "
-"visszaállításra — az „Eredeti visszaállítása” eltűnik a Médiatárból, és a "
-"másik szinten történő újraoptimalizálás sem lehetséges. A meglévő biztonsági "
-"mentések megmaradnak és továbbra is visszaállíthatók."
-
-#: build/index.js:69
-msgid "Retention"
-msgstr "Megőrzés"
-
-#: build/index.js:69
+#: build/index.js:70
 msgid "Keep backups for"
 msgstr "Biztonsági mentések megőrzése"
 
-#: build/index.js:69
+#: build/index.js:70
 msgid ""
 "Backups older than this are deleted by a daily cleanup task. Forever keeps "
 "everything — watch the folder size on large sites."
@@ -2471,27 +2471,27 @@ msgstr ""
 "Az ennél régebbi biztonsági mentéseket egy napi takarító feladat törli. Az "
 "„Örökre” mindent megtart — nagy oldalakon figyeld a mappa méretét."
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "or"
 msgstr "vagy"
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "Backup retention in days"
 msgstr "Biztonsági mentések megőrzése napokban"
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "days"
 msgstr "nap"
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "On uninstall"
 msgstr "Eltávolításkor"
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "Delete all LW Image data when the plugin is deleted"
 msgstr "Az összes LW Image-adat törlése a bővítmény törlésekor"
 
-#: build/index.js:69
+#: build/index.js:70
 msgid ""
 "Off (default): settings, API key, pattern rules, event log and per-image "
 "statistics survive a delete and reinstall. On: they are removed on "
@@ -2504,11 +2504,11 @@ msgstr ""
 "mindkét esetben megmaradnak. A Bővítmények oldal Kikapcsolás linkje ugyanezt "
 "kérdezi."
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "Running environment checks…"
 msgstr "Környezetellenőrzés folyamatban…"
 
-#: build/index.js:69
+#: build/index.js:70
 msgid ""
 "Environment checks — hosting problems surface here before a bulk run trips "
 "over them."
@@ -2516,20 +2516,20 @@ msgstr ""
 "Környezetellenőrzés — a tárhelyproblémák itt derülnek ki, mielőtt egy "
 "tömeges futás elakadna rajtuk."
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "Run tests again"
 msgstr "Tesztek újrafuttatása"
 
 #. translators: %s: relative time, e.g. "3 minutes ago".
-#: build/index.js:70
+#: build/index.js:71
 msgid "last run %s · cached for 10 minutes"
 msgstr "utolsó futás: %s · 10 percig gyorsítótárazva"
 
-#: build/index.js:70
+#: build/index.js:71
 msgid "All checks"
 msgstr "Összes ellenőrzés"
 
-#: build/index.js:70
+#: build/index.js:71
 msgid ""
 "The last 200 events — uploads, bulk runs, Media Library actions and "
 "restores: what converted, what was skipped, and why."
@@ -2537,10 +2537,10 @@ msgstr ""
 "Az utolsó 200 esemény — feltöltések, tömeges futások, Médiatár-műveletek és "
 "visszaállítások: mi konvertálódott, mi maradt ki, és miért."
 
-#: build/index.js:70
+#: build/index.js:71
 msgid "Logging enabled"
 msgstr "Naplózás bekapcsolva"
 
-#: build/index.js:70
+#: build/index.js:71
 msgid "existing entries remain until cleared"
 msgstr "a meglévő bejegyzések törlésig megmaradnak"

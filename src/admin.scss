@@ -1885,3 +1885,99 @@ a.lw-img-libtile {
 		font-size: 12px;
 	}
 }
+
+// Backup state bar + facts (Backup tab).
+.lw-img-backup {
+	&__bar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: $gap-lg;
+		padding: 18px 20px;
+	}
+
+	&__icon {
+		display: grid;
+		flex: none;
+		place-items: center;
+		width: 48px;
+		height: 48px;
+		border-radius: 12px;
+		background: $brand;
+		color: #fff;
+
+		svg {
+			fill: currentColor;
+		}
+	}
+
+	&__text {
+		display: flex;
+		flex: 1 1 280px;
+		flex-direction: column;
+		gap: 2px;
+
+		strong {
+			font-size: 15px;
+		}
+
+		span {
+			color: $muted;
+			font-size: 13px;
+		}
+	}
+
+	.components-toggle-control {
+		margin: 0;
+	}
+
+	&__facts {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 1px;
+		margin: 0;
+		border-top: 1px solid $stroke;
+		background: $stroke;
+	}
+
+	&__fact {
+		padding: 12px 20px;
+		background: $surface;
+
+		dt {
+			color: $muted;
+			font-size: 11.5px;
+			letter-spacing: 0.05em;
+			text-transform: uppercase;
+		}
+
+		dd {
+			margin: 2px 0 0;
+			font-weight: 600;
+		}
+
+		code {
+			padding: 0;
+			background: none;
+			font-size: 12.5px;
+			font-weight: 400;
+		}
+	}
+
+	&__warn {
+		padding: 12px 20px 16px;
+		border-top: 1px solid $stroke;
+	}
+
+	&.is-off {
+		.lw-img-backup__icon {
+			background: $track;
+			color: $muted;
+		}
+
+		.lw-img-backup__fact dd {
+			color: $muted;
+		}
+	}
+}
+

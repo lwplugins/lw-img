@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-25T08:19:03+00:00\n"
+"POT-Creation-Date: 2026-09-25T08:23:58+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: lw-img\n"
@@ -244,7 +244,7 @@ msgstr ""
 #: includes/Health/ApiChecks.php:35
 #: includes/Health/ApiChecks.php:43
 #: includes/Health/ApiChecks.php:49
-#: build/index.js:38
+#: build/index.js:40
 msgid "HelloImg API"
 msgstr ""
 
@@ -432,8 +432,8 @@ msgid "Original (backup)"
 msgstr ""
 
 #: includes/Media/ComparePage.php:81
-#: build/index.js:21
-#: build/index.js:25
+#: build/index.js:23
+#: build/index.js:27
 msgid "Optimized"
 msgstr ""
 
@@ -490,7 +490,7 @@ msgstr ""
 #: includes/Media/InfoMetabox.php:145
 #: includes/Media/RowActions.php:66
 #: build/index.js:1
-#: build/index.js:46
+#: build/index.js:48
 msgid "Try again"
 msgstr ""
 
@@ -520,9 +520,9 @@ msgstr ""
 
 #: includes/Media/InfoMetabox.php:188
 #: includes/Media/SavingsColumn.php:148
-#: build/index.js:21
-#: build/index.js:25
-#: build/index.js:43
+#: build/index.js:23
+#: build/index.js:27
+#: build/index.js:45
 msgid "Skipped"
 msgstr ""
 
@@ -531,9 +531,9 @@ msgid "Restore original"
 msgstr ""
 
 #: includes/Media/SavingsColumn.php:124
-#: build/index.js:21
-#: build/index.js:25
-#: build/index.js:43
+#: build/index.js:23
+#: build/index.js:27
+#: build/index.js:45
 msgid "Failed"
 msgstr ""
 
@@ -572,7 +572,7 @@ msgid "Filter by LW Image status"
 msgstr ""
 
 #: includes/Rest/Admin/LogController.php:85
-#: build/index.js:46
+#: build/index.js:48
 msgid "Log cleared."
 msgstr ""
 
@@ -680,7 +680,7 @@ msgid "Autoloader not found. Please run \"composer install\" in the plugin direc
 msgstr ""
 
 #: build/index.js:1
-#: build/index.js:46
+#: build/index.js:48
 msgid "Loading…"
 msgstr ""
 
@@ -781,8 +781,8 @@ msgid "General Settings"
 msgstr ""
 
 #: build/index.js:12
-#: build/index.js:35
-#: build/index.js:63
+#: build/index.js:37
+#: build/index.js:65
 msgid "Stats"
 msgstr ""
 
@@ -791,7 +791,7 @@ msgid "Statistics"
 msgstr ""
 
 #: build/index.js:12
-#: build/index.js:68
+#: build/index.js:70
 msgid "Upload"
 msgstr ""
 
@@ -808,9 +808,8 @@ msgid "Bulk Optimization"
 msgstr ""
 
 #: build/index.js:12
-#: build/index.js:30
-#: build/index.js:67
-#: build/index.js:68
+#: build/index.js:32
+#: build/index.js:69
 msgid "Backup"
 msgstr ""
 
@@ -819,7 +818,7 @@ msgid "Backup Settings"
 msgstr ""
 
 #: build/index.js:12
-#: build/index.js:69
+#: build/index.js:70
 msgid "Tester"
 msgstr ""
 
@@ -828,7 +827,7 @@ msgid "Environment Tester"
 msgstr ""
 
 #: build/index.js:12
-#: build/index.js:70
+#: build/index.js:71
 msgid "Log"
 msgstr ""
 
@@ -837,7 +836,7 @@ msgid "Event Log"
 msgstr ""
 
 #: build/index.js:12
-#: build/index.js:36
+#: build/index.js:38
 msgid "Connected"
 msgstr ""
 
@@ -848,7 +847,7 @@ msgstr ""
 #. translators: %s: percentage of the bulk run done.
 #. translators: %s: percentage of the run done.
 #: build/index.js:13
-#: build/index.js:26
+#: build/index.js:28
 #, js-format
 msgid "%s%%"
 msgstr ""
@@ -898,780 +897,834 @@ msgid "Set in wp-config.php"
 msgstr ""
 
 #: build/index.js:14
-msgid "backups are kept forever"
+msgid "Location"
+msgstr ""
+
+#: build/index.js:14
+msgid "Restore"
+msgstr ""
+
+#: build/index.js:14
+msgid "Any time, from the Media Library"
+msgstr ""
+
+#: build/index.js:14
+#: build/index.js:70
+msgid "Retention"
 msgstr ""
 
 #. translators: %d: number of days.
 #: build/index.js:15
 #, js-format
+msgid "%d days"
+msgstr ""
+
+#: build/index.js:15
+#: build/index.js:19
+msgid "Forever"
+msgstr ""
+
+#: build/index.js:15
+msgid "Backing up originals is on"
+msgstr ""
+
+#: build/index.js:15
+msgid "Backing up originals is off"
+msgstr ""
+
+#: build/index.js:15
+msgid "Every conversion is reversible."
+msgstr ""
+
+#: build/index.js:15
+msgid "New conversions cannot be undone."
+msgstr ""
+
+#. translators: %s: PHP constant name.
+#: build/index.js:16
+#: build/index.js:38
+#, js-format
+msgid "Set in wp-config.php (%s)"
+msgstr ""
+
+#: build/index.js:16
+#: build/index.js:70
+msgid "On"
+msgstr ""
+
+#: build/index.js:16
+msgid "Off"
+msgstr ""
+
+#: build/index.js:16
+msgid "With backups off there is no way to restore an image once it has been converted — Restore original disappears from the Media Library, and re-optimizing at another level becomes impossible. Existing backups are kept and still restorable."
+msgstr ""
+
+#: build/index.js:16
+msgid "backups are kept forever"
+msgstr ""
+
+#. translators: %d: number of days.
+#: build/index.js:17
+#, js-format
 msgid "removes backups older than %d days"
 msgstr ""
 
 #. translators: %s: "removes backups older than N days".
-#: build/index.js:16
+#: build/index.js:18
 #, js-format
 msgid "%s · runs when the system cron triggers WP-Cron"
 msgstr ""
 
 #. translators: 1: "removes backups older than N days", 2: date and time.
-#: build/index.js:17
+#: build/index.js:19
 #, js-format
 msgid "%1$s · next run %2$s"
 msgstr ""
 
-#: build/index.js:17
-#: build/index.js:65
+#: build/index.js:19
+#: build/index.js:67
 msgid "Backup folder"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Backed-up originals"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "files"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "one per optimized image"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Cleanup"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Daily"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Never"
 msgstr ""
 
-#: build/index.js:17
-#: build/index.js:21
+#: build/index.js:19
+#: build/index.js:23
 msgid "Media Library"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Hover an optimized image and click \"Restore original\" — the original comes back and thumbnails are regenerated. A side-by-side Compare view is on the image's edit screen."
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "WP-CLI"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "wp lw-img restore 123 456 — restore any number of attachments from the command line."
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Kept on uninstall"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Backups are never deleted when the plugin is removed — your originals stay safe in the uploads folder."
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "How to restore"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "7 days"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "30 days"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "90 days"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "1 year"
 msgstr ""
 
-#: build/index.js:17
-msgid "Forever"
-msgstr ""
-
-#: build/index.js:17
+#: build/index.js:19
 msgid "WebP — widest support. If the converted file would not be smaller than the original, the original is kept."
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "AVIF — smaller files, modern browsers. If the converted file would not be smaller than the original, the original is kept."
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Lossless"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Lossless — pixel-perfect, larger files."
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Normal"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Normal — balanced quality and size."
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Aggressive"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Aggressive — smaller files, slight compression may show."
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Ultra"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Ultra — maximum compression, visible on detailed images."
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Gentle"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Gentle — lightest server load"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Fast"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Fast — highest server load"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Skip entirely (never sent to the API)"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Keep original dimensions"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Use optimization level…"
 msgstr ""
 
-#: build/index.js:17
-#: build/index.js:68
+#: build/index.js:19
+#: build/index.js:70
 msgid "Keep EXIF metadata"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "General tab"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "see the fix on the Tester tab"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Cancel the run? Images converted so far stay converted; the rest waits for the next run."
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Cancel run"
 msgstr ""
 
-#: build/index.js:17
+#: build/index.js:19
 msgid "Optimize all in background"
 msgstr ""
 
 #. translators: %s: number of failed images.
-#: build/index.js:18
+#: build/index.js:20
 #, js-format
 msgid "Put all %s failed images back in the queue? They are processed by the next run."
 msgstr ""
 
-#: build/index.js:18
+#: build/index.js:20
 msgid "Retry all"
 msgstr ""
 
 #. translators: %s: number of failed images.
-#: build/index.js:19
+#: build/index.js:21
 #, js-format
 msgid "Retry %s failed"
 msgstr ""
 
 #. translators: %s: number of skipped images.
-#: build/index.js:20
+#: build/index.js:22
 #, js-format
 msgid "Put all %s skipped images back in the queue? The next run checks them again against the current settings."
 msgstr ""
 
-#: build/index.js:20
+#: build/index.js:22
 msgid "Re-scan all"
 msgstr ""
 
 #. translators: %s: number of skipped images.
-#: build/index.js:21
+#: build/index.js:23
 #, js-format
 msgid "Re-scan %s skipped"
 msgstr ""
 
-#: build/index.js:21
+#: build/index.js:23
 msgid "Checking API key and redirects, counting images…"
 msgstr ""
 
-#: build/index.js:21
+#: build/index.js:23
 msgid "Processing speed"
 msgstr ""
 
-#: build/index.js:21
-#: build/index.js:25
+#: build/index.js:23
+#: build/index.js:27
 msgid "Pending"
 msgstr ""
 
-#: build/index.js:21
+#: build/index.js:23
 msgid "All-time totals, independent of the current run."
 msgstr ""
 
-#: build/index.js:21
+#: build/index.js:23
 msgid "Show these images in the Media Library"
 msgstr ""
 
-#: build/index.js:21
+#: build/index.js:23
 msgid "Skip reasons"
 msgstr ""
 
 #. translators: 1: skip reason, 2: number of images.
-#: build/index.js:22
+#: build/index.js:24
 #, js-format
 msgid "%1$s · %2$s"
 msgstr ""
 
 #. translators: 1: images optimized, 2: duration, 3: bytes saved, 4: percentage saved.
-#: build/index.js:23
+#: build/index.js:25
 #, js-format
 msgid "Run finished — %1$s images optimized in %2$s, %3$s saved (−%4$s%%)."
 msgstr ""
 
 #. translators: %s: number of skipped images.
-#: build/index.js:24
+#: build/index.js:26
 #, js-format
 msgid "See the %s skipped images in the Media Library"
 msgstr ""
 
 #. translators: 1: images processed, 2: images in the run.
-#: build/index.js:25
+#: build/index.js:27
 #, js-format
 msgid "Run cancelled — %1$s of %2$s images processed. Converted images stay converted; press Start to continue with the rest."
 msgstr ""
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Check the key on the General tab"
 msgstr ""
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Manage your plan in the HelloImg dashboard"
 msgstr ""
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "The run was stopped."
 msgstr ""
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Recent activity"
 msgstr ""
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Waiting for the first background tick… WP-Cron starts within a minute on most hosts."
 msgstr ""
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Ready"
 msgstr ""
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Running"
 msgstr ""
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Finished"
 msgstr ""
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Cancelled"
 msgstr ""
 
-#: build/index.js:25
+#: build/index.js:27
 msgid "Stopped"
 msgstr ""
 
 #. translators: 1: images processed, 2: images in the run.
-#: build/index.js:27
+#: build/index.js:29
 #, js-format
 msgid "%1$s / %2$s processed"
 msgstr ""
 
-#: build/index.js:27
+#: build/index.js:29
 msgid "Bulk run progress"
 msgstr ""
 
-#: build/index.js:27
+#: build/index.js:29
 msgid "Elapsed"
 msgstr ""
 
-#: build/index.js:27
+#: build/index.js:29
 msgid "Speed"
 msgstr ""
 
-#: build/index.js:27
+#: build/index.js:29
 msgid "Est. remaining"
 msgstr ""
 
 #. translators: %s: estimated remaining time, e.g. "12m 30s".
-#: build/index.js:28
+#: build/index.js:30
 #, js-format
 msgid "~%s"
 msgstr ""
 
-#: build/index.js:28
+#: build/index.js:30
 msgid "Saved so far"
 msgstr ""
 
-#: build/index.js:28
+#: build/index.js:30
 msgid "The background worker has not reported for a while. While this page is open it keeps the run moving; WP-CLI (wp lw-img optimize --all) is the reliable path on sites without traffic."
 msgstr ""
 
-#: build/index.js:28
+#: build/index.js:30
 msgid "Now processing"
 msgstr ""
 
 #. translators: 1: max width, 2: max height (∞ = no limit).
-#: build/index.js:29
+#: build/index.js:31
 #, js-format
 msgid "fit inside %1$s × %2$s px"
 msgstr ""
 
-#: build/index.js:29
+#: build/index.js:31
 msgid "original dimensions kept"
 msgstr ""
 
-#: build/index.js:29
+#: build/index.js:31
 msgid "This run uses your Upload settings"
 msgstr ""
 
-#: build/index.js:29
-#: build/index.js:58
+#: build/index.js:31
+#: build/index.js:60
 msgid "Level"
 msgstr ""
 
-#: build/index.js:29
+#: build/index.js:31
 msgid "Output"
 msgstr ""
 
-#: build/index.js:29
+#: build/index.js:31
 msgid "Resize"
 msgstr ""
 
-#: build/index.js:29
-#: build/index.js:58
+#: build/index.js:31
+#: build/index.js:60
 msgid "Pattern rules"
 msgstr ""
 
 #. translators: %s: number of pattern rules.
-#: build/index.js:30
+#: build/index.js:32
 #, js-format
 msgid "%s rule"
 msgid_plural "%s rules"
 msgstr[0] ""
 msgstr[1] ""
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "EXIF"
 msgstr ""
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "kept"
 msgstr ""
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "removed"
 msgstr ""
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "on"
 msgstr ""
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "off"
 msgstr ""
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "Thumbnails are regenerated from the converted file after every conversion — no separate regeneration needed."
 msgstr ""
 
-#: build/index.js:30
+#: build/index.js:32
 msgid "Change on the Upload tab"
 msgstr ""
 
 #. translators: 1: monthly image limit, 2: HelloImg dashboard host.
-#: build/index.js:31
+#: build/index.js:33
 #, js-format
 msgid "%1$s images/month · manage your plan at %2$s"
 msgstr ""
 
 #. translators: %s: HelloImg dashboard host.
-#: build/index.js:32
+#: build/index.js:34
 #, js-format
 msgid "no monthly limit · manage your plan at %s"
 msgstr ""
 
 #. translators: %s: bytes saved through the API.
-#: build/index.js:33
+#: build/index.js:35
 #, js-format
 msgid "%s saved via the API"
 msgstr ""
 
 #. translators: 1: number of images, 2: domain.
-#: build/index.js:34
+#: build/index.js:36
 #, js-format
 msgid "%1$s from %2$s"
 msgstr ""
 
-#: build/index.js:34
+#: build/index.js:36
 msgid "Plan"
 msgstr ""
 
-#: build/index.js:34
+#: build/index.js:36
 msgid "This month"
 msgstr ""
 
-#: build/index.js:34
+#: build/index.js:36
 msgid "Optimized on this site"
 msgstr ""
 
 #. translators: %s: bytes saved on this site.
-#: build/index.js:35
+#: build/index.js:37
 #, js-format
 msgid "%s saved"
 msgstr ""
 
-#: build/index.js:35
-#: build/index.js:36
+#: build/index.js:37
+#: build/index.js:38
 msgid "API key"
 msgstr ""
 
-#. translators: %s: PHP constant name.
-#: build/index.js:36
-#, js-format
-msgid "Set in wp-config.php (%s)"
-msgstr ""
-
-#: build/index.js:36
+#: build/index.js:38
 msgid "No key saved yet."
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "The saved key will be removed when you save."
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Saved key: <hint />"
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Stored in wp_options and never shown again after saving."
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "HelloImg API key"
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Paste a new key to replace it"
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Hide key"
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Show key"
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Remove key"
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Keep the key"
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "New uploads are converted automatically."
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "New uploads are converted automatically. The key is stored in wp_options."
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Error"
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Checking…"
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Not connected"
 msgstr ""
 
-#: build/index.js:36
+#: build/index.js:38
 msgid "Paste an API key to enable conversion. Free tier: 1,000 images / month."
 msgstr ""
 
 #. translators: %s: HelloImg plan name.
-#: build/index.js:37
+#: build/index.js:39
 #, js-format
 msgid "Connection test passed — the API key works (plan: %s)."
 msgstr ""
 
-#: build/index.js:37
+#: build/index.js:39
 msgid "Connection test passed — the API key works."
 msgstr ""
 
 #. translators: %s: error message.
-#: build/index.js:38
+#: build/index.js:40
 #, js-format
 msgid "Connection test failed: %s"
 msgstr ""
 
-#: build/index.js:38
+#: build/index.js:40
 msgid "Save and test"
 msgstr ""
 
-#: build/index.js:38
+#: build/index.js:40
 msgid "Test connection"
 msgstr ""
 
 #. translators: %s: HelloImg dashboard host name.
-#: build/index.js:39
+#: build/index.js:41
 #, js-format
 msgid "Get your API key at %s"
 msgstr ""
 
-#: build/index.js:39
+#: build/index.js:41
 msgid "Full environment checks on the Tester tab"
 msgstr ""
 
 #. translators: 1: domain the key belongs to, 2: this site's host, 3: HelloImg dashboard host.
-#: build/index.js:40
+#: build/index.js:42
 #, js-format
 msgid "This API key belongs to %1$s, but this site is %2$s. The API refuses requests from other sites — create a key for this site at %3$s."
 msgstr ""
 
-#: build/index.js:40
+#: build/index.js:42
 msgid "forever"
 msgstr ""
 
 #. translators: %s: optimization level name.
-#: build/index.js:41
+#: build/index.js:43
 #, js-format
 msgid "%s level"
 msgstr ""
 
-#: build/index.js:41
+#: build/index.js:43
 msgid "EXIF kept"
 msgstr ""
 
-#: build/index.js:41
+#: build/index.js:43
 msgid "EXIF stripped"
 msgstr ""
 
 #. translators: %s: retention, e.g. "30 days" or "forever".
-#: build/index.js:42
+#: build/index.js:44
 #, js-format
 msgid "backups on · %s"
 msgstr ""
 
-#: build/index.js:42
+#: build/index.js:44
 msgid "backups off"
 msgstr ""
 
 #. translators: %s: bulk speed name.
-#: build/index.js:43
+#: build/index.js:45
 #, js-format
 msgid "bulk speed: %s"
 msgstr ""
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "New uploads:"
 msgstr ""
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Add your API key"
 msgstr ""
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Grab your key from the HelloImg dashboard and paste it here — Test connection verifies it instantly."
 msgstr ""
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Upload as usual"
 msgstr ""
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "New JPEG / PNG / HEIC / TIFF / BMP / GIF uploads become WebP automatically — originals are backed up first, and nothing ever fails because of LW Img."
 msgstr ""
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Optimize the existing library"
 msgstr ""
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "The Bulk tab converts everything already in the Media Library, in the background. The Tester tab checks your server first."
 msgstr ""
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Getting started"
 msgstr ""
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Everything is reversible: originals live in uploads/lw-img-backups/ and can be restored per image from the Media Library."
 msgstr ""
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Converted"
 msgstr ""
 
-#: build/index.js:43
+#: build/index.js:45
 msgid "Restored"
 msgstr ""
 
 #. translators: %s: percentage saved.
-#: build/index.js:44
-#: build/index.js:64
-#: build/index.js:68
+#: build/index.js:46
+#: build/index.js:66
+#: build/index.js:70
 #, js-format
 msgid "−%s%%"
 msgstr ""
 
-#: build/index.js:44
+#: build/index.js:46
 msgid "original restored from backup"
 msgstr ""
 
 #. translators: 1: skip reason, 2: original size, 3: converted size.
-#: build/index.js:45
+#: build/index.js:47
 #, js-format
 msgid "%1$s — %2$s original, converted would be %3$s"
 msgstr ""
 
 #. translators: 1: event type, 2: number of events.
-#: build/index.js:46
+#: build/index.js:48
 #, js-format
 msgid "%1$s %2$s"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Events"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Refresh"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Clear all log entries?"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Clear log"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Logging is off, so no new events are recorded. Turn on \"Logging enabled\" above and save."
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Time"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Event"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "File"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Details"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Event log"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Search"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Filter"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Clear"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Clear all filters"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "All"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "No entries match these filters."
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Nothing here yet."
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Previous page"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Next page"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Rows per page"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Select all rows on this page"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Clear selection"
 msgstr ""
 
-#: build/index.js:46
+#: build/index.js:48
 msgid "Bulk actions"
 msgstr ""
 
 #. translators: %d: number of rows.
-#: build/index.js:46
+#: build/index.js:48
 #, js-format
 msgid "%d entry"
 msgid_plural "%d entries"
@@ -1679,7 +1732,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of results.
-#: build/index.js:46
+#: build/index.js:48
 #, js-format
 msgid "%d result"
 msgid_plural "%d results"
@@ -1687,19 +1740,19 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: current page, 2: total pages.
-#: build/index.js:46
+#: build/index.js:48
 #, js-format
 msgid "Page %1$d of %2$d"
 msgstr ""
 
 #. translators: %s: row name.
-#: build/index.js:46
+#: build/index.js:48
 #, js-format
 msgid "Select: %s"
 msgstr ""
 
 #. translators: %d: number of selected rows.
-#: build/index.js:47
+#: build/index.js:49
 #, js-format
 msgid "%d selected"
 msgid_plural "%d selected"
@@ -1707,107 +1760,107 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: selected rows, 2: of those, on this page.
-#: build/index.js:48
+#: build/index.js:50
 #, js-format
 msgid "%1$d selected, %2$d on this page"
 msgstr ""
 
 #. translators: 1: rows the action applies to, 2: selected rows on this page.
-#: build/index.js:48
+#: build/index.js:50
 #, js-format
 msgid "applies to %1$d of %2$d"
 msgstr ""
 
-#: build/index.js:48
+#: build/index.js:50
 msgid "Filter by filename…"
 msgstr ""
 
-#: build/index.js:48
+#: build/index.js:50
 msgid "No matching events"
 msgstr ""
 
-#: build/index.js:48
+#: build/index.js:50
 msgid "No events yet. Upload an image or run a bulk optimization — every conversion, skip, and failure lands here with its reason."
 msgstr ""
 
 #. translators: %s: relative time, e.g. "3 days ago".
-#: build/index.js:49
+#: build/index.js:51
 #, js-format
 msgid "Scanned %s — never runs on its own."
 msgstr ""
 
-#: build/index.js:49
+#: build/index.js:51
 msgid "Not scanned yet."
 msgstr ""
 
-#: build/index.js:49
+#: build/index.js:51
 msgid "Scan again"
 msgstr ""
 
-#: build/index.js:49
+#: build/index.js:51
 msgid "Leftovers from other optimizers"
 msgstr ""
 
-#: build/index.js:49
+#: build/index.js:51
 msgid "No leftovers found"
 msgstr ""
 
 #. translators: %s: comma-separated list of other optimizer plugins.
-#: build/index.js:50
+#: build/index.js:52
 #, js-format
 msgid "Checked %s — nothing of theirs is taking up space."
 msgstr ""
 
 #. translators: %s: size, e.g. "1.2 GB".
-#: build/index.js:51
+#: build/index.js:53
 #, js-format
 msgid "at least %s"
 msgstr ""
 
-#: build/index.js:51
+#: build/index.js:53
 msgid "of originals from optimizers you no longer use — <b>safe to delete</b> once you are sure you will not restore them."
 msgstr ""
 
-#: build/index.js:51
+#: build/index.js:53
 msgid "beside each image"
 msgstr ""
 
-#: build/index.js:51
+#: build/index.js:53
 msgid "backup folder"
 msgstr ""
 
 #. translators: %s: number of files.
-#: build/index.js:52
+#: build/index.js:54
 #, js-format
 msgid "%s files"
 msgstr ""
 
-#: build/index.js:52
+#: build/index.js:54
 msgid "The scan stopped early on this very large uploads folder, so the real total is higher than shown."
 msgstr ""
 
-#: build/index.js:52
+#: build/index.js:54
 msgid "LW Image never touches these files: it only measures them. To reclaim the space, delete the folder or the files with your file manager, over SFTP, or from that plugin's own settings if it is still installed."
 msgstr ""
 
-#: build/index.js:52
+#: build/index.js:54
 msgid "OK"
 msgstr ""
 
-#: build/index.js:52
+#: build/index.js:54
 msgid "Warning"
 msgstr ""
 
-#: build/index.js:52
+#: build/index.js:54
 msgid "Critical"
 msgstr ""
 
-#: build/index.js:52
+#: build/index.js:54
 msgid "Info"
 msgstr ""
 
 #. translators: %d: number of issues.
-#: build/index.js:53
+#: build/index.js:55
 #, js-format
 msgid "%d issue"
 msgid_plural "%d issues"
@@ -1816,35 +1869,35 @@ msgstr[1] ""
 
 #. translators: %d: number of warnings.
 #. translators: %d: count.
-#: build/index.js:54
-#: build/index.js:57
-#: build/index.js:58
+#: build/index.js:56
+#: build/index.js:59
+#: build/index.js:60
 #, js-format
 msgid "%d warning"
 msgid_plural "%d warnings"
 msgstr[0] ""
 msgstr[1] ""
 
-#: build/index.js:54
+#: build/index.js:56
 msgid "Copied"
 msgstr ""
 
-#: build/index.js:54
+#: build/index.js:56
 msgid "Copy"
 msgstr ""
 
-#: build/index.js:54
+#: build/index.js:56
 msgid "Needs attention"
 msgstr ""
 
 #. translators: 1: critical issues, 2: warnings.
-#: build/index.js:55
+#: build/index.js:57
 #, js-format
 msgid "%1$s, %2$s"
 msgstr ""
 
 #. translators: %d: number of critical issues.
-#: build/index.js:56
+#: build/index.js:58
 #, js-format
 msgid "%d critical issue"
 msgid_plural "%d critical issues"
@@ -1852,19 +1905,19 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of warnings.
-#: build/index.js:58
+#: build/index.js:60
 #, js-format
 msgid "%d warning found"
 msgid_plural "%d warnings found"
 msgstr[0] ""
 msgstr[1] ""
 
-#: build/index.js:58
+#: build/index.js:60
 msgid "All checks passed — ready for bulk optimization"
 msgstr ""
 
 #. translators: %d: count.
-#: build/index.js:58
+#: build/index.js:60
 #, js-format
 msgid "%d critical"
 msgid_plural "%d critical"
@@ -1872,461 +1925,411 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count.
-#: build/index.js:58
+#: build/index.js:60
 #, js-format
 msgid "%d OK"
 msgstr ""
 
 #. translators: %d: count.
-#: build/index.js:58
+#: build/index.js:60
 #, js-format
 msgid "%d info"
 msgstr ""
 
-#: build/index.js:58
+#: build/index.js:60
 msgid "Pattern"
 msgstr ""
 
-#: build/index.js:58
+#: build/index.js:60
 msgid "Action"
 msgstr ""
 
-#: build/index.js:58
+#: build/index.js:60
 msgid "Remove rule"
 msgstr ""
 
-#: build/index.js:58
+#: build/index.js:60
 msgid "Add rule"
 msgstr ""
 
 #. translators: %d: maximum number of pattern rules.
-#: build/index.js:59
+#: build/index.js:61
 #, js-format
 msgid "At most %d rules."
 msgstr ""
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "Examples:"
 msgstr ""
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "* matches anything. A pattern without / matches the file name; with / it matches anywhere in the path. Every matching rule applies to uploads and bulk runs alike (\"Skip entirely\" also keeps the file out of smart crop). \"Skip entirely\" wins over the others; if two level rules match, the first one listed wins."
 msgstr ""
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "Smart crop"
 msgstr ""
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "Smart crop runs only on converted uploads — turn on Auto-convert uploads to use it. The command line (wp lw-img smartcrop) works either way."
 msgstr ""
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "Smart-crop thumbnails"
 msgstr ""
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "Re-crop the selected thumbnail sizes around the subject instead of the centre. Each selected size costs one extra API call per upload. Runs in the background right after the upload; on system-cron sites the cropped thumbnails appear within the cron interval."
 msgstr ""
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "Thumbnail sizes"
 msgstr ""
 
-#: build/index.js:59
+#: build/index.js:61
 msgid "No hard-cropped thumbnail sizes are registered on this site — smart crop has nothing to work on. Sizes that scale (keep the aspect ratio) never need it."
 msgstr ""
 
 #. translators: 1: image size name, 2: width, 3: height.
-#: build/index.js:60
+#: build/index.js:62
 #, js-format
 msgid "%1$s %2$s × %3$s"
 msgstr ""
 
 #. translators: %s: image size name.
-#: build/index.js:61
+#: build/index.js:63
 #, js-format
 msgid "%s (not registered on this site)"
 msgstr ""
 
-#: build/index.js:61
+#: build/index.js:63
 msgid "Select all"
 msgstr ""
 
-#: build/index.js:61
+#: build/index.js:63
 msgid "Select none"
 msgstr ""
 
 #. translators: 1: selected sizes, 2: API calls per upload (1 + selected).
-#: build/index.js:62
+#: build/index.js:64
 #, js-format
 msgid "Cost per upload: 1 + %1$s = %2$s API calls."
 msgstr ""
 
-#: build/index.js:62
+#: build/index.js:64
 msgid "Account"
 msgstr ""
 
-#: build/index.js:62
+#: build/index.js:64
 msgid "Current defaults"
 msgstr ""
 
-#: build/index.js:62
+#: build/index.js:64
 msgid "Advanced"
 msgstr ""
 
-#: build/index.js:62
+#: build/index.js:64
 msgid "Request timeout (s)"
 msgstr ""
 
-#: build/index.js:62
+#: build/index.js:64
 msgid "How long to wait for the API per image. Slow jobs past the API's own 30 s window are polled automatically before giving up."
 msgstr ""
 
-#: build/index.js:62
+#: build/index.js:64
 msgid "seconds"
 msgstr ""
 
 #. translators: %s: relative time, e.g. "12 minutes ago".
-#: build/index.js:63
+#: build/index.js:65
 #, js-format
 msgid "Updated %s, refreshes hourly on its own."
 msgstr ""
 
-#: build/index.js:63
+#: build/index.js:65
 msgid "Refresh figures"
 msgstr ""
 
-#: build/index.js:63
+#: build/index.js:65
 msgid "What optimization has saved on this site so far."
 msgstr ""
 
-#: build/index.js:63
+#: build/index.js:65
 msgid "No optimized images yet"
 msgstr ""
 
-#: build/index.js:63
+#: build/index.js:65
 msgid "Stats appear here after the first conversion. New uploads convert automatically — for everything already in the Media Library, run a bulk optimization."
 msgstr ""
 
-#: build/index.js:63
+#: build/index.js:65
 msgid "Open the Bulk tab"
 msgstr ""
 
-#: build/index.js:63
+#: build/index.js:65
 msgid "saved"
 msgstr ""
 
-#: build/index.js:64
+#: build/index.js:66
 msgid "After:"
 msgstr ""
 
-#: build/index.js:64
+#: build/index.js:66
 msgid "Before:"
 msgstr ""
 
-#: build/index.js:64
+#: build/index.js:66
 msgid "Optimized images"
 msgstr ""
 
 #. translators: %s: share of the Media Library.
-#: build/index.js:65
+#: build/index.js:67
 #, js-format
 msgid "%s%% of the Media Library"
 msgstr ""
 
-#: build/index.js:65
+#: build/index.js:67
 msgid "optimize the rest"
 msgstr ""
 
-#: build/index.js:65
+#: build/index.js:67
 msgid "Average saving"
 msgstr ""
 
-#: build/index.js:65
+#: build/index.js:67
 msgid "image"
 msgstr ""
 
-#: build/index.js:65
+#: build/index.js:67
 msgid "across all optimized images"
 msgstr ""
 
 #. translators: 1: number of files, 2: retention ("kept forever" or "30-day retention").
-#: build/index.js:66
+#: build/index.js:68
 #, js-format
 msgid "%1$s files · %2$s"
 msgstr ""
 
 #. translators: %d: number of days.
-#: build/index.js:67
+#: build/index.js:69
 #, js-format
 msgid "%d-day retention"
 msgstr ""
 
-#: build/index.js:67
+#: build/index.js:69
 msgid "kept forever"
 msgstr ""
 
-#: build/index.js:67
+#: build/index.js:69
 msgid "Biggest wins"
 msgstr ""
 
-#: build/index.js:67
+#: build/index.js:69
 msgid "to"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "What happens to every new image upload."
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Auto-convert uploads"
 msgstr ""
 
-#: build/index.js:68
-msgid "On"
-msgstr ""
-
-#: build/index.js:68
+#: build/index.js:70
 msgid "Off — uploads are left untouched"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Convert"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Back up original"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Thumbnails"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "New uploads are left untouched. The settings below still apply to bulk runs and to \"Optimize now\" in the Media Library, and old-URL redirects keep working."
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Conversion"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Output format"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Optimization level"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Camera info, GPS, copyright. Off by default — smaller files and removes potentially sensitive data."
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Size limits"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Resize large images"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Images are scaled down proportionally to fit; small images are never upscaled. 0 = no limit."
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Maximum width in pixels"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Maximum height in pixels"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "px"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "File size range"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Files outside the range are skipped (original kept). Tiny files rarely benefit; the API rejects images over 10 MB."
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Minimum file size in kilobytes"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "KB min"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Maximum file size in megabytes"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "MB max"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Skip & exclude"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Skip already-WebP / AVIF uploads"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Recommended — no API call, no credit usage."
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Skip animated GIFs"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Off by default: animated GIFs become animated WebP with frames and timing preserved. If the WebP would be larger, the original is kept automatically."
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "After conversion"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Redirect old image URLs to the converted file"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Recommended. Nothing is stored: when a request for photo.jpg 404s, the plugin matches the path to its converted attachment and answers with a 301 to photo.webp — external links, sent newsletters and search results keep working. The Tester tab checks that the server lets these requests through."
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Bulk optimize"
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "Runs in the background — you can close this tab. References to converted files in post content and page-builder data are rewritten automatically."
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "The last status update failed; retrying in a few seconds."
 msgstr ""
 
-#: build/index.js:68
+#: build/index.js:70
 msgid "WP-Cron only runs while the site receives traffic. For very large libraries the command line is the guaranteed path:"
 msgstr ""
 
-#: build/index.js:68
-msgid "Every conversion keeps the original, so nothing is ever lost."
-msgstr ""
-
-#: build/index.js:68
-msgid "Back up originals"
-msgstr ""
-
-#: build/index.js:68
-msgid "On — every conversion is reversible"
-msgstr ""
-
-#: build/index.js:68
-msgid "Off — conversions cannot be undone"
-msgstr ""
-
-#: build/index.js:68
-msgid "Original saved"
-msgstr ""
-
-#: build/index.js:68
-msgid "Restorable any time"
-msgstr ""
-
-#. translators: %d: number of days.
-#: build/index.js:69
-#, js-format
-msgid "Cleaned up after %d days"
-msgstr ""
-
-#: build/index.js:69
-msgid "Kept forever"
-msgstr ""
-
-#: build/index.js:69
-msgid "Originals are deleted after conversion"
-msgstr ""
-
-#: build/index.js:69
-msgid "With backups off there is no way to restore an image once it has been converted — Restore original disappears from the Media Library, and re-optimizing at another level becomes impossible. Existing backups are kept and still restorable."
-msgstr ""
-
-#: build/index.js:69
-msgid "Retention"
-msgstr ""
-
-#: build/index.js:69
+#: build/index.js:70
 msgid "Keep backups for"
 msgstr ""
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "Backups older than this are deleted by a daily cleanup task. Forever keeps everything — watch the folder size on large sites."
 msgstr ""
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "or"
 msgstr ""
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "Backup retention in days"
 msgstr ""
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "days"
 msgstr ""
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "On uninstall"
 msgstr ""
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "Delete all LW Image data when the plugin is deleted"
 msgstr ""
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "Off (default): settings, API key, pattern rules, event log and per-image statistics survive a delete and reinstall. On: they are removed on uninstall. Backup originals are kept either way. The Deactivate link on the Plugins screen asks the same question."
 msgstr ""
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "Running environment checks…"
 msgstr ""
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "Environment checks — hosting problems surface here before a bulk run trips over them."
 msgstr ""
 
-#: build/index.js:69
+#: build/index.js:70
 msgid "Run tests again"
 msgstr ""
 
 #. translators: %s: relative time, e.g. "3 minutes ago".
-#: build/index.js:70
+#: build/index.js:71
 #, js-format
 msgid "last run %s · cached for 10 minutes"
 msgstr ""
 
-#: build/index.js:70
+#: build/index.js:71
 msgid "All checks"
 msgstr ""
 
-#: build/index.js:70
+#: build/index.js:71
 msgid "The last 200 events — uploads, bulk runs, Media Library actions and restores: what converted, what was skipped, and why."
 msgstr ""
 
-#: build/index.js:70
+#: build/index.js:71
 msgid "Logging enabled"
 msgstr ""
 
-#: build/index.js:70
+#: build/index.js:71
 msgid "existing entries remain until cleared"
 msgstr ""

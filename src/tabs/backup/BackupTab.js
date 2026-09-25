@@ -1,22 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { Notice } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
-import { backup, file, scheduled, undo } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { NumberInput, SwitchRow, fieldOf } from '../../components/Fields';
-import Pipeline from '../../components/Pipeline';
 import Section from '../../components/Section';
 import Segmented from '../../components/Segmented';
 import SettingRow from '../../components/SettingRow';
 import { api } from '../../data/api';
 import { daysLabel } from '../../data/format';
 import useRemote from '../../data/useRemote';
+import BackupHero from './BackupHero';
 import BackupStorage from './BackupStorage';
 import RestoreGuide from './RestoreGuide';
 
@@ -46,7 +44,6 @@ export default function BackupTab( { store } ) {
 		value: String( n ),
 		label: PRESET_LABELS[ n ] ?? daysLabel( n ),
 	} ) );
-	const enabled = !! options.backup_enabled;
 	const days = options.backup_retention_days;
 	const daysNumber = Number( days ) || 0;
 	const preset = presets.find(
@@ -55,69 +52,7 @@ export default function BackupTab( { store } ) {
 
 	return (
 		<>
-			<Section
-				title={ __( 'Backup', 'lw-img' ) }
-				description={ __(
-					'Every conversion keeps the original, so nothing is ever lost.',
-					'lw-img'
-				) }
-			>
-				<SwitchRow
-					title={ __( 'Back up originals', 'lw-img' ) }
-					store={ store }
-					name="backup_enabled"
-					onText={ __(
-						'On — every conversion is reversible',
-						'lw-img'
-					) }
-					offText={ __(
-						'Off — conversions cannot be undone',
-						'lw-img'
-					) }
-				/>
-				<Pipeline
-					active={ enabled }
-					steps={ [
-						{
-							icon: backup,
-							label: __( 'Original saved', 'lw-img' ),
-						},
-						{ icon: file, label: meta.backupPath },
-						{
-							icon: undo,
-							label: __( 'Restorable any time', 'lw-img' ),
-						},
-						{
-							icon: scheduled,
-							label: daysNumber
-								? sprintf(
-										/* translators: %d: number of days. */
-										__(
-											'Cleaned up after %d days',
-											'lw-img'
-										),
-										daysNumber
-									)
-								: __( 'Kept forever', 'lw-img' ),
-						},
-					] }
-				/>
-				{ ! enabled && (
-					<Notice status="warning" isDismissible={ false }>
-						<strong>
-							{ __(
-								'Originals are deleted after conversion',
-								'lw-img'
-							) }
-						</strong>
-						<br />
-						{ __(
-							'With backups off there is no way to restore an image once it has been converted — Restore original disappears from the Media Library, and re-optimizing at another level becomes impossible. Existing backups are kept and still restorable.',
-							'lw-img'
-						) }
-					</Notice>
-				) }
-			</Section>
+			<BackupHero store={ store } days={ daysNumber } />
 
 			<BackupStorage storage={ storage } days={ daysNumber } />
 
