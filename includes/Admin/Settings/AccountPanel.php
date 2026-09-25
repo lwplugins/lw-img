@@ -119,7 +119,7 @@ final class AccountPanel {
 
 		if ( '' !== $domain && ! self::host_matches( SiteHost::current(), $domain ) ) {
 			printf(
-				'<div class="notice notice-warning inline lw-img-site-mismatch"><p>%s</p></div>',
+				'<div class="notice notice-warning lw-notice inline lw-img-site-mismatch"><p>%s</p></div>',
 				esc_html(
 					sprintf(
 						/* translators: 1: domain the key belongs to, 2: this site's host, 3: dashboard host. */

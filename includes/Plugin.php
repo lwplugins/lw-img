@@ -12,6 +12,7 @@ namespace LightweightPlugins\Img;
 defined( 'ABSPATH' ) || exit;
 
 use LightweightPlugins\Img\Admin\DeactivationDialog;
+use LightweightPlugins\Img\Admin\NoticeManager;
 use LightweightPlugins\Img\Admin\SettingsPage;
 use LightweightPlugins\Img\Backup\AttachmentDeleteCleanup;
 use LightweightPlugins\Img\Backup\RestoreHandler;
@@ -70,6 +71,7 @@ final class Plugin {
 		new UploadInterceptor();
 
 		if ( is_admin() ) {
+			NoticeManager::register();
 			CompetitorNotice::register();
 			SiteStats::register();
 			HealthReport::register();

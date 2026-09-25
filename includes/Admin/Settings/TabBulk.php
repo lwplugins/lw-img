@@ -59,14 +59,14 @@ final class TabBulk implements TabInterface {
 		?>
 		<h2><?php esc_html_e( 'Bulk optimize', 'lw-img' ); ?></h2>
 		<?php if ( 'key' === $notice ) : ?>
-			<div class="notice notice-error inline">
+			<div class="notice notice-error lw-notice inline">
 				<p>
 					<?php esc_html_e( 'The bulk run was not started: the API key is missing or was rejected by the API.', 'lw-img' ); ?>
 					<a href="#general" class="lw-img-goto"><?php esc_html_e( 'Check the key on the General tab', 'lw-img' ); ?></a>
 				</p>
 			</div>
 		<?php elseif ( 'redirects' === $notice ) : ?>
-			<div class="notice notice-error inline">
+			<div class="notice notice-error lw-notice inline">
 				<p>
 					<?php esc_html_e( 'The bulk run was not started: this server answers missing image files itself, so old URLs of converted images would return 404 instead of redirecting — external links and search results would break.', 'lw-img' ); ?>
 					<a href="#tester" class="lw-img-goto"><?php esc_html_e( 'See the fix on the Tester tab', 'lw-img' ); ?></a>

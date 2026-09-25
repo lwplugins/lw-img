@@ -57,7 +57,7 @@ final class CompetitorNotice {
 		);
 
 		printf(
-			'<div class="notice notice-warning"><p><strong>%s</strong> %s</p><p>%s <a href="%s">%s</a></p></div>',
+			'<div class="notice notice-warning lw-notice"><p><strong>%s</strong> %s</p><p>%s <a href="%s">%s</a></p></div>',
 			esc_html__( 'LW Image:', 'lw-img' ),
 			esc_html(
 				sprintf(

@@ -71,7 +71,7 @@ final class TabLog implements TabInterface {
 		}
 
 		printf(
-			'<div class="notice notice-success is-dismissible inline"><p>%s</p></div>',
+			'<div class="notice notice-success lw-notice is-dismissible inline"><p>%s</p></div>',
 			esc_html__( 'Log cleared.', 'lw-img' )
 		);
 	}
