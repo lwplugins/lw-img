@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.5] - 2026-09-25
+
+### Fixed
+- Notices from themes and other plugins (for example a theme's purchase-code or recommended-plugins notice) could show on the LW Image screen. They are now kept off every LW Plugins screen, whatever their markup
+
 ## [1.9.4] - 2026-09-17
 
 ### Fixed

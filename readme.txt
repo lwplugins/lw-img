@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.9.4
+Stable tag: 1.9.5
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,9 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 1.9.5 =
+* Fix: Notices from themes and other plugins (for example a theme's purchase-code or recommended-plugins notice) could show on the LW Image screen. They are now kept off every LW Plugins screen, whatever their markup
 
 = 1.9.4 =
 * Fix: after a web-server fix, "Run tests again" on the Tester tab showed the old-image redirects as OK while the Bulk tab kept the start button blocked for up to 10 minutes — both now read the same probe result, and the re-run clears it
