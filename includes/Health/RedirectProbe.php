@@ -47,11 +47,22 @@ final class RedirectProbe {
 		}
 
 		$works = self::works();
+		self::remember( $works );
+
+		return $works;
+	}
+
+	/**
+	 * Keep a live verdict for the screens that read the cache (a start
+	 * refused on redirects should show the same reason afterwards).
+	 *
+	 * @param bool|null $works Verdict from works(); null is not stored.
+	 * @return void
+	 */
+	public static function remember( ?bool $works ): void {
 		if ( null !== $works ) {
 			set_transient( self::CACHE_KEY, $works ? 'yes' : 'no', self::CACHE_TTL );
 		}
-
-		return $works;
 	}
 
 	/**

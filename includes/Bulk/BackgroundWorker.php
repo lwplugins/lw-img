@@ -82,6 +82,15 @@ final class BackgroundWorker {
 	}
 
 	/**
+	 * Whether a tick (cron, assist) is processing right now.
+	 *
+	 * @return bool
+	 */
+	public static function is_locked(): bool {
+		return false !== get_transient( self::LOCK );
+	}
+
+	/**
 	 * Schedule the next tick and try to fire cron immediately.
 	 *
 	 * @param int $delay Seconds from now.

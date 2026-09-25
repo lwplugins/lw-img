@@ -37,6 +37,7 @@ use LightweightPlugins\Img\Media\NotFoundRedirect;
 use LightweightPlugins\Img\Media\RowActions;
 use LightweightPlugins\Img\Media\SavingsColumn;
 use LightweightPlugins\Img\Media\StatusFilter;
+use LightweightPlugins\Img\Rest\Admin\Routes as AdminRoutes;
 use LightweightPlugins\Img\Stats\SiteStats;
 use LightweightPlugins\Img\Upload\OutputFormatMap;
 use LightweightPlugins\Img\Upload\Rules\RuleMigration;
@@ -69,6 +70,10 @@ final class Plugin {
 		NotFoundRedirect::register();
 		OutputFormatMap::register();
 		new UploadInterceptor();
+
+		// REST requests are not is_admin(): the admin routes register on
+		// every request and check manage_options per route.
+		AdminRoutes::register();
 
 		if ( is_admin() ) {
 			NoticeManager::register();

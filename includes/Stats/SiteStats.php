@@ -40,7 +40,7 @@ final class SiteStats {
 	 */
 	public const RESCAN_ACTION = 'lw_img_rescan_leftovers';
 
-	private const CACHE_KEY = 'lw_img_stats';
+	public const CACHE_KEY = 'lw_img_stats';
 
 	/**
 	 * Where the last leftover scan is kept (an option, not a transient: it
