@@ -231,4 +231,30 @@ final class BulkJob {
 			}
 		);
 	}
+
+	/**
+	 * Add re-queued images to a running job's total, so "processed" can
+	 * never outgrow "total" when failed or skipped images are re-queued
+	 * mid-run (they are picked up by the same run).
+	 *
+	 * @param int $count Number of images put back into the queue.
+	 * @return void
+	 */
+	public static function grow( int $count ): void {
+		if ( $count <= 0 ) {
+			return;
+		}
+
+		self::mutate(
+			static function ( array $job ) use ( $count ): ?array {
+				if ( ( $job['state'] ?? '' ) !== self::STATE_RUNNING ) {
+					return null;
+				}
+
+				$job['total'] = (int) ( $job['total'] ?? 0 ) + $count;
+
+				return $job;
+			}
+		);
+	}
 }

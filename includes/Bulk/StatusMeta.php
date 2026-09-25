@@ -87,6 +87,9 @@ final class StatusMeta {
 
 		if ( $count > 0 ) {
 			delete_option( UnoptimizedQuery::CURSOR_OPTION );
+			delete_transient( UnoptimizedQuery::COUNT_TRANSIENT );
+			// A running job picks the re-queued images up too.
+			BulkJob::grow( $count );
 		}
 
 		return $count;

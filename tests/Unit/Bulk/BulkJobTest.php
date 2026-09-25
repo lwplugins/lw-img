@@ -114,4 +114,21 @@ final class BulkJobTest extends MonkeyTestCase {
 		$this->assertSame( BulkJob::STATE_CANCELLED, $this->stored['state'] );
 		$this->assertArrayNotHasKey( 'halt', $this->stored );
 	}
+
+	public function test_grow_adds_requeued_images_to_a_running_total(): void {
+		BulkJob::start( 10 );
+
+		BulkJob::grow( 4 );
+
+		$this->assertSame( 14, $this->stored['total'] );
+	}
+
+	public function test_grow_leaves_a_finished_run_alone(): void {
+		BulkJob::start( 10 );
+		BulkJob::finish( BulkJob::STATE_DONE );
+
+		BulkJob::grow( 4 );
+
+		$this->assertSame( 10, $this->stored['total'] );
+	}
 }
