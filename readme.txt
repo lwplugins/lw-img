@@ -4,7 +4,7 @@ Tags: image optimization, webp, image compression, performance, helloimg
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.9.5
+Stable tag: 2.0.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,6 +74,26 @@ One extra API call per selected size per upload — the Upload tab shows the exa
 Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 == Changelog ==
+
+= 2.0.0 =
+* New: New settings screen built with WordPress components on a new lw-img/v1 admin REST API: side navigation, a top bar with Save/Discard and a Cmd/Ctrl+S shortcut, loading skeletons and a mobile layout. Tabs load their data only when opened, and an invalid value is shown next to its field (pattern rules per row) with nothing saved.
+* New: A halted bulk run says why it stopped (no API key, no credit, key rejected) instead of silently returning to the start screen.
+* New: The bulk dashboard keeps the current run separate from the all-time Media Library totals, shows why Start is unavailable, and reports how many images Retry or Re-scan queued.
+* New: Hungarian translation of the plugin and the new interface.
+* Change: The API key is never sent to the browser; the screen shows a masked hint, and a key set in wp-config.php (LW_IMG_API_KEY) is shown as read-only.
+* Change: The HelloImg account is cached for 10 minutes instead of being requested on every settings-page view; Test connection refreshes it.
+* Change: The admin accent and the plugin logo use a darker green (#00875f) so white text on buttons is readable.
+* Change: The WP-CLI halt warning names the real reason instead of always saying the quota is exhausted.
+* Change: The classic settings screen, its admin-post/AJAX handlers and its stylesheet and script were removed. The Media Library actions (Optimize now, Restore, Re-optimize) are unchanged.
+* Fix: Bulk counters could lose updates when WP-Cron, the dashboard and WP-CLI worked at the same time.
+* Fix: A bulk run that was cancelled or halted could be reported as finished by a worker ending at the same moment.
+* Fix: Retrying or re-scanning images during a run could push progress over 100%.
+* Fix: Saving settings reset debug mode and other settings without a control on the screen.
+* Fix: A blank or negative number was saved as the minimum; it is now rejected.
+* Fix: Start could be clicked when nothing was pending.
+* Fix: The cached HelloImg account is removed on uninstall.
+* Fix: Bulk workers on different sites sharing one database server no longer wait for each other's locks.
+* Fix: Admin assets load even when the "LW Plugins" menu title is translated.
 
 = 1.9.5 =
 * Fix: Notices from themes and other plugins (for example a theme's purchase-code or recommended-plugins notice) could show on the LW Image screen. They are now kept off every LW Plugins screen, whatever their markup
@@ -247,3 +267,8 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 * New: Connection test against HelloImg /v1/account endpoint
 * New: Graceful fallback when the API is unreachable, the key is invalid, or the balance is exhausted
 * New: Upload event log (last 200 events) with pagination and clear action
+
+== Upgrade Notice ==
+
+= 2.0.0 =
+New settings screen. Your settings, bulk queue, backups and log are kept; the API key is no longer shown in the browser.

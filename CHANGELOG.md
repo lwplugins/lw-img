@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.0.0] - 2026-09-25
+
+### Added
+- New settings screen built with WordPress components on a new `lw-img/v1` admin REST API: side navigation, a top bar with Save/Discard and a Cmd/Ctrl+S shortcut, loading skeletons and a mobile layout. Tabs load their data only when opened, and an invalid value is shown next to its field (pattern rules per row) with nothing saved.
+- A halted bulk run says why it stopped (no API key, no credit, key rejected) instead of silently returning to the start screen.
+- The bulk dashboard keeps the current run separate from the all-time Media Library totals, shows why Start is unavailable, and reports how many images Retry or Re-scan queued.
+- Hungarian translation of the plugin and the new interface.
+
+### Changed
+- The API key is never sent to the browser; the screen shows a masked hint, and a key set in wp-config.php (`LW_IMG_API_KEY`) is shown as read-only.
+- The HelloImg account is cached for 10 minutes instead of being requested on every settings-page view; Test connection refreshes it.
+- The admin accent and the plugin logo use a darker green (#00875f) so white text on buttons is readable.
+- The WP-CLI halt warning names the real reason instead of always saying the quota is exhausted.
+- The classic settings screen, its admin-post/AJAX handlers and its stylesheet and script were removed. The Media Library actions (Optimize now, Restore, Re-optimize) are unchanged.
+
+### Fixed
+- Bulk counters could lose updates when WP-Cron, the dashboard and WP-CLI worked at the same time.
+- A bulk run that was cancelled or halted could be reported as finished by a worker ending at the same moment.
+- Retrying or re-scanning images during a run could push progress over 100%.
+- Saving settings reset debug mode and other settings without a control on the screen.
+- A blank or negative number was saved as the minimum; it is now rejected.
+- Start could be clicked when nothing was pending.
+- The cached HelloImg account is removed on uninstall.
+- Bulk workers on different sites sharing one database server no longer wait for each other's locks.
+- Admin assets load even when the "LW Plugins" menu title is translated.
+
 ## [1.9.5] - 2026-09-25
 
 ### Fixed
