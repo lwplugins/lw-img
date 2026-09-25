@@ -11,6 +11,8 @@ namespace LightweightPlugins\Img\Bulk;
 
 defined( 'ABSPATH' ) || exit;
 
+use LightweightPlugins\Img\Db\LockName;
+
 /**
  * Wraps a read-modify-write of the job record in a MySQL advisory lock.
  *
@@ -22,6 +24,9 @@ defined( 'ABSPATH' ) || exit;
  */
 final class JobLock {
 
+	/**
+	 * Lock purpose; LockName adds the per-site suffix.
+	 */
 	private const NAME = 'lw_img_job';
 
 	/**
@@ -39,15 +44,17 @@ final class JobLock {
 	public static function run( callable $callback ): mixed {
 		global $wpdb;
 
+		$name = LockName::for_site( self::NAME );
+
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- advisory lock; no data is read.
-		$locked = '1' === (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, %d)', self::NAME, self::WAIT ) );
+		$locked = '1' === (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, %d)', $name, self::WAIT ) );
 
 		try {
 			return $callback();
 		} finally {
 			if ( $locked ) {
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- advisory lock release; no data is read.
-				$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', self::NAME ) );
+				$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $name ) );
 			}
 		}
 	}

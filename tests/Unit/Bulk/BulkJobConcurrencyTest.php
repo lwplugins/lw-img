@@ -11,6 +11,7 @@ namespace LightweightPlugins\Img\Tests\Unit\Bulk;
 
 use Brain\Monkey\Functions;
 use LightweightPlugins\Img\Bulk\BulkJob;
+use LightweightPlugins\Img\Bulk\JobLock;
 use LightweightPlugins\Img\Tests\Unit\MonkeyTestCase;
 
 /**
@@ -96,6 +97,13 @@ final class BulkJobConcurrencyTest extends MonkeyTestCase {
 			private BulkJobConcurrencyTest $test;
 
 			/**
+			 * Table prefix (scopes the lock name).
+			 *
+			 * @var string
+			 */
+			public string $prefix = 'wp_';
+
+			/**
 			 * @param BulkJobConcurrencyTest $test Owning test.
 			 */
 			public function __construct( BulkJobConcurrencyTest $test ) {
@@ -140,7 +148,7 @@ final class BulkJobConcurrencyTest extends MonkeyTestCase {
 		BulkJob::record( 'skipped' );
 
 		$this->assertCount( 2, $this->lock_calls );
-		$this->assertStringContainsString( 'GET_LOCK', $this->lock_calls[0] );
+		$this->assertMatchesRegularExpression( "/GET_LOCK\\('lw_img_job_[0-9a-f]{12}'/", $this->lock_calls[0] );
 		$this->assertStringContainsString( 'RELEASE_LOCK', $this->lock_calls[1] );
 	}
 
@@ -190,5 +198,20 @@ final class BulkJobConcurrencyTest extends MonkeyTestCase {
 
 		$this->assertSame( 4, $this->db['failed'] );
 		$this->assertArrayNotHasKey( 'retried', $this->db );
+	}
+
+	public function test_the_lock_is_released_when_the_work_throws(): void {
+		try {
+			JobLock::run(
+				static function (): void {
+					throw new \RuntimeException( 'boom' );
+				}
+			);
+		} catch ( \RuntimeException $e ) {
+			$this->assertSame( 'boom', $e->getMessage() );
+		}
+
+		$this->assertCount( 2, $this->lock_calls );
+		$this->assertStringContainsString( 'RELEASE_LOCK', $this->lock_calls[1] );
 	}
 }

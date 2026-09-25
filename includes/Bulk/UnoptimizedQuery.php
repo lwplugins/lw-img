@@ -12,6 +12,7 @@ namespace LightweightPlugins\Img\Bulk;
 defined( 'ABSPATH' ) || exit;
 
 use LightweightPlugins\Img\Db\ImageRepository;
+use LightweightPlugins\Img\Db\LockName;
 use LightweightPlugins\Img\Db\Schema;
 use LightweightPlugins\Img\Options;
 
@@ -58,8 +59,10 @@ final class UnoptimizedQuery {
 	public function claim( int $limit ): array {
 		global $wpdb;
 
+		$lock = LockName::for_site( self::CLAIM_LOCK );
+
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- advisory lock; no data is read.
-		$locked = '1' === (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', self::CLAIM_LOCK ) );
+		$locked = '1' === (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', $lock ) );
 
 		// The shared cursor keeps every pick to the unprocessed tail of the
 		// ID range; without it each pick re-probes the whole processed
@@ -88,7 +91,7 @@ final class UnoptimizedQuery {
 
 		if ( $locked ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- advisory lock release; no data is read.
-			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', self::CLAIM_LOCK ) );
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) );
 		}
 
 		return $ids;

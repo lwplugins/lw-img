@@ -16,6 +16,13 @@ namespace LightweightPlugins\Img\Tests\Unit\Support;
 final class NoLockWpdb {
 
 	/**
+	 * Table prefix (scopes lock names).
+	 *
+	 * @var string
+	 */
+	public string $prefix = 'wp_';
+
+	/**
 	 * @param string $sql     Query with placeholders.
 	 * @param mixed  ...$args Values (ignored).
 	 */
