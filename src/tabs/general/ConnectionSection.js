@@ -41,11 +41,9 @@ function connectionState( apiKey, account ) {
 		return [
 			'ok',
 			__( 'Connected', 'lw-img' ),
+			// The key row itself says when the key comes from wp-config.php.
 			apiKey.source === 'constant'
-				? __(
-						'New uploads are converted automatically. The key is set in wp-config.php.',
-						'lw-img'
-					)
+				? __( 'New uploads are converted automatically.', 'lw-img' )
 				: __(
 						'New uploads are converted automatically. The key is stored in wp_options.',
 						'lw-img'
@@ -118,24 +116,19 @@ export default function ConnectionSection( { store, account } ) {
 	}
 
 	const canTest = apiKey.set || ( keyDirty && draft !== '' );
-	const action = canTest ? (
-		<div className="lw-admin-stack">
-			<div className="lw-admin-inline">
-				<Button
-					__next40pxDefaultSize
-					variant="secondary"
-					isBusy={ isTesting }
-					disabled={ isTesting || store.isSaving || draft === '' }
-					accessibleWhenDisabled
-					onClick={ test }
-				>
-					{ keyDirty && draft !== ''
-						? __( 'Save and test', 'lw-img' )
-						: __( 'Test connection', 'lw-img' ) }
-				</Button>
-			</div>
-			{ result }
-		</div>
+	const testButton = canTest ? (
+		<Button
+			__next40pxDefaultSize
+			variant="secondary"
+			isBusy={ isTesting }
+			disabled={ isTesting || store.isSaving || draft === '' }
+			accessibleWhenDisabled
+			onClick={ test }
+		>
+			{ keyDirty && draft !== ''
+				? __( 'Save and test', 'lw-img' )
+				: __( 'Test connection', 'lw-img' ) }
+		</Button>
 	) : null;
 
 	return (
@@ -143,12 +136,10 @@ export default function ConnectionSection( { store, account } ) {
 			title={ __( 'HelloImg API', 'lw-img' ) }
 			badge={ <StatusBadge status={ pill }>{ pillLabel }</StatusBadge> }
 			description={ lead }
+			actions={ testButton }
 		>
-			<ApiKeyRow
-				store={ store }
-				action={ action }
-				onSave={ store.save }
-			/>
+			{ result }
+			<ApiKeyRow store={ store } onSave={ store.save } />
 			<p className="lw-admin-hint">
 				{ createInterpolateElement(
 					sprintf(

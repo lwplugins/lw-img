@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-25T08:09:00+00:00\n"
+"POT-Creation-Date: 2026-09-25T08:19:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: lw-img\n"
@@ -1413,7 +1413,7 @@ msgid "Keep the key"
 msgstr ""
 
 #: build/index.js:36
-msgid "New uploads are converted automatically. The key is set in wp-config.php."
+msgid "New uploads are converted automatically."
 msgstr ""
 
 #: build/index.js:36

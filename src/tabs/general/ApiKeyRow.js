@@ -19,10 +19,9 @@ import SettingRow from '../../components/SettingRow';
  *
  * @param {Object}   props
  * @param {Object}   props.store  Settings store.
- * @param {Element}  props.action Test button (+ result) under the field.
  * @param {Function} props.onSave Enter in the field saves.
  */
-export default function ApiKeyRow( { store, action, onSave } ) {
+export default function ApiKeyRow( { store, onSave } ) {
 	const [ visible, setVisible ] = useState( false );
 	const id = useInstanceId( ApiKeyRow, 'lw-img-api-key' );
 	const { apiKey, lockedConstants } = store.data.meta;
@@ -31,21 +30,20 @@ export default function ApiKeyRow( { store, action, onSave } ) {
 	const hint = apiKey.hint ? <code>{ apiKey.hint }</code> : null;
 
 	if ( store.isLocked( 'api_key' ) ) {
+		// One read-only line: nothing to edit, so no two-column field row.
 		return (
-			<SettingRow title={ __( 'API key', 'lw-img' ) } errors={ errors }>
-				<p className="lw-admin-locked">
-					<Icon icon={ lock } size={ 16 } />
-					<span>
-						{ sprintf(
-							/* translators: %s: PHP constant name. */
-							__( 'Set in wp-config.php (%s)', 'lw-img' ),
-							lockedConstants.api_key || 'LW_IMG_API_KEY'
-						) }
-						{ hint && <> · { hint }</> }
-					</span>
-				</p>
-				{ action }
-			</SettingRow>
+			<p className="lw-img-keyline">
+				<strong>{ __( 'API key', 'lw-img' ) }</strong>
+				<Icon icon={ lock } size={ 16 } />
+				<span>
+					{ sprintf(
+						/* translators: %s: PHP constant name. */
+						__( 'Set in wp-config.php (%s)', 'lw-img' ),
+						lockedConstants.api_key || 'LW_IMG_API_KEY'
+					) }
+				</span>
+				{ hint }
+			</p>
 		);
 	}
 
@@ -129,7 +127,6 @@ export default function ApiKeyRow( { store, action, onSave } ) {
 					</Button>
 				) }
 			</div>
-			{ action }
 		</SettingRow>
 	);
 }

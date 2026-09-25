@@ -1862,3 +1862,26 @@ a.lw-img-libtile {
 		}
 	}
 }
+
+// Read-only API key line (key set in wp-config.php).
+.lw-img-keyline {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 8px;
+	margin: 0;
+	color: $muted;
+
+	strong {
+		margin-right: $gap-sm;
+		color: $text;
+	}
+
+	svg {
+		fill: currentColor;
+	}
+
+	code {
+		font-size: 12px;
+	}
+}
