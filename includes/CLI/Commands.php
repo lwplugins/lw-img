@@ -360,17 +360,17 @@ final class Commands {
 	 * @param AttachmentOptimizer $optimizer Optimizer instance.
 	 * @param int                 $id        Attachment ID.
 	 * @param array<string, int>  $counts    Outcome counters (by reference).
-	 * @return bool True when the run must halt (API quota exhausted).
+	 * @return bool True when the run must halt (no key, no credit, key rejected).
 	 */
 	private function process_one( AttachmentOptimizer $optimizer, int $id, array &$counts ): bool {
 		$outcome = $optimizer->optimize( $id );
 
 		if ( ! empty( $outcome['halt'] ) ) {
 			if ( BulkJob::is_running() ) {
-				BulkJob::finish( BulkJob::STATE_CANCELLED );
+				BulkJob::halt( (string) ( $outcome['halt_reason'] ?? '' ), (string) $outcome['detail'] );
 				BackgroundWorker::unschedule();
 			}
-			WP_CLI::warning( sprintf( 'API quota exhausted (%s) — run halted; pending images stay queued for the next run.', $outcome['detail'] ) );
+			WP_CLI::warning( sprintf( 'Run halted (%s) — pending images stay queued for the next run.', $outcome['detail'] ) );
 			return true;
 		}
 

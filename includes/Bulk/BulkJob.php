@@ -22,6 +22,7 @@ final class BulkJob {
 	public const STATE_RUNNING   = 'running';
 	public const STATE_CANCELLED = 'cancelled';
 	public const STATE_DONE      = 'done';
+	public const STATE_HALTED    = 'halted';
 
 	/**
 	 * Current job record (empty array when none exists).
@@ -198,6 +199,33 @@ final class BulkJob {
 
 				$job['state']       = $state;
 				$job['finished_at'] = time();
+
+				return $job;
+			}
+		);
+	}
+
+	/**
+	 * Stop a running job because the API refused to go on (no key, no
+	 * credit, key rejected), keeping the reason for the dashboard.
+	 *
+	 * @param string $reason HaltReason constant.
+	 * @param string $detail Raw error message from the API or the guard.
+	 * @return void
+	 */
+	public static function halt( string $reason, string $detail ): void {
+		self::mutate(
+			static function ( array $job ) use ( $reason, $detail ): ?array {
+				if ( ( $job['state'] ?? '' ) !== self::STATE_RUNNING ) {
+					return null;
+				}
+
+				$job['state']       = self::STATE_HALTED;
+				$job['finished_at'] = time();
+				$job['halt']        = [
+					'reason' => $reason,
+					'detail' => mb_substr( $detail, 0, 300 ),
+				];
 
 				return $job;
 			}

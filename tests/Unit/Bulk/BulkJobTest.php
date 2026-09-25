@@ -93,4 +93,25 @@ final class BulkJobTest extends MonkeyTestCase {
 
 		$this->assertSame( [], $this->stored );
 	}
+
+	public function test_halt_keeps_the_reason_and_message(): void {
+		BulkJob::start( 10 );
+
+		BulkJob::halt( 'quota', 'Insufficient balance' );
+
+		$this->assertSame( BulkJob::STATE_HALTED, $this->stored['state'] );
+		$this->assertSame( 'quota', $this->stored['halt']['reason'] );
+		$this->assertSame( 'Insufficient balance', $this->stored['halt']['detail'] );
+		$this->assertFalse( BulkJob::is_running() );
+	}
+
+	public function test_halt_is_ignored_once_the_run_has_ended(): void {
+		BulkJob::start( 10 );
+		BulkJob::finish( BulkJob::STATE_CANCELLED );
+
+		BulkJob::halt( 'auth', 'Unauthorized' );
+
+		$this->assertSame( BulkJob::STATE_CANCELLED, $this->stored['state'] );
+		$this->assertArrayNotHasKey( 'halt', $this->stored );
+	}
 }

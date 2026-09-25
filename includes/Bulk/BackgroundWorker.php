@@ -164,7 +164,7 @@ final class BackgroundWorker {
 		$buffer    = new RewriteBuffer();
 		$optimizer = new AttachmentOptimizer( null, null, null, null, $buffer );
 		$drained   = false;
-		$halted    = false;
+		$halted    = null;
 		$processed = 0;
 
 		while ( time() < $deadline && BulkJob::is_running() ) {
@@ -180,8 +180,8 @@ final class BackgroundWorker {
 			}
 
 			$state = self::process_batch( $ids, $optimizer, $deadline, $processed );
-			if ( 'halt' === $state ) {
-				$halted = true;
+			if ( is_array( $state ) ) {
+				$halted = $state;
 				break;
 			}
 			if ( 'stop' === $state ) {
@@ -192,10 +192,11 @@ final class BackgroundWorker {
 		$buffer->flush();
 		delete_transient( self::LOCK );
 
-		if ( $halted ) {
-			// API quota exhausted: stop the whole run — nothing else will
-			// succeed and the images themselves stay pending.
-			BulkJob::finish( BulkJob::STATE_CANCELLED );
+		if ( null !== $halted ) {
+			// No key, no credit or a rejected key: stop the whole run —
+			// nothing else will succeed and the images themselves stay
+			// pending. The reason is kept for the dashboard.
+			BulkJob::halt( $halted['reason'], $halted['detail'] );
 			self::unschedule();
 			return true;
 		}
@@ -226,14 +227,17 @@ final class BackgroundWorker {
 	 * @param AttachmentOptimizer $optimizer Optimizer wired to the rewrite buffer.
 	 * @param int                 $deadline  Unix timestamp ending the budget.
 	 * @param int                 $processed Running item counter (by reference).
-	 * @return string 'ok' (batch done), 'stop' (budget/cancel), or 'halt' (quota).
+	 * @return string|array{reason: string, detail: string} 'ok' (batch done), 'stop' (budget/cancel), or the halt reason and detail.
 	 */
-	private static function process_batch( array $ids, AttachmentOptimizer $optimizer, int $deadline, int &$processed ): string {
+	private static function process_batch( array $ids, AttachmentOptimizer $optimizer, int $deadline, int &$processed ): string|array {
 		foreach ( $ids as $attachment_id ) {
 			$outcome = $optimizer->optimize( $attachment_id );
 
 			if ( ! empty( $outcome['halt'] ) ) {
-				return 'halt';
+				return [
+					'reason' => (string) ( $outcome['halt_reason'] ?? '' ),
+					'detail' => (string) $outcome['detail'],
+				];
 			}
 
 			BulkJob::record(

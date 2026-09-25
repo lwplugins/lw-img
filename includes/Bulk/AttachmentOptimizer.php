@@ -94,7 +94,7 @@ final class AttachmentOptimizer {
 	 * removes it from the pending queue until it is explicitly re-queued.
 	 *
 	 * @param int $attachment_id Attachment post ID.
-	 * @return array{result: string, detail: string, bytes_in?: int, bytes_saved?: int, halt?: bool} Outcome and detail; halt=true means the run must stop (API quota exhausted).
+	 * @return array{result: string, detail: string, bytes_in?: int, bytes_saved?: int, halt?: bool, halt_reason?: string} Outcome and detail; halt=true means the run must stop (no key, no credit, key rejected — halt_reason says which, see HaltReason).
 	 */
 	public function optimize( int $attachment_id ): array {
 		if ( '' === trim( (string) Options::get( 'api_key' ) ) ) {
@@ -104,9 +104,10 @@ final class AttachmentOptimizer {
 			do_action( 'lw_img_upload_failed', 'bulk run', 'API key missing — run halted', [ 'attachment_id' => $attachment_id ] );
 
 			return [
-				'result' => self::RESULT_FAILED,
-				'detail' => 'API key missing',
-				'halt'   => true,
+				'result'      => self::RESULT_FAILED,
+				'detail'      => 'API key missing',
+				'halt'        => true,
+				'halt_reason' => HaltReason::NO_KEY,
 			];
 		}
 
@@ -135,14 +136,16 @@ final class AttachmentOptimizer {
 		} catch ( ApiException $e ) {
 			do_action( 'lw_img_upload_failed', $file, $e->getMessage(), [ 'attachment_id' => $attachment_id ] );
 
-			if ( $e->is_quota() || $e->is_auth() ) {
+			$halt_reason = HaltReason::from_exception( $e );
+			if ( null !== $halt_reason ) {
 				// Out of credit, or the key was rejected (rotated/revoked
 				// mid-run): leave the image unstamped (it is fine and stays
 				// pending) and tell the caller to halt the whole run.
 				return [
-					'result' => self::RESULT_FAILED,
-					'detail' => $e->getMessage(),
-					'halt'   => true,
+					'result'      => self::RESULT_FAILED,
+					'detail'      => $e->getMessage(),
+					'halt'        => true,
+					'halt_reason' => $halt_reason,
 				];
 			}
 

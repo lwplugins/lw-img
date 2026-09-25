@@ -11,6 +11,7 @@ namespace LightweightPlugins\Img\Tests\Unit\Bulk;
 
 use Brain\Monkey\Functions;
 use LightweightPlugins\Img\Bulk\AttachmentOptimizer;
+use LightweightPlugins\Img\Bulk\HaltReason;
 use LightweightPlugins\Img\Tests\Unit\MonkeyTestCase;
 
 /**
@@ -37,5 +38,16 @@ final class AttachmentOptimizerTest extends MonkeyTestCase {
 
 		$this->assertSame( AttachmentOptimizer::RESULT_FAILED, $result['result'] );
 		$this->assertTrue( $result['halt'] ?? false );
+	}
+
+	public function test_a_missing_key_halt_names_its_reason(): void {
+		Functions\when( 'get_option' )->justReturn( [ 'api_key' => '' ] );
+		Functions\when( 'wp_parse_args' )->alias(
+			static fn ( array $args, array $defaults ): array => array_merge( $defaults, $args )
+		);
+
+		$result = ( new AttachmentOptimizer() )->optimize( 123 );
+
+		$this->assertSame( HaltReason::NO_KEY, $result['halt_reason'] ?? null );
 	}
 }
