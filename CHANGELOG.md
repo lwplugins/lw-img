@@ -5,6 +5,9 @@
 ### Changed
 - The LW Plugins overview page is now a searchable table showing each LW plugin's status and version, with one-click activation for installed plugins; it always uses the newest version shipped by any active LW plugin.
 
+### Fixed
+- `wp lw-img leftovers --format=json|csv|yaml|ids|count` with no leftovers now prints the format's empty value (e.g. `[]` for JSON) instead of a Success sentence, so scripts can parse it; `--rescan` no longer prints its progress line into machine-readable output. The table format keeps the "No leftovers found" message.
+
 ## [2.0.2] - 2026-09-25
 
 ### Fixed

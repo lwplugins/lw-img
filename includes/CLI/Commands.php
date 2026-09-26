@@ -119,14 +119,14 @@ final class Commands {
 		$rescan = (bool) WP_CLI\Utils\get_flag_value( $assoc_args, 'rescan', false );
 		$format = (string) WP_CLI\Utils\get_flag_value( $assoc_args, 'format', 'table' );
 
-		if ( $rescan ) {
+		if ( $rescan && 'table' === $format ) {
 			WP_CLI::log( 'Scanning the uploads folder…' );
 		}
 
 		$scan    = SiteStats::stored_leftovers( $rescan );
 		$sources = (array) $scan['sources'];
 
-		if ( [] === $sources ) {
+		if ( [] === $sources && 'table' === $format ) {
 			WP_CLI::success( 'No leftovers found. Checked: ' . implode( ', ', SiteStats::KNOWN_SOURCES ) . '.' );
 			return;
 		}

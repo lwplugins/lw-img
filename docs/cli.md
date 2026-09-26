@@ -68,7 +68,9 @@ wp lw-img leftovers --format=json       # table | csv | json | yaml | count
 
 Measures backup folders and sidecar originals left behind by other
 optimizer plugins (dedicated backup dirs and beside-the-image patterns
-alike). Read-only — LW Image never deletes them.
+alike). Read-only — LW Image never deletes them. With no leftovers, the
+table format prints a "No leftovers found" message; the other formats print
+their empty value (`[]` for JSON, `0` for count) and exit 0.
 
 ## `wp lw-img doctor`
 

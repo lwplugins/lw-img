@@ -77,6 +77,7 @@ Yes. HelloImg includes 1,000 images/month free. After that, $0.001 per image.
 
 = 2.0.3 =
 * Change: the LW Plugins overview page is now a searchable table showing each LW plugin's status and version, with one-click activation for installed plugins; it always uses the newest version shipped by any active LW plugin.
+* Fix: `wp lw-img leftovers --format=json|csv|yaml|ids|count` with no leftovers now prints the format's empty value (e.g. `[]` for JSON) instead of a Success sentence, so scripts can parse it; `--rescan` no longer prints its progress line into machine-readable output. The table format keeps the "No leftovers found" message.
 
 = 2.0.2 =
 * Fix: "Requires at least" raised to WordPress 6.6 - the React settings screen needs the react-jsx-runtime script core registers from 6.6; on older versions the page stayed blank.
