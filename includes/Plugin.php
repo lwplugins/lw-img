@@ -12,6 +12,7 @@ namespace LightweightPlugins\Img;
 defined( 'ABSPATH' ) || exit;
 
 use LightweightPlugins\Img\Admin\DeactivationDialog;
+use LightweightPlugins\Img\Admin\Hub\Hub;
 use LightweightPlugins\Img\Admin\NoticeManager;
 use LightweightPlugins\Img\Admin\SettingsPage;
 use LightweightPlugins\Img\Backup\AttachmentDeleteCleanup;
@@ -47,6 +48,7 @@ final class Plugin {
 
 	public function __construct() {
 		$this->init_hooks();
+		Hub::init( LW_IMG_FILE );
 		$this->init_components();
 	}
 

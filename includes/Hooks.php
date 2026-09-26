@@ -28,7 +28,8 @@
  *    $context: attachment_id (not on upload). Smart crop passes the size file's
  *    path and a 'smart crop: ' error prefix.
  *  - `lw_img_restored` ( int $attachment_id, string $restored_path ) — since 1.1.0.
- *  - `lw_plugins_overview_cards` () — since 1.0.0; shared by every LW plugin.
+ *  - `lw_plugins_overview_cards` () — removed in 2.0.3: the LW Plugins overview
+ *    is now the shared React hub and no longer fires it.
  *
  * Pattern rules (option `pattern_rules`, list of {pattern, action, value}) run
  * before these hooks: exclude / keep_size / level / keep_exif per wildcard
