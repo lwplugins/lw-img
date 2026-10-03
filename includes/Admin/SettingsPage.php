@@ -94,7 +94,7 @@ final class SettingsPage {
 				[
 					'version'      => LW_IMG_VERSION,
 					'namespace'    => Routes::NAMESPACE,
-					'docsUrl'      => SettingsMeta::DOCS_URL,
+					'docsUrl'      => SettingsMeta::docs_url(),
 					'dashboardUrl' => lw_img_dashboard_url(),
 				]
 			) . ';',

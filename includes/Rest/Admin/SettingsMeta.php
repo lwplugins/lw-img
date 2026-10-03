@@ -26,9 +26,15 @@ use function LightweightPlugins\Img\lw_img_dashboard_url;
 final class SettingsMeta {
 
 	/**
-	 * Plugin documentation.
+	 * Plugin page on docs.lwplugins.com, in the admin user's language.
+	 *
+	 * @return string
 	 */
-	public const DOCS_URL = 'https://github.com/lwplugins/lw-img#readme';
+	public static function docs_url(): string {
+		$lang = str_starts_with( get_user_locale(), 'hu' ) ? 'hu' : 'en';
+
+		return 'https://docs.lwplugins.com/' . $lang . '/plugins/lw-img';
+	}
 
 	/**
 	 * Build the meta block.
@@ -50,7 +56,7 @@ final class SettingsMeta {
 			'backup_path'       => 'uploads/lw-img-backups/',
 			'dashboard_url'     => $dashboard,
 			'dashboard_host'    => is_string( $host ) && '' !== $host ? $host : $dashboard,
-			'docs_url'          => self::DOCS_URL,
+			'docs_url'          => self::docs_url(),
 			'site_host'         => SiteHost::current(),
 			'capabilities'      => self::capabilities(),
 		];

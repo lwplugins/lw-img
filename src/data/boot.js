@@ -5,7 +5,8 @@ const boot = window.lwImg || {};
 
 export const VERSION = boot.version || '';
 export const NAMESPACE = boot.namespace || 'lw-img/v1';
-export const DOCS_URL = boot.docsUrl || 'https://lwplugins.com/docs/lw-img/';
+export const DOCS_URL =
+	boot.docsUrl || 'https://docs.lwplugins.com/en/plugins/lw-img';
 export const DASHBOARD_URL = boot.dashboardUrl || 'https://app.helloimg.io/';
 
 // Media Library list filtered by LW Image status (StatusFilter, classic).
