@@ -44,13 +44,19 @@ final class DatabaseChecks {
 		$placeholders = implode( ',', array_fill( 0, count( $names ), '%s' ) );
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- information_schema lookup with %s placeholders only; report is transient-cached.
 		$results = $wpdb->get_results(
-			$wpdb->prepare( "SELECT table_name AS name, engine FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN ($placeholders)", $names )
+			$wpdb->prepare( "SELECT TABLE_NAME AS name, ENGINE AS engine FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN ($placeholders)", $names )
 		);
 		// phpcs:enable
 
+		// MySQL 8 labels unaliased information_schema columns in upper case
+		// (TABLE_NAME, ENGINE); read the row case-insensitively either way.
 		$engines = [];
-		foreach ( $results as $result ) {
-			$engines[ (string) $result->name ] = (string) $result->engine;
+		foreach ( (array) $results as $result ) {
+			$row  = array_change_key_case( (array) $result, CASE_LOWER );
+			$name = (string) ( $row['name'] ?? $row['table_name'] ?? '' );
+			if ( '' !== $name ) {
+				$engines[ $name ] = (string) ( $row['engine'] ?? '' );
+			}
 		}
 
 		foreach ( $tables as $table ) {

@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.0.5] - 2026-11-25
+
+### Fixed
+- The Tester tab no longer fails on MySQL 8 with an "Undefined property: stdClass::$engine" error; the table storage engines are now read whatever case the database server uses for column names.
+
 ## [2.0.4] - 2026-10-03
 
 ### Fixed
