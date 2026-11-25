@@ -83,7 +83,7 @@ final class RedirectProbe {
 	 *                   request itself.
 	 */
 	public static function works(): ?bool {
-		$base = (string) ( wp_get_upload_dir()['baseurl'] ?? '' );
+		$base = wp_get_upload_dir()['baseurl'];
 		if ( '' === $base ) {
 			return null;
 		}

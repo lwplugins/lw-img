@@ -69,7 +69,7 @@ final class RedirectChecks {
 	 * @return string `/wp-content/uploads` when it cannot be derived.
 	 */
 	public static function uploads_path(): string {
-		$path = wp_parse_url( (string) ( wp_get_upload_dir()['baseurl'] ?? '' ), PHP_URL_PATH );
+		$path = wp_parse_url( wp_get_upload_dir()['baseurl'], PHP_URL_PATH );
 		$path = is_string( $path ) ? trim( $path, '/' ) : '';
 
 		return '' === $path ? '/wp-content/uploads' : '/' . $path;

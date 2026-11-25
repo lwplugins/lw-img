@@ -161,6 +161,8 @@ final class NotFoundRedirect {
 			$metadata = wp_get_attachment_metadata( $attachment_id );
 			if ( is_array( $metadata ) && ! empty( $metadata['sizes'] ) ) {
 				foreach ( $metadata['sizes'] as $size ) {
+					// Stored metadata can be incomplete (other plugins, failed uploads), whatever the stub's shape says.
+					/** @var array<string, mixed> $size */
 					$file = (string) ( $size['file'] ?? '' );
 					if ( '' !== $file && (int) ( $size['width'] ?? 0 ) === $parsed['width'] ) {
 						$slash = strrpos( $main, '/' );

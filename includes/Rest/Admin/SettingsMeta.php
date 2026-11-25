@@ -106,8 +106,8 @@ final class SettingsMeta {
 
 			$sizes[] = [
 				'name'   => (string) $name,
-				'width'  => (int) ( $size['width'] ?? 0 ),
-				'height' => (int) ( $size['height'] ?? 0 ),
+				'width'  => (int) $size['width'],
+				'height' => (int) $size['height'],
 			];
 		}
 

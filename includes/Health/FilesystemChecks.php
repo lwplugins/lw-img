@@ -29,7 +29,7 @@ final class FilesystemChecks {
 		$uploads = wp_get_upload_dir();
 		$basedir = (string) $uploads['basedir'];
 
-		$writable = '' === (string) ( $uploads['error'] ?? '' ) && wp_is_writable( $basedir );
+		$writable = '' === (string) $uploads['error'] && wp_is_writable( $basedir );
 		$rows[]   = [
 			'label'   => __( 'Uploads directory', 'lw-img' ),
 			'status'  => $writable ? 'ok' : 'critical',

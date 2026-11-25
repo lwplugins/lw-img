@@ -75,6 +75,8 @@ final class AttachmentRebuilder {
 		$dir = dirname( $old_main );
 
 		foreach ( $metadata['sizes'] as $size ) {
+			// Stored metadata can be incomplete (other plugins, failed uploads), whatever the stub's shape says.
+			/** @var array<string, mixed> $size */
 			$file = (string) ( $size['file'] ?? '' );
 			// Guard: metadata file values are basenames, but enforce at filesystem use.
 			$safe = wp_basename( $file );
